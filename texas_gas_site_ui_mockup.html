@@ -479,7 +479,13 @@ function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot
 function renderHero() {
   const list = priceData[heroFuel];
 
-  document.getElementById('chains').innerHTML = list.map((c,i) => {
+  // Hero cards are capped at the 8 cheapest chains so the grid never
+  // overflows on mobile even for ZIPs that return a long brand list.
+  // The station list below shows every chain.
+  const HERO_MAX = 8;
+  const heroList = list.slice(0, HERO_MAX);
+
+  document.getElementById('chains').innerHTML = heroList.map((c,i) => {
     const sym = c.ch==='up'?'▲ +0.03':c.ch==='dn'?'▼ −0.02':'— no change';
     const cls = c.ch==='up'?'ch-up':c.ch==='dn'?'ch-dn':'ch-nc';
     const isSel = c.n === chainFilter;

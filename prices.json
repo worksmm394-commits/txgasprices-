@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-16T19:57:42.479Z",
+  "updated": "2026-04-16T20:23:28.515Z",
   "stateAverage": {
     "regular": 3.685,
     "midgrade": 4.127,
@@ -10,7 +10,7 @@
     "aaa": "gasprices.aaa.com (TX state avg, today)",
     "eia": null,
     "gasbuddy": null,
-    "apify": "apify.com/actors/johnvc~fuelprices (daily, 3/3 cities)"
+    "apify": "apify.com/actors/johnvc~fuelprices (daily, 2/2 cities)"
   },
   "note": "Per-chain prices are ESTIMATES derived from the Texas state average plus fixed per-chain offsets (see CHAIN_OFFSETS in fetch-prices.js). Set GASBUDDY_API_KEY to replace estimates with live per-station data.",
   "chains": [
@@ -39,12 +39,44 @@
       "diesel": 5.207
     },
     {
+      "chain": "Valero",
+      "priceMode": "estimated",
+      "regular": 3.665,
+      "midgrade": 4.107,
+      "premium": 4.49,
+      "diesel": 5.227
+    },
+    {
+      "chain": "Exxon",
+      "priceMode": "estimated",
+      "regular": 3.735,
+      "midgrade": 4.177,
+      "premium": 4.56,
+      "diesel": 5.287
+    },
+    {
+      "chain": "Conoco",
+      "priceMode": "estimated",
+      "regular": 3.745,
+      "midgrade": 4.187,
+      "premium": 4.57,
+      "diesel": 5.287
+    },
+    {
       "chain": "Shell",
       "priceMode": "estimated",
       "regular": 3.755,
       "midgrade": 4.197,
       "premium": 4.58,
       "diesel": 5.297
+    },
+    {
+      "chain": "Phillips 66",
+      "priceMode": "estimated",
+      "regular": 3.765,
+      "midgrade": 4.207,
+      "premium": 4.59,
+      "diesel": 5.307
     },
     {
       "chain": "Chevron",
@@ -57,39 +89,38 @@
   ],
   "cities": {
     "houston-tx": {
-      "regular": [
+      "chains": [
         {
-          "chain": "Murphy USA",
-          "regular": null,
-          "station": null,
-          "address": null
+          "chain": "Exxon",
+          "regular": 3.57,
+          "station": "Exxon",
+          "address": "11035 Katy Fwy, Houston",
+          "stationCount": 2
         },
         {
-          "chain": "HEB Gas",
-          "regular": null,
-          "station": null,
-          "address": null
+          "chain": "Phillips 66",
+          "regular": 3.63,
+          "station": "Phillips 66",
+          "address": "14602 Memorial Dr, Houston",
+          "stationCount": 1
         },
         {
           "chain": "Shell",
           "regular": 3.63,
           "station": "Shell",
-          "address": "14002 Memorial Dr, Houston"
+          "address": "14002 Memorial Dr, Houston",
+          "stationCount": 3
         },
         {
-          "chain": "Chevron",
-          "regular": null,
-          "station": null,
-          "address": null
-        },
-        {
-          "chain": "Buc-ee's",
-          "regular": null,
-          "station": null,
-          "address": null
+          "chain": "Valero",
+          "regular": 3.64,
+          "station": "Valero",
+          "address": "14360 Memorial Dr, Houston",
+          "stationCount": 2
         }
       ],
       "cheapestOverall": {
+        "chain": "Exxon",
         "station": "Exxon",
         "price": 3.57,
         "address": "11035 Katy Fwy, Houston"
@@ -175,7 +206,74 @@
         "address": "5625 West Gate Blvd, Austin"
       },
       "stationsSeen": 20
+    },
+    "mcallen-tx": {
+      "chains": [
+        {
+          "chain": "Walmart Neighborhood Market",
+          "regular": 3.55,
+          "station": "Walmart Neighborhood Market",
+          "address": "2208 Dove Ave, McAllen",
+          "stationCount": 1
+        },
+        {
+          "chain": "Sunoco",
+          "regular": 3.57,
+          "station": "Sunoco",
+          "address": "1901 Dove Ave, McAllen",
+          "stationCount": 2
+        },
+        {
+          "chain": "Murphy USA",
+          "regular": 3.57,
+          "station": "Murphy USA",
+          "address": "2700 Nolana Avenue, McAllen",
+          "stationCount": 1
+        },
+        {
+          "chain": "Sam's Club",
+          "regular": 3.59,
+          "station": "Sam's Club",
+          "address": "7601 N 10th St, McAllen",
+          "stationCount": 1
+        },
+        {
+          "chain": "Stripes",
+          "regular": 3.61,
+          "station": "Stripes",
+          "address": "4621 N 23rd St, McAllen",
+          "stationCount": 2
+        },
+        {
+          "chain": "Circle K",
+          "regular": 3.63,
+          "station": "Circle K",
+          "address": "7144 N 23rd St, McAllen",
+          "stationCount": 1
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.65,
+          "station": "Valero",
+          "address": "5600 N Ware Rd, McAllen",
+          "stationCount": 3
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.65,
+          "station": "Exxon",
+          "address": "6313 N 23rd St, McAllen",
+          "stationCount": 2
+        }
+      ],
+      "cheapestOverall": {
+        "chain": "Walmart Neighborhood Market",
+        "station": "Walmart Neighborhood Market",
+        "price": 3.55,
+        "address": "2208 Dove Ave, McAllen"
+      },
+      "stationsSeen": 13
     }
   },
-  "apifyUpdated": "2026-04-16T19:57:42.479Z"
+  "apifyUpdated": "2026-04-16T20:22:20.401Z"
 }

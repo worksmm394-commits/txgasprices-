@@ -22,15 +22,19 @@ const FUELS        = ['regular', 'midgrade', 'premium', 'diesel'];
 const hasEstimates = prices.chains.some(c => c.priceMode === 'estimated');
 const CURRENT_YEAR = new Date().getFullYear();
 
-// Placeholder station metadata. Real addresses/distances require a per-
-// station data source (e.g. GasBuddy). Until then we reuse fixed strings
-// so the UI cards look real and consistent across cities.
+// Placeholder station metadata for fallback chains. Real addresses/distances
+// come from Apify per-city data when available; these are used only for
+// cities without Apify coverage so UI cards aren't blank.
 const STATION_META = {
-  'Murphy USA': { a: '4821 Westheimer Rd',  d: '0.4 mi' },
-  'HEB Gas':    { a: '2300 S Shepherd Dr',  d: '0.8 mi' },
-  "Buc-ee's":   { a: '9350 Katy Freeway',   d: '1.2 mi' },
-  'Shell':      { a: '1100 Louisiana St',   d: '1.4 mi' },
-  'Chevron':    { a: '5600 Richmond Ave',   d: '1.7 mi' },
+  'Murphy USA':  { a: '4821 Westheimer Rd',   d: '0.4 mi' },
+  'HEB Gas':     { a: '2300 S Shepherd Dr',   d: '0.8 mi' },
+  "Buc-ee's":    { a: '9350 Katy Freeway',    d: '1.2 mi' },
+  'Valero':      { a: '3400 Main St',         d: '0.9 mi' },
+  'Exxon':       { a: '1801 Smith St',        d: '1.1 mi' },
+  'Conoco':      { a: '7000 Kirby Dr',        d: '1.3 mi' },
+  'Shell':       { a: '1100 Louisiana St',    d: '1.4 mi' },
+  'Phillips 66': { a: '4200 Richmond Ave',    d: '1.5 mi' },
+  'Chevron':     { a: '5600 Richmond Ave',    d: '1.7 mi' },
 };
 
 // ── regional price variation ─────────────────────────────────
@@ -85,30 +89,70 @@ function money2(n) { return Number(n).toFixed(2); }
 function fmtPrice(n)       { return '$' + Number(n).toFixed(2); }
 function fuelLabel(f)      { return f.charAt(0).toUpperCase() + f.slice(1); }
 
-// Per-town chain prices.
-// Priority:
-//   1. Live per-city regular prices from Apify/GasBuddy (prices.cities[slug])
-//   2. Base price × regional multiplier, rounded to 3 decimals (estimate)
-// Midgrade/premium/diesel are always estimates — we only fetch regular live.
+// Returns the live chain array for a town, or null if none exists.
+// Tolerates the pre-refactor schema (`cityRow.regular`) by translating it
+// on the fly so builds don't regress while the daily fetch replaces old
+// entries. Stations with no posted price are dropped.
+function liveChainsFor(town) {
+  const c = prices.cities && prices.cities[town.slug];
+  if (!c) return null;
+  if (Array.isArray(c.chains) && c.chains.length) return c.chains;
+  if (Array.isArray(c.regular)) {
+    const chains = c.regular.filter(r => r && r.regular != null);
+    return chains.length ? chains : null;
+  }
+  return null;
+}
+function townHasLiveData(town) { return !!liveChainsFor(town); }
+
+// Fuel-grade differential from the Texas state average (e.g. mid is ~$0.44
+// above regular). We apply this delta to live regular prices so /midgrade,
+// /premium, /diesel pages of live-data cities have plausible numbers.
+function fuelDiffFromState() {
+  const base = prices.stateAverage || {};
+  const r = Number(base.regular) || 0;
+  return {
+    regular:  0,
+    midgrade: (Number(base.midgrade) || 0) - r,
+    premium:  (Number(base.premium)  || 0) - r,
+    diesel:   (Number(base.diesel)   || 0) - r,
+  };
+}
+
+// Per-town chain list.
+//   - Live-data city  → return ALL chains Apify found (no padding with fallbacks)
+//   - No data city    → return the 9 fallback chains, each × regional multiplier
+// Regular price is real for live chains; mid/premium/diesel are derived via
+// fuelDiffFromState() since the actor only fetches regular (fuelType: 1).
 function chainsForTown(town) {
   const mult = regionMultiplier(town);
-  const cityRow = prices.cities && prices.cities[town.slug];
-  const liveRegular = {};
-  if (cityRow && Array.isArray(cityRow.regular)) {
-    for (const r of cityRow.regular) {
-      if (r && r.chain && r.regular != null) liveRegular[r.chain] = Number(r.regular);
-    }
+  const live = liveChainsFor(town);
+
+  if (live) {
+    const diff = fuelDiffFromState();
+    return live.map(c => {
+      const reg = Number(c.regular);
+      return {
+        chain:     c.chain,
+        priceMode: 'live',
+        address:   c.address || null,
+        station:   c.station || null,
+        regular:   round3(reg),
+        midgrade:  round3(reg + diff.midgrade),
+        premium:   round3(reg + diff.premium),
+        diesel:    round3(reg + diff.diesel),
+      };
+    });
   }
+
   return prices.chains.map(c => {
-    const row = { chain: c.chain };
-    row.priceMode = liveRegular[c.chain] != null ? 'live' : (c.priceMode || 'estimated');
-    for (const f of FUELS) {
-      if (f === 'regular' && liveRegular[c.chain] != null) {
-        row[f] = round3(liveRegular[c.chain]);
-      } else {
-        row[f] = round3(c[f] * mult);
-      }
-    }
+    const row = {
+      chain:     c.chain,
+      priceMode: c.priceMode || 'estimated',
+      address:   null,
+      station:   null,
+    };
+    for (const f of FUELS) row[f] = round3(c[f] * mult);
     return row;
   });
 }
@@ -171,6 +215,7 @@ function formatUpdated(iso) {
 
 // Build the priceData object literal the client-side JS expects.
 // Shape per fuel: [{n, p, ch, a, d}] sorted cheapest-first.
+// Address preference: real Apify address > fallback STATION_META > generic.
 function buildPriceData(town) {
   const out = {};
   for (const fuel of FUELS) {
@@ -178,8 +223,8 @@ function buildPriceData(town) {
       n:  c.chain,
       p:  Number(c[fuel]),
       ch: 'same', // day-over-day delta not tracked yet
-      a:  STATION_META[c.chain]?.a || '1000 Main St',
-      d:  STATION_META[c.chain]?.d || '1.0 mi',
+      a:  c.address || STATION_META[c.chain]?.a || '1000 Main St',
+      d:  STATION_META[c.chain]?.d || 'nearby',
     }));
   }
   return out;
@@ -310,7 +355,12 @@ function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, faqItems
   return lines.join('\n');
 }
 
-function buildEstBanner(fuel) {
+function buildEstBanner(town, fuel) {
+  // Suppress the "estimates" banner for cities that have live per-chain
+  // prices from Apify — regular is real, and mid/premium/diesel are derived
+  // from the real regular + state fuel-grade differentials, which is close
+  // enough that warning about estimates would be misleading.
+  if (townHasLiveData(town)) return '';
   if (!hasEstimates) return '';
   const avg = prices.stateAverage && prices.stateAverage[fuel];
   const avgText = avg != null
@@ -402,7 +452,7 @@ function buildPage(town, fuel, opts = {}) {
     CITY_OPTIONS:     buildCityOptions(`${town.name}, TX`),
     FUEL_TABS:        buildFuelTabs(town.slug, fuel),
     INITIAL_FUEL:     fuel,
-    EST_BANNER:       buildEstBanner(fuel),
+    EST_BANNER:       buildEstBanner(town, fuel),
     PRICE_DATA_JSON:  JSON.stringify(buildPriceData(town), null, 2),
     FOOTER_NOTE:      buildFooterNote(),
     DEFAULT_TO_CITY:  defaultToCity(town.name),

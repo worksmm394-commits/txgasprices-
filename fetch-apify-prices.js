@@ -82,16 +82,40 @@ const CITIES = [
   { slug: 'flower-mound-tx',     zip: '75028' },
 ];
 
-// Our tracked chain brands. Each has a `match` predicate that accepts raw
-// station names returned by the scraper, which can be messy:
-//   "Murphy USA #1234", "H-E-B Fuel", "HEB Gas", "Bucees", "Shell 7-Eleven"
-const CHAINS = [
-  { name: 'Murphy USA', match: n => /murphy/i.test(n) },
-  { name: 'HEB Gas',    match: n => /\bh[\s.-]?e[\s.-]?b\b/i.test(n) },
-  { name: 'Shell',      match: n => /\bshell\b/i.test(n) },
-  { name: 'Chevron',    match: n => /chevron/i.test(n) },
-  { name: "Buc-ee's",   match: n => /buc[- ]?ee/i.test(n) },
-];
+// Canonicalize raw station names to a stable brand label. We group all
+// stations by this canonical name and take the cheapest per group. For known
+// brand families (Murphy USA/Express, HEB/H-E-B, Bucees/Buc-ee's) we force a
+// single canonical spelling; anything else falls through as-is (title-cased).
+function canonicalChainName(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return null;
+  if (/murphy/i.test(s))                    return 'Murphy USA';
+  if (/\bh[\s.-]?e[\s.-]?b\b/i.test(s))      return 'HEB Gas';
+  if (/buc[- ]?ee/i.test(s))                return "Buc-ee's";
+  if (/\bshell\b/i.test(s))                 return 'Shell';
+  if (/chevron/i.test(s))                   return 'Chevron';
+  if (/\bexxon\b/i.test(s))                 return 'Exxon';
+  if (/\bvalero\b/i.test(s))                return 'Valero';
+  if (/phillips\s*66/i.test(s))             return 'Phillips 66';
+  if (/\bconoco\b/i.test(s))                return 'Conoco';
+  if (/\btexaco\b/i.test(s))                return 'Texaco';
+  if (/\bsunoco\b/i.test(s))                return 'Sunoco';
+  if (/7[\s-]?eleven/i.test(s))             return '7-Eleven';
+  if (/circle\s*k/i.test(s))                return 'Circle K';
+  if (/\bcostco\b/i.test(s))                return 'Costco';
+  if (/\bsam'?s\s*club\b/i.test(s))         return "Sam's Club";
+  if (/qu(ik|ick)\s*trip|\bqt\b/i.test(s))  return 'QuikTrip';
+  if (/race\s*trac|racetrac/i.test(s))      return 'RaceTrac';
+  if (/\bstripes\b/i.test(s))               return 'Stripes';
+  if (/love'?s/i.test(s))                   return "Love's";
+  if (/pilot|flying\s*j/i.test(s))          return 'Pilot/Flying J';
+  if (/\bmobil\b/i.test(s))                 return 'Mobil';
+  if (/\bbp\b/i.test(s))                    return 'BP';
+  if (/\bspeedway\b/i.test(s))              return 'Speedway';
+  if (/\bwawa\b/i.test(s))                  return 'Wawa';
+  // Everything else: preserve the name as-is (scraper already title-cases).
+  return s;
+}
 
 const ACTOR           = 'johnvc~fuelprices';
 const RUN_SYNC_URL    = `https://api.apify.com/v2/acts/${ACTOR}/run-sync-get-dataset-items?token=${APIFY_TOKEN}`;
@@ -136,41 +160,52 @@ async function fetchCity(city) {
     }
 
     // Build a normalized list of stations we can search across.
+    // Only stations with a posted credit/cash price make the cut — stale
+    // entries with 0 or null prices are dropped here so nothing downstream
+    // has to carry the "no posted price" state.
     const stations = items
       .map(i => ({
-        name: pickName(i),
-        price: pickPrice(i),
+        raw:     pickName(i),
+        canon:   canonicalChainName(pickName(i)),
+        price:   pickPrice(i),
         address: pickAddress(i),
       }))
-      .filter(s => s.name && s.price != null);
+      .filter(s => s.canon && s.price != null);
 
-    // Per-chain cheapest within this city.
-    const chainResults = CHAINS.map(chain => {
-      const matches = stations.filter(s => chain.match(s.name));
-      if (!matches.length) {
-        return { chain: chain.name, regular: null, station: null, address: null };
+    // Group stations by canonical chain name; pick the cheapest in each group.
+    const byChain = new Map();
+    for (const s of stations) {
+      const existing = byChain.get(s.canon);
+      if (!existing) {
+        byChain.set(s.canon, { station: s, count: 1 });
+      } else {
+        existing.count++;
+        if (s.price < existing.station.price) existing.station = s;
       }
-      const cheapest = matches.reduce((a, b) => b.price < a.price ? b : a);
-      return {
-        chain: chain.name,
-        regular: Math.round(cheapest.price * 1000) / 1000,
-        station: cheapest.name,
-        address: cheapest.address || null,
-      };
-    });
+    }
+    const chainResults = [...byChain.entries()]
+      .map(([chain, { station, count }]) => ({
+        chain,
+        regular:      Math.round(station.price * 1000) / 1000,
+        station:      station.raw,
+        address:      station.address || null,
+        stationCount: count,
+      }))
+      .sort((a, b) => a.regular - b.regular);
 
-    // Overall cheapest station (any chain).
+    // Overall cheapest station (any chain) — useful for the homepage + FAQ.
     const overallCheapest = stations.reduce((a, b) => b.price < a.price ? b : a);
 
     const elapsed = ((Date.now() - started) / 1000).toFixed(1);
-    console.log(`  ✓ ${city.slug} (${city.zip}) — ${stations.length} stations in ${elapsed}s`);
+    console.log(`  ✓ ${city.slug} (${city.zip}) — ${stations.length} stations, ${chainResults.length} chains in ${elapsed}s`);
 
     return {
       slug: city.slug,
-      regular: chainResults,
+      chains: chainResults,
       cheapestOverall: {
-        station: overallCheapest.name,
-        price: Math.round(overallCheapest.price * 1000) / 1000,
+        chain:   canonicalChainName(overallCheapest.raw),
+        station: overallCheapest.raw,
+        price:   Math.round(overallCheapest.price * 1000) / 1000,
         address: overallCheapest.address || null,
       },
       stationsSeen: stations.length,
@@ -215,12 +250,13 @@ async function runPool(items, worker, concurrency) {
   console.log(`Fetching ${targetCities.length} cities from ${ACTOR} (concurrency=${CONCURRENCY})...`);
   const results = await runPool(targetCities, fetchCity, CONCURRENCY);
 
-  // Build the cities block, keyed by slug. Only cities that succeeded are included.
+  // Build the cities block, keyed by slug. Only cities that succeeded with
+  // at least one priced chain are included.
   const citiesBlock = {};
   for (const r of results) {
-    if (r && !r.error && r.regular) {
+    if (r && !r.error && Array.isArray(r.chains) && r.chains.length > 0) {
       citiesBlock[r.slug] = {
-        regular:          r.regular,
+        chains:           r.chains,
         cheapestOverall:  r.cheapestOverall,
         stationsSeen:     r.stationsSeen,
       };
@@ -257,13 +293,13 @@ async function runPool(items, worker, concurrency) {
       console.log(`\n${r.slug}: ERROR — ${r.error}`);
       continue;
     }
-    console.log(`\n${r.slug}:`);
-    for (const row of r.regular) {
-      const price = row.regular != null ? `$${row.regular.toFixed(3)}/gal` : '(no station)';
-      console.log(`  ${row.chain.padEnd(12)} ${price}${row.station ? `  @ ${row.station}` : ''}`);
+    console.log(`\n${r.slug}  (${r.chains.length} chains, ${r.stationsSeen} stations):`);
+    for (const row of r.chains) {
+      const count = row.stationCount > 1 ? ` (${row.stationCount}×)` : '';
+      console.log(`  ${row.chain.padEnd(14)} $${row.regular.toFixed(3)}/gal${count}  @ ${row.address || row.station}`);
     }
     if (r.cheapestOverall?.price != null) {
-      console.log(`  ${'CHEAPEST'.padEnd(12)} $${r.cheapestOverall.price.toFixed(3)}/gal  @ ${r.cheapestOverall.station}`);
+      console.log(`  ${'CHEAPEST'.padEnd(14)} $${r.cheapestOverall.price.toFixed(3)}/gal  @ ${r.cheapestOverall.station}`);
     }
   }
 })().catch(e => {

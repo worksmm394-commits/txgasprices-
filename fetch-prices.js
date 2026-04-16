@@ -30,11 +30,15 @@ const GASBUDDY_KEY = process.env.GASBUDDY_API_KEY || "";
 // (Murphy/Buc-ee's/HEB cheaper than average, Shell/Chevron above).
 // Used only until a real per-station source (e.g. GasBuddy) is wired in.
 const CHAIN_OFFSETS = {
-  "Murphy USA": { regular: -0.12, midgrade: -0.12, premium: -0.12, diesel: -0.10 },
-  "Buc-ee's":   { regular: -0.08, midgrade: -0.08, premium: -0.08, diesel: -0.07 },
-  "HEB Gas":    { regular: -0.05, midgrade: -0.05, premium: -0.05, diesel: -0.04 },
-  "Shell":      { regular: +0.07, midgrade: +0.07, premium: +0.07, diesel: +0.05 },
-  "Chevron":    { regular: +0.10, midgrade: +0.10, premium: +0.10, diesel: +0.07 },
+  "Murphy USA":  { regular: -0.12, midgrade: -0.12, premium: -0.12, diesel: -0.10 },
+  "Buc-ee's":    { regular: -0.08, midgrade: -0.08, premium: -0.08, diesel: -0.07 },
+  "HEB Gas":     { regular: -0.05, midgrade: -0.05, premium: -0.05, diesel: -0.04 },
+  "Valero":      { regular: -0.02, midgrade: -0.02, premium: -0.02, diesel: -0.02 },
+  "Exxon":       { regular: +0.05, midgrade: +0.05, premium: +0.05, diesel: +0.04 },
+  "Conoco":      { regular: +0.06, midgrade: +0.06, premium: +0.06, diesel: +0.04 },
+  "Shell":       { regular: +0.07, midgrade: +0.07, premium: +0.07, diesel: +0.05 },
+  "Phillips 66": { regular: +0.08, midgrade: +0.08, premium: +0.08, diesel: +0.06 },
+  "Chevron":     { regular: +0.10, midgrade: +0.10, premium: +0.10, diesel: +0.07 },
 };
 
 const BROWSER_HEADERS = {
