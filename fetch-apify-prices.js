@@ -26,31 +26,60 @@ if (!APIFY_TOKEN) {
   process.exit(1);
 }
 
-// Top 20 Texas cities by population. ZIPs are chosen for suburban/retail
-// coverage — downtown business-district ZIPs (e.g. 77001, 75201) were tested
-// and found to under-represent discount chains like Murphy USA and HEB. These
-// suburban ZIPs surface a representative mix of chain and independent stations.
+// Top 50 Texas cities by population + growth, chosen for maximum search
+// traffic coverage. ZIPs are suburban/retail where possible — downtown
+// business-district ZIPs under-represent discount chains.
 const CITIES = [
-  { slug: 'houston-tx',         zip: '77079' },  // West Houston / Memorial
-  { slug: 'dallas-tx',          zip: '75248' },  // North Dallas
-  { slug: 'san-antonio-tx',     zip: '78250' },  // NW San Antonio
-  { slug: 'austin-tx',          zip: '78745' },  // South Austin
-  { slug: 'fort-worth-tx',      zip: '76133' },  // SW Fort Worth
-  { slug: 'el-paso-tx',         zip: '79936' },  // East El Paso
-  { slug: 'arlington-tx',       zip: '76010' },  // central, kept
-  { slug: 'corpus-christi-tx',  zip: '78412' },  // S Corpus Christi
-  { slug: 'lubbock-tx',         zip: '79424' },  // SW Lubbock
-  { slug: 'amarillo-tx',        zip: '79109' },  // SW Amarillo
-  { slug: 'laredo-tx',          zip: '78040' },  // kept — central Laredo
-  { slug: 'waco-tx',            zip: '76710' },  // W Waco
-  { slug: 'killeen-tx',         zip: '76541' },  // kept
-  { slug: 'beaumont-tx',        zip: '77706' },  // W Beaumont
-  { slug: 'midland-tx',         zip: '79701' },  // kept
-  { slug: 'odessa-tx',          zip: '79761' },  // kept
-  { slug: 'tyler-tx',           zip: '75703' },  // S Tyler
-  { slug: 'abilene-tx',         zip: '79601' },  // kept
-  { slug: 'denton-tx',          zip: '76201' },  // kept
-  { slug: 'mcallen-tx',         zip: '78504' },  // N McAllen
+  { slug: 'houston-tx',          zip: '77079' },
+  { slug: 'san-antonio-tx',      zip: '78250' },
+  { slug: 'dallas-tx',           zip: '75248' },
+  { slug: 'austin-tx',           zip: '78745' },
+  { slug: 'fort-worth-tx',       zip: '76116' },
+  { slug: 'el-paso-tx',          zip: '79925' },
+  { slug: 'arlington-tx',        zip: '76015' },
+  { slug: 'corpus-christi-tx',   zip: '78413' },
+  { slug: 'plano-tx',            zip: '75075' },
+  { slug: 'lubbock-tx',          zip: '79424' },
+  { slug: 'laredo-tx',           zip: '78045' },
+  { slug: 'irving-tx',           zip: '75063' },
+  { slug: 'garland-tx',          zip: '75043' },
+  { slug: 'frisco-tx',           zip: '75034' },
+  { slug: 'mckinney-tx',         zip: '75070' },
+  { slug: 'grand-prairie-tx',    zip: '75052' },
+  { slug: 'amarillo-tx',         zip: '79119' },
+  { slug: 'brownsville-tx',      zip: '78526' },
+  { slug: 'killeen-tx',          zip: '76542' },
+  { slug: 'denton-tx',           zip: '76210' },
+  { slug: 'mesquite-tx',         zip: '75150' },
+  { slug: 'pasadena-tx',         zip: '77504' },
+  { slug: 'mcallen-tx',          zip: '78504' },
+  { slug: 'waco-tx',             zip: '76710' },
+  { slug: 'midland-tx',          zip: '79707' },
+  { slug: 'lewisville-tx',       zip: '75067' },
+  { slug: 'carrollton-tx',       zip: '75010' },
+  { slug: 'round-rock-tx',       zip: '78664' },
+  { slug: 'abilene-tx',          zip: '79606' },
+  { slug: 'pearland-tx',         zip: '77584' },
+  { slug: 'college-station-tx',  zip: '77845' },
+  { slug: 'richardson-tx',       zip: '75080' },
+  { slug: 'league-city-tx',      zip: '77573' },
+  { slug: 'odessa-tx',           zip: '79762' },
+  { slug: 'beaumont-tx',         zip: '77706' },
+  { slug: 'allen-tx',            zip: '75013' },
+  { slug: 'sugar-land-tx',       zip: '77478' },
+  { slug: 'edinburg-tx',         zip: '78539' },
+  { slug: 'tyler-tx',            zip: '75703' },
+  { slug: 'wichita-falls-tx',    zip: '76308' },
+  { slug: 'san-angelo-tx',       zip: '76904' },
+  { slug: 'longview-tx',         zip: '75605' },
+  { slug: 'pflugerville-tx',     zip: '78660' },
+  { slug: 'cedar-park-tx',       zip: '78613' },
+  { slug: 'georgetown-tx',       zip: '78628' },
+  { slug: 'conroe-tx',           zip: '77304' },
+  { slug: 'baytown-tx',          zip: '77521' },
+  { slug: 'atascocita-tx',       zip: '77346' },
+  { slug: 'rowlett-tx',          zip: '75089' },
+  { slug: 'flower-mound-tx',     zip: '75028' },
 ];
 
 // Our tracked chain brands. Each has a `match` predicate that accepts raw
