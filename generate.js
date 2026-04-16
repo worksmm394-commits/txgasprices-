@@ -383,6 +383,65 @@ function defaultToCity(currentName) {
   return currentName === 'Dallas' ? 'Houston, TX' : 'Dallas, TX';
 }
 
+// ── chain card server-rendering ──────────────────────────────
+// Chains where the posted price requires a paid membership.
+const MEMBERSHIP_CHAINS = new Set([
+  "Sam's Club", 'Costco', 'Walmart', 'Walmart Neighborhood Market', "BJ's",
+]);
+const MEMBERSHIP_TOOLTIP = "Requires Sam's Club / Costco / Walmart+ membership";
+
+function escAttr(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function escHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Server-render the hero chain card grid for a city's initial (regular) fuel.
+// Matches the client-side renderHero() output so the page looks identical
+// before the JS re-renders on load — and, importantly, the membership badge
+// appears in the raw HTML for search crawlers and no-JS visitors.
+function renderInitialChainsHtml(town) {
+  const pd = buildPriceData(town);
+  const list = pd.regular || [];
+  if (!list.length) return '';
+
+  const HERO_MAX = 6;
+  const needsToggle = list.length > HERO_MAX;
+  const heroList = needsToggle ? list.slice(0, HERO_MAX) : list;
+
+  const cards = heroList.map((c, i) => {
+    const isMember = MEMBERSHIP_CHAINS.has(c.n);
+    const stationsLine = c.sc && c.sc > 0
+      ? `      <div class="cc-stations">${c.sc} station${c.sc === 1 ? '' : 's'} nearby</div>`
+      : '';
+    const memberBadge = isMember
+      ? `      <div><span class="cc-mbr" title="${escAttr(MEMBERSHIP_TOOLTIP)}">⚑ membership price</span></div>`
+      : '';
+    const parts = [
+      `    <div class="cc${i === 0 ? ' best' : ''}" data-chain="${escAttr(c.n)}" onclick="setChainFilter(this.dataset.chain)">`,
+      i === 0 ? `      <div class="cc-badge">cheapest</div>` : null,
+      `      <div class="cc-name">${escHtml(c.n)}</div>`,
+      `      <div class="cc-price">$${c.p.toFixed(2)}</div>`,
+      `      <div class="cc-ch ch-nc">— no change</div>`,
+      stationsLine || null,
+      memberBadge || null,
+      `    </div>`,
+    ].filter(Boolean);
+    return parts.join('\n');
+  }).join('\n');
+
+  const toggleBtn = needsToggle
+    ? `\n    <div class="chains-toggle"><button type="button" onclick="toggleChainsExpanded()">Show all ${list.length} chains ▼</button></div>`
+    : '';
+
+  return '\n' + cards + toggleBtn + '\n  ';
+}
+
+function dataSourceFor(town) {
+  return townHasLiveData(town) ? 'GasBuddy data' : 'AAA Texas estimate';
+}
+
 // ── substitution ──────────────────────────────────────────────
 function render(tokens) {
   let html = TEMPLATE;
@@ -481,6 +540,8 @@ function buildPage(town, fuel, opts = {}) {
     FAQ_Q3_ANSWER:             q3.a,
     FAQ_Q4_QUESTION:           q4.q,
     FAQ_Q4_ANSWER:             q4.a,
+    DATA_SOURCE:               dataSourceFor(town),
+    INITIAL_CHAINS_HTML:       renderInitialChainsHtml(town),
   });
 }
 

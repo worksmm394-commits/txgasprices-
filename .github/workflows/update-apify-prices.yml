@@ -2,9 +2,11 @@ name: Daily Apify price refresh
 
 on:
   schedule:
-    # Once per day at 10:00 UTC (5am Central). Apify runs cost credits so we
-    # keep this separate from the hourly AAA state-average refresh.
-    - cron: '0 10 * * *'
+    # Every 3 days at 10:00 UTC (5am Central). Gas prices change 3-4x per
+    # week, so a 3-day cadence captures all meaningful moves while keeping
+    # monthly Apify cost under ~$20. The hourly AAA state-average refresh
+    # runs on its own workflow for the non-Apify fallback cities.
+    - cron: '0 10 */3 * *'
   workflow_dispatch: {}
 
 concurrency:

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-16T21:06:11.067Z",
+  "updated": "2026-04-16T21:21:37.444Z",
   "stateAverage": {
     "regular": 3.685,
     "midgrade": 4.127,
@@ -10,7 +10,7 @@
     "aaa": "gasprices.aaa.com (TX state avg, today)",
     "eia": null,
     "gasbuddy": null,
-    "apify": "apify.com/actors/johnvc~fuelprices (daily, 50/50 cities, 124 ZIPs)"
+    "apify": "apify.com/actors/johnvc~fuelprices (daily, 1/1 cities, 5 ZIPs)"
   },
   "note": "Per-chain prices are ESTIMATES derived from the Texas state average plus fixed per-chain offsets (see CHAIN_OFFSETS in fetch-prices.js). Set GASBUDDY_API_KEY to replace estimates with live per-station data.",
   "chains": [
@@ -479,41 +479,13 @@
           "regular": 3.37,
           "station": "Valero",
           "address": "9094 Guilbeau Rd, San Antonio",
-          "stationCount": 8
-        },
-        {
-          "chain": "76",
-          "regular": 3.39,
-          "station": "76",
-          "address": "7877 Boca Chica Blvd, Brownsville",
-          "stationCount": 1
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 3.42,
-          "station": "Murphy USA",
-          "address": "6125 East Fm 802, Brownsville",
-          "stationCount": 4
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.44,
-          "station": "7-Eleven",
-          "address": "7900 Boca Chica Blvd, Brownsville",
-          "stationCount": 1
-        },
-        {
-          "chain": "Sunoco",
-          "regular": 3.45,
-          "station": "Sunoco",
-          "address": "7401 Padre Island Blvd, Brownsville",
-          "stationCount": 5
+          "stationCount": 11
         },
         {
           "chain": "HEB Gas",
-          "regular": 3.45,
+          "regular": 3.55,
           "station": "H-E-B",
-          "address": "2250 Boca Chica Blvd, Brownsville",
+          "address": "10660 W FM-471, San Antonio",
           "stationCount": 3
         },
         {
@@ -521,21 +493,14 @@
           "regular": 3.55,
           "station": "Walmart Neighborhood Market",
           "address": "9005 FM-1560 N, San Antonio",
-          "stationCount": 1
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.57,
-          "station": "Exxon",
-          "address": "2100 E Price Rd, Brownsville",
           "stationCount": 2
         },
         {
-          "chain": "Stripes",
-          "regular": 3.57,
-          "station": "Stripes",
-          "address": "4425 E 14th St, Brownsville",
-          "stationCount": 1
+          "chain": "Murphy USA",
+          "regular": 3.55,
+          "station": "Murphy USA",
+          "address": "6711 Leslie Road, San Antonio",
+          "stationCount": 3
         },
         {
           "chain": "Noor Pantry",
@@ -545,18 +510,25 @@
           "stationCount": 1
         },
         {
-          "chain": "Gordon's Bait & Tackle",
+          "chain": "Exxon",
           "regular": 3.59,
-          "station": "Gordon's Bait & Tackle",
-          "address": "7066 Padre Island Hwy, Brownsville",
-          "stationCount": 1
+          "station": "Exxon",
+          "address": "8928 Culebra Rd, San Antonio",
+          "stationCount": 3
+        },
+        {
+          "chain": "QuikTrip",
+          "regular": 3.59,
+          "station": "QuikTrip",
+          "address": "8850 Culebra Rd, San Antonio",
+          "stationCount": 4
         },
         {
           "chain": "Shell",
           "regular": 3.61,
           "station": "Shell",
           "address": "7196 Crestway St, San Antonio",
-          "stationCount": 1
+          "stationCount": 2
         },
         {
           "chain": "Circle K",
@@ -5043,5 +5015,5 @@
       "zipsFetched": 2
     }
   },
-  "apifyUpdated": "2026-04-16T21:06:11.079Z"
+  "apifyUpdated": "2026-04-16T21:21:37.444Z"
 }
