@@ -454,13 +454,116 @@ function buildFaqItems(town, d) {
   return items;
 }
 
-// Server-render the FAQ <details> blocks. Sits inside the template's
-// <section class="faq"><h2>…</h2>{{FAQ_ITEMS_HTML}}</section>.
-function buildFaqItemsHtml(faqItems) {
+// Server-render the FAQ <details> blocks. A small source-citation line is
+// appended below every answer — same text on every item for a given page
+// (the user spec is explicit: one line under each answer).
+function buildFaqItemsHtml(faqItems, sourceLine) {
   return faqItems.map(item => `  <details>
     <summary>${escHtml(item.q)}</summary>
     <div class="faq-a">${item.a}</div>
+    <div class="faq-src">${escHtml(sourceLine)}</div>
   </details>`).join('\n');
+}
+
+// Build 3 stat cards above the FAQ accordion, keyed off what the city
+// actually is in cities-info.json. Category priority:
+//   oil rigs > border > refinery > military > college > price fallback.
+// Each card shows a short uppercase label, a bold value, and a context line.
+function buildFaqStatsHtml(town, d, info) {
+  const pop = Number(town.population) || 0;
+  const popFmt = pop > 0 ? pop.toLocaleString('en-US') : null;
+  const cards = [];
+
+  const pushCard = (label, value, context) => {
+    if (value == null || value === '') return;
+    cards.push({ label, value, context: context || '' });
+  };
+
+  if (info.oil_rigs_nearby && info.oil_rigs_nearby > 0) {
+    pushCard('Active oil rigs',
+      `${info.oil_rigs_nearby}+`,
+      `in ${town.county || 'the county'} County`);
+    if (info.refinery_miles) {
+      pushCard('Miles to refinery',
+        `${info.refinery_miles} mi`,
+        'round-trip for finished fuel');
+    }
+    pushCard('Truck ownership',
+      `${info.truck_ownership_pct || 0}%`,
+      'of household vehicles');
+  } else if (info.border_town) {
+    pushCard('Truck share of traffic',
+      `${info.truck_traffic_pct || 0}%`,
+      'cross-border freight flow');
+    if (info.daily_traffic_count) {
+      pushCard('Daily traffic',
+        info.daily_traffic_count.toLocaleString('en-US'),
+        `vehicles on ${info.highway_primary || 'primary highway'}`);
+    }
+    if (popFmt) pushCard('Population', popFmt, 'residents');
+  } else if (info.refinery_nearby && info.refinery_name) {
+    const capMatch = info.refinery_name.match(/([\d,]+)\s*bbl\/day/i);
+    const refShort = info.refinery_name.split('—')[0].trim();
+    pushCard('Nearest refinery capacity',
+      capMatch ? `${capMatch[1]} bbl/day` : 'major refinery',
+      refShort);
+    pushCard('Distance',
+      `${info.refinery_miles || 0} mi`,
+      `from ${town.name}`);
+    if (info.fuel_terminal_miles != null) {
+      pushCard('Fuel terminal',
+        `${info.fuel_terminal_miles} mi`,
+        'to nearest pipeline terminal');
+    }
+  } else if (info.military_base && info.military_base_name) {
+    const soldierMatch = info.military_base_name.match(/([\d,]+)\s*active-duty/i);
+    const sqMiMatch    = info.military_base_name.match(/([\d.,]+)\s*square miles/i);
+    const acreMatch    = info.military_base_name.match(/([\d,]+)\s*acres/i);
+    const baseShort    = info.military_base_name.split(/[—(]/)[0].trim();
+    pushCard('Military base', baseShort, `adjacent to ${town.name}`);
+    if (soldierMatch) {
+      pushCard('Active-duty personnel', soldierMatch[1], 'stationed at base');
+    }
+    if (sqMiMatch) {
+      pushCard('Base size',
+        `${sqMiMatch[1]} sq mi`,
+        acreMatch ? `${acreMatch[1]} acres` : 'land area');
+    } else if (acreMatch) {
+      pushCard('Base size', `${acreMatch[1]} acres`, 'land area');
+    }
+  } else if (info.college_town && info.university_name) {
+    const enrollMatch = info.university_name.match(/([\d,]+)\s*students/i);
+    const uniShort = info.university_name.split(' (')[0].split(',')[0].trim();
+    pushCard('Anchor university', uniShort, 'largest local institution');
+    if (enrollMatch) {
+      pushCard('Students enrolled', enrollMatch[1], 'full- and part-time');
+    }
+    if (popFmt) pushCard('City population', popFmt, 'residents');
+  }
+
+  // Fill to 3 with price-based cards (also used as the sole fallback for
+  // cities with none of the conditional categories).
+  if (cards.length < 3) {
+    pushCard('Cheapest gas',
+      `$${faq2dec(d.cheapestPrice)}/gal`,
+      `at ${d.cheapestChain}`);
+  }
+  if (cards.length < 3) {
+    pushCard('15-gallon tank', `$${d.tankCost15}`, 'full tank cost');
+  }
+  if (cards.length < 3) {
+    const diff = Number(d.stateAvg) - Number(d.cheapestPrice);
+    const abs = Math.abs(diff).toFixed(2);
+    pushCard(diff >= 0 ? 'Saved vs state avg' : 'Above state avg',
+      `$${abs}/gal`, 'vs Texas average');
+  }
+
+  const out = cards.slice(0, 3).map(c => `    <div class="faq-stat">
+      <div class="fs-label">${escHtml(c.label)}</div>
+      <div class="fs-value">${escHtml(c.value)}</div>
+      <div class="fs-context">${escHtml(c.context)}</div>
+    </div>`).join('\n');
+  return `  <div class="faq-stats">\n${out}\n  </div>`;
 }
 
 function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, faqItems, opts = {}) {
@@ -648,7 +751,14 @@ function buildPage(town, fuel, opts = {}) {
   const faqItems = buildFaqItems(town, {
     cheapestPrice, cheapestChain, tankCost15, tankCost20, stateAvg,
   });
-  const faqItemsHtml = buildFaqItemsHtml(faqItems);
+  const updatedHuman = formatUpdated(prices.updated);
+  const sourceLine = townHasLiveData(town)
+    ? `Source: GasBuddy via Apify · ${updatedHuman}`
+    : `Source: AAA Texas · ${updatedHuman}`;
+  const faqItemsHtml = buildFaqItemsHtml(faqItems, sourceLine);
+  const faqStatsHtml = buildFaqStatsHtml(town, {
+    cheapestPrice, cheapestChain, tankCost15, tankCost20, stateAvg,
+  }, CITY_INFO[town.slug] || {});
 
   const population = Number(town.population) || 0;
   const populationFormatted = population > 0 ? population.toLocaleString('en-US') : 'many';
@@ -693,6 +803,7 @@ function buildPage(town, fuel, opts = {}) {
     REGION_DESC:               regionDesc(town),
     ABOVE_BELOW:               aboveBelow(mult),
     FAQ_ITEMS_HTML:            faqItemsHtml,
+    FAQ_STATS_HTML:            faqStatsHtml,
     DATA_SOURCE:               dataSourceFor(town),
     INITIAL_CHAINS_HTML:       renderInitialChainsHtml(town),
   });

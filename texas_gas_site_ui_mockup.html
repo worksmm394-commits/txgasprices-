@@ -207,6 +207,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .faq details[open]>summary::after{content:"−";color:#1D9E75;transform:translateY(-50%) rotate(0)}
 .faq .faq-a{padding:8px 0 2px;font-size:13px;line-height:1.55;color:#4a4a45}
 .faq .faq-a b{color:#1a1a18;font-weight:500}
+.faq .faq-src{font-size:11px;color:#9a9990;margin:6px 0 2px;font-style:italic;letter-spacing:.01em}
+.faq-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 14px}
+.faq-stat{background:#f8f6ef;border-radius:8px;padding:12px 14px;border:0.5px solid rgba(0,0,0,.08)}
+.fs-label{font-size:10px;color:#9a9990;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.fs-value{font-size:16px;font-weight:600;color:#1a1a18;line-height:1.25}
+.fs-context{font-size:11px;color:#6b6b66;margin-top:3px;line-height:1.35}
+@media (max-width:600px){.faq-stats{grid-template-columns:1fr}}
 
 /* estimates banner */
 .estnote{background:#FFF8E1;border:0.5px solid #EAC36A;border-radius:8px;padding:9px 13px;margin-bottom:14px;font-size:12px;color:#5a4510;line-height:1.45}
@@ -435,6 +442,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- FAQ — items server-rendered dynamically from cities-info.json -->
 <section class="faq">
   <h2>Gas prices in {{CITY_NAME}} — common questions</h2>
+{{FAQ_STATS_HTML}}
 {{FAQ_ITEMS_HTML}}
 </section>
 
