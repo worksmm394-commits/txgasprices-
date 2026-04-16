@@ -5,7 +5,9 @@
       "Bash(echo \"exit=$?\")",
       "Bash(npm install *)",
       "Bash(npx wrangler *)",
-      "Bash(powershell -ExecutionPolicy Bypass -File make-favicon.ps1)"
+      "Bash(powershell -ExecutionPolicy Bypass -File make-favicon.ps1)",
+      "Bash(curl -s -H \"Accept: application/json\" \"https://www.fueleconomy.gov/ws/rest/vehicle/menu/make?year=2025\")",
+      "Bash(tee build-car-db.log)"
     ]
   }
 }

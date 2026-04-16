@@ -38,6 +38,42 @@ function fmtPrice(n)       { return '$' + Number(n).toFixed(2); }
 function fuelLabel(f)      { return f.charAt(0).toUpperCase() + f.slice(1); }
 function sortedByPrice(f)  { return [...prices.chains].sort((a, b) => a[f] - b[f]); }
 function cheapestFor(f)    { return sortedByPrice(f)[0]; }
+function mostExpensiveFor(f) { return sortedByPrice(f).slice(-1)[0]; }
+
+// Haversine great-circle distance in km between two {lat, lng} points.
+function haversineKm(a, b) {
+  const toRad = d => d * Math.PI / 180;
+  const R = 6371;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const x = Math.sin(dLat / 2) ** 2
+    + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.asin(Math.sqrt(x));
+}
+
+function nearestCities(town, n = 6) {
+  if (town.lat == null || town.lng == null) return [];
+  return towns
+    .filter(t => t.slug !== town.slug && t.lat != null && t.lng != null)
+    .map(t => ({ t, km: haversineKm(town, t) }))
+    .sort((a, b) => a.km - b.km)
+    .slice(0, n)
+    .map(x => x.t);
+}
+
+function buildNearbyCitiesHtml(town) {
+  const cities = nearestCities(town);
+  if (!cities.length) return '';
+  const items = cities.map(t =>
+    `    <li><a href="/gas-prices/${t.slug}">Gas prices in ${t.name}</a></li>`
+  ).join('\n');
+  return `<section class="nearby">
+  <h2>Nearby cities</h2>
+  <ul class="nearby-list">
+${items}
+  </ul>
+</section>`;
+}
 
 function formatUpdated(iso) {
   const d = new Date(iso);
@@ -80,7 +116,45 @@ function buildFuelTabs(slug, currentFuel) {
   }).join('\n');
 }
 
-function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc) {
+function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, cheapestPrice, cheapestChain, savings) {
+  const webPage = {
+    '@context':   'https://schema.org',
+    '@type':      'WebPage',
+    name:         pageTitle,
+    description:  metaDesc,
+    dateModified: prices.updated,
+    url:          `https://txgasprices.net${canonicalPath}`,
+  };
+  const faq = {
+    '@context': 'https://schema.org',
+    '@type':    'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name:    `What is the cheapest gas in ${town.name}, TX today?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `The cheapest regular unleaded in ${town.name}, TX today is $${cheapestPrice}/gal at ${cheapestChain}, updated hourly from AAA Texas state-average data.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name:    `How often are gas prices in ${town.name} updated?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `Gas prices on TXGasPrices.net are refreshed every hour from the AAA Texas state average and per-chain offsets for Murphy USA, HEB, Shell, Chevron, and Buc-ee's.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name:    `How much can drivers save by choosing the cheapest station in ${town.name}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `${town.name}, TX drivers can save up to $${savings}/gal by filling up at the cheapest station compared to the most expensive local option.`,
+        },
+      },
+    ],
+  };
   return [
     `<meta name="description" content="${metaDesc}">`,
     `<link rel="canonical" href="https://txgasprices.net${canonicalPath}">`,
@@ -88,14 +162,10 @@ function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc) {
     `<meta property="og:description" content="${metaDesc}">`,
     `<meta property="og:url" content="https://txgasprices.net${canonicalPath}">`,
     `<script type="application/ld+json">`,
-    JSON.stringify({
-      '@context':    'https://schema.org',
-      '@type':       'WebPage',
-      name:          pageTitle,
-      description:   metaDesc,
-      dateModified:  prices.updated,
-      url:           `https://txgasprices.net${canonicalPath}`,
-    }, null, 2),
+    JSON.stringify(webPage, null, 2),
+    `</script>`,
+    `<script type="application/ld+json">`,
+    JSON.stringify(faq, null, 2),
     `</script>`,
   ].join('\n');
 }
@@ -134,25 +204,30 @@ function render(tokens) {
 function buildPage(town, fuel) {
   const fLabel       = fuelLabel(fuel);
   const cheap        = cheapestFor(fuel);
+  const expensive    = mostExpensiveFor(fuel);
   const canonicalPath = fuel === 'regular'
     ? `/gas-prices/${town.slug}`
     : `/gas-prices/${town.slug}/${fuel}`;
 
+  const cheapestPrice = Number(cheap[fuel]).toFixed(2);
+  const cheapestChain = cheap.chain;
+  const savings       = (Number(expensive[fuel]) - Number(cheap[fuel])).toFixed(2);
+
   const pageTitle = fuel === 'regular'
-    ? `Gas Prices in ${town.name}, TX Today — TXGasPrices.net`
-    : `${fLabel} Gas Prices in ${town.name}, TX Today — TXGasPrices.net`;
+    ? `Gas Prices in ${town.name}, TX Today — Cheapest $${cheapestPrice}/gal | TXGasPrices`
+    : `${fLabel} Gas Prices in ${town.name}, TX Today — Cheapest $${cheapestPrice}/gal | TXGasPrices`;
 
   const heroTitle = fuel === 'regular'
     ? `Gas prices in ${town.name}, TX`
     : `${fLabel} gas prices in ${town.name}, TX`;
 
-  const metaDesc = `Live ${fuel === 'regular' ? '' : fuel + ' '}gas prices in ${town.name}, TX today. `
-    + `Cheapest: ${cheap.chain} at ${fmtPrice(cheap[fuel])}. `
-    + `Compare Murphy USA, HEB Gas, Shell and more.`;
+  const metaDesc = `Live ${fuel === 'regular' ? '' : fuel + ' '}gas prices in ${town.name}, TX `
+    + `updated hourly from AAA. Cheapest: ${cheapestChain} at $${cheapestPrice}/gal. `
+    + `Compare Murphy USA, HEB, Shell, Chevron and more across local stations.`;
 
   return render({
     PAGE_TITLE:       pageTitle,
-    HEAD_EXTRA:       buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc),
+    HEAD_EXTRA:       buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, cheapestPrice, cheapestChain, savings),
     CITY_SLUG:        town.slug,
     CITY_NAME:        town.name,
     CITY_NAME_FULL:   `${town.name}, TX`,
@@ -169,6 +244,10 @@ function buildPage(town, fuel) {
     FOOTER_NOTE:      buildFooterNote(),
     DEFAULT_TO_CITY:  defaultToCity(town.name),
     CURRENT_YEAR:     String(CURRENT_YEAR),
+    CHEAPEST_PRICE:   cheapestPrice,
+    CHEAPEST_CHAIN:   cheapestChain,
+    SAVINGS:          savings,
+    NEARBY_CITIES:    buildNearbyCitiesHtml(town),
   });
 }
 
