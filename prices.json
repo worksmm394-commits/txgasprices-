@@ -1,5 +1,5 @@
 {
-  "updated": "2026-04-16T11:45:12.381Z",
+  "updated": "2026-04-16T19:57:42.479Z",
   "stateAverage": {
     "regular": 3.685,
     "midgrade": 4.127,
@@ -9,7 +9,8 @@
   "source": {
     "aaa": "gasprices.aaa.com (TX state avg, today)",
     "eia": null,
-    "gasbuddy": null
+    "gasbuddy": null,
+    "apify": "apify.com/actors/johnvc~fuelprices (daily, 3/3 cities)"
   },
   "note": "Per-chain prices are ESTIMATES derived from the Texas state average plus fixed per-chain offsets (see CHAIN_OFFSETS in fetch-prices.js). Set GASBUDDY_API_KEY to replace estimates with live per-station data.",
   "chains": [
@@ -53,5 +54,128 @@
       "premium": 4.61,
       "diesel": 5.317
     }
-  ]
+  ],
+  "cities": {
+    "houston-tx": {
+      "regular": [
+        {
+          "chain": "Murphy USA",
+          "regular": null,
+          "station": null,
+          "address": null
+        },
+        {
+          "chain": "HEB Gas",
+          "regular": null,
+          "station": null,
+          "address": null
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.63,
+          "station": "Shell",
+          "address": "14002 Memorial Dr, Houston"
+        },
+        {
+          "chain": "Chevron",
+          "regular": null,
+          "station": null,
+          "address": null
+        },
+        {
+          "chain": "Buc-ee's",
+          "regular": null,
+          "station": null,
+          "address": null
+        }
+      ],
+      "cheapestOverall": {
+        "station": "Exxon",
+        "price": 3.57,
+        "address": "11035 Katy Fwy, Houston"
+      },
+      "stationsSeen": 8
+    },
+    "dallas-tx": {
+      "regular": [
+        {
+          "chain": "Murphy USA",
+          "regular": 3.35,
+          "station": "Murphy Express",
+          "address": "6021 Campbell Rd., Dallas"
+        },
+        {
+          "chain": "HEB Gas",
+          "regular": null,
+          "station": null,
+          "address": null
+        },
+        {
+          "chain": "Shell",
+          "regular": null,
+          "station": null,
+          "address": null
+        },
+        {
+          "chain": "Chevron",
+          "regular": null,
+          "station": null,
+          "address": null
+        },
+        {
+          "chain": "Buc-ee's",
+          "regular": null,
+          "station": null,
+          "address": null
+        }
+      ],
+      "cheapestOverall": {
+        "station": "Murphy Express",
+        "price": 3.35,
+        "address": "6021 Campbell Rd., Dallas"
+      },
+      "stationsSeen": 7
+    },
+    "austin-tx": {
+      "regular": [
+        {
+          "chain": "Murphy USA",
+          "regular": null,
+          "station": null,
+          "address": null
+        },
+        {
+          "chain": "HEB Gas",
+          "regular": 3.67,
+          "station": "H-E-B",
+          "address": "8700 IH-35, Austin"
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.69,
+          "station": "Shell",
+          "address": "8600 Manchaca Rd, Austin"
+        },
+        {
+          "chain": "Chevron",
+          "regular": 3.77,
+          "station": "Chevron",
+          "address": "6903 Brodie Ln, Austin"
+        },
+        {
+          "chain": "Buc-ee's",
+          "regular": null,
+          "station": null,
+          "address": null
+        }
+      ],
+      "cheapestOverall": {
+        "station": "Exxon",
+        "price": 3.59,
+        "address": "5625 West Gate Blvd, Austin"
+      },
+      "stationsSeen": 20
+    }
+  },
+  "apifyUpdated": "2026-04-16T19:57:42.479Z"
 }

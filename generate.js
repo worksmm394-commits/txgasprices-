@@ -85,12 +85,30 @@ function money2(n) { return Number(n).toFixed(2); }
 function fmtPrice(n)       { return '$' + Number(n).toFixed(2); }
 function fuelLabel(f)      { return f.charAt(0).toUpperCase() + f.slice(1); }
 
-// Per-town chain prices: base price × regional multiplier, rounded to 3 decimals.
+// Per-town chain prices.
+// Priority:
+//   1. Live per-city regular prices from Apify/GasBuddy (prices.cities[slug])
+//   2. Base price × regional multiplier, rounded to 3 decimals (estimate)
+// Midgrade/premium/diesel are always estimates — we only fetch regular live.
 function chainsForTown(town) {
   const mult = regionMultiplier(town);
+  const cityRow = prices.cities && prices.cities[town.slug];
+  const liveRegular = {};
+  if (cityRow && Array.isArray(cityRow.regular)) {
+    for (const r of cityRow.regular) {
+      if (r && r.chain && r.regular != null) liveRegular[r.chain] = Number(r.regular);
+    }
+  }
   return prices.chains.map(c => {
-    const row = { chain: c.chain, priceMode: c.priceMode };
-    for (const f of FUELS) row[f] = round3(c[f] * mult);
+    const row = { chain: c.chain };
+    row.priceMode = liveRegular[c.chain] != null ? 'live' : (c.priceMode || 'estimated');
+    for (const f of FUELS) {
+      if (f === 'regular' && liveRegular[c.chain] != null) {
+        row[f] = round3(liveRegular[c.chain]);
+      } else {
+        row[f] = round3(c[f] * mult);
+      }
+    }
     return row;
   });
 }

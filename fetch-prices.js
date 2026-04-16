@@ -223,10 +223,20 @@ function applyOffsets(avg, offsets) {
     };
   });
 
+  // Preserve the Apify `cities` block and its timestamp across hourly runs —
+  // fetch-apify-prices.js populates those less frequently (daily) and we
+  // don't want the hourly state-average refresh to wipe them.
+  let prior = {};
+  if (fs.existsSync("prices.json")) {
+    try { prior = JSON.parse(fs.readFileSync("prices.json", "utf8")); }
+    catch { prior = {}; }
+  }
+
   const payload = {
     updated: new Date().toISOString(),
     stateAverage: { ...avg },
     source: {
+      ...(prior.source || {}),
       aaa: aaa ? "gasprices.aaa.com (TX state avg, today)" : null,
       eia: eia ? "api.eia.gov v2 (TX weekly retail)" : null,
       gasbuddy: gb ? "api.gasbuddy.com (per-chain live)" : null,
@@ -236,6 +246,8 @@ function applyOffsets(avg, offsets) {
       "plus fixed per-chain offsets (see CHAIN_OFFSETS in fetch-prices.js). " +
       "Set GASBUDDY_API_KEY to replace estimates with live per-station data.",
     chains,
+    ...(prior.cities       ? { cities: prior.cities }             : {}),
+    ...(prior.apifyUpdated ? { apifyUpdated: prior.apifyUpdated } : {}),
   };
 
   fs.writeFileSync("prices.json", JSON.stringify(payload, null, 2));
