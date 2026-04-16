@@ -1,0 +1,57 @@
+{
+  "updated": "2026-04-16T11:45:12.381Z",
+  "stateAverage": {
+    "regular": 3.685,
+    "midgrade": 4.127,
+    "premium": 4.51,
+    "diesel": 5.247
+  },
+  "source": {
+    "aaa": "gasprices.aaa.com (TX state avg, today)",
+    "eia": null,
+    "gasbuddy": null
+  },
+  "note": "Per-chain prices are ESTIMATES derived from the Texas state average plus fixed per-chain offsets (see CHAIN_OFFSETS in fetch-prices.js). Set GASBUDDY_API_KEY to replace estimates with live per-station data.",
+  "chains": [
+    {
+      "chain": "Murphy USA",
+      "priceMode": "estimated",
+      "regular": 3.565,
+      "midgrade": 4.007,
+      "premium": 4.39,
+      "diesel": 5.147
+    },
+    {
+      "chain": "Buc-ee's",
+      "priceMode": "estimated",
+      "regular": 3.605,
+      "midgrade": 4.047,
+      "premium": 4.43,
+      "diesel": 5.177
+    },
+    {
+      "chain": "HEB Gas",
+      "priceMode": "estimated",
+      "regular": 3.635,
+      "midgrade": 4.077,
+      "premium": 4.46,
+      "diesel": 5.207
+    },
+    {
+      "chain": "Shell",
+      "priceMode": "estimated",
+      "regular": 3.755,
+      "midgrade": 4.197,
+      "premium": 4.58,
+      "diesel": 5.297
+    },
+    {
+      "chain": "Chevron",
+      "priceMode": "estimated",
+      "regular": 3.785,
+      "midgrade": 4.227,
+      "premium": 4.61,
+      "diesel": 5.317
+    }
+  ]
+}

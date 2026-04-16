@@ -1,0 +1,45 @@
+name: Update prices and deploy
+
+on:
+  schedule:
+    # Runs at minute 0 of every hour (UTC).
+    - cron: '0 * * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: update-prices
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch latest prices
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          GASBUDDY_API_KEY: ${{ secrets.GASBUDDY_API_KEY }}
+        run: node fetch-prices.js
+
+      - name: Generate static pages
+        run: node generate.js
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages deploy output --project-name=txgasprices

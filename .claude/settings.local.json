@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node *)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(npm install *)",
+      "Bash(npx wrangler *)",
+      "Bash(powershell -ExecutionPolicy Bypass -File make-favicon.ps1)"
+    ]
+  }
+}
