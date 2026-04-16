@@ -116,7 +116,7 @@ function buildFuelTabs(slug, currentFuel) {
   }).join('\n');
 }
 
-function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, cheapestPrice, cheapestChain, savings) {
+function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, faqData) {
   const webPage = {
     '@context':   'https://schema.org',
     '@type':      'WebPage',
@@ -125,32 +125,44 @@ function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, cheapest
     dateModified: prices.updated,
     url:          `https://txgasprices.net${canonicalPath}`,
   };
+  const updatedHuman = formatUpdated(prices.updated);
+  // JSON-LD questions and answers MUST match the visible FAQ on the page,
+  // or Google will withhold rich results. Keep these strings in lockstep
+  // with the <details> block in the template.
   const faq = {
     '@context': 'https://schema.org',
     '@type':    'FAQPage',
     mainEntity: [
       {
         '@type': 'Question',
-        name:    `What is the cheapest gas in ${town.name}, TX today?`,
+        name:    `What is the cheapest gas in ${town.name} right now?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `The cheapest regular unleaded in ${town.name}, TX today is $${cheapestPrice}/gal at ${cheapestChain}, updated hourly from AAA Texas state-average data.`,
+          text: `${faqData.cheapestChain} is currently the cheapest at $${faqData.cheapestPrice}/gal for regular unleaded. Prices last updated ${updatedHuman}.`,
         },
       },
       {
         '@type': 'Question',
-        name:    `How often are gas prices in ${town.name} updated?`,
+        name:    `How much does a full tank cost in ${town.name}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Gas prices on TXGasPrices.net are refreshed every hour from the AAA Texas state average and per-chain offsets for Murphy USA, HEB, Shell, Chevron, and Buc-ee's.`,
+          text: `At current prices, filling a 15-gallon tank costs $${faqData.tankCost15} at ${faqData.cheapestChain}. A 20-gallon tank costs $${faqData.tankCost20}.`,
         },
       },
       {
         '@type': 'Question',
-        name:    `How much can drivers save by choosing the cheapest station in ${town.name}?`,
+        name:    `How do ${town.name} gas prices compare to the Texas average?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `${town.name}, TX drivers can save up to $${savings}/gal by filling up at the cheapest station compared to the most expensive local option.`,
+          text: `The Texas state average for regular is $${faqData.stateAvg}/gal. ${town.name} drivers pay the state average — choose ${faqData.cheapestChain} to pay below average.`,
+        },
+      },
+      {
+        '@type': 'Question',
+        name:    `Which gas station is most expensive in ${town.name}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `${faqData.mostExpensiveChain} is currently the most expensive at $${faqData.mostExpensivePrice}/gal — $${faqData.savings}/gal more than ${faqData.cheapestChain}.`,
         },
       },
     ],
@@ -209,9 +221,18 @@ function buildPage(town, fuel) {
     ? `/gas-prices/${town.slug}`
     : `/gas-prices/${town.slug}/${fuel}`;
 
-  const cheapestPrice = Number(cheap[fuel]).toFixed(2);
-  const cheapestChain = cheap.chain;
-  const savings       = (Number(expensive[fuel]) - Number(cheap[fuel])).toFixed(2);
+  const cheapestPrice         = Number(cheap[fuel]).toFixed(2);
+  const cheapestChain         = cheap.chain;
+  const mostExpensivePrice    = Number(expensive[fuel]).toFixed(2);
+  const mostExpensiveChain    = expensive.chain;
+  const savings               = (Number(expensive[fuel]) - Number(cheap[fuel])).toFixed(2);
+  const tankCost15            = (Number(cheap[fuel]) * 15).toFixed(2);
+  const tankCost20            = (Number(cheap[fuel]) * 20).toFixed(2);
+  const tankSavingsVsExpensive = ((Number(expensive[fuel]) - Number(cheap[fuel])) * 15).toFixed(2);
+  const stateAvg              = prices.stateAverage && prices.stateAverage[fuel] != null
+    ? Number(prices.stateAverage[fuel]).toFixed(2)
+    : cheapestPrice;
+  const numStations           = prices.chains.length;
 
   const pageTitle = fuel === 'regular'
     ? `Gas Prices in ${town.name}, TX Today — Cheapest $${cheapestPrice}/gal | TXGasPrices`
@@ -227,7 +248,11 @@ function buildPage(town, fuel) {
 
   return render({
     PAGE_TITLE:       pageTitle,
-    HEAD_EXTRA:       buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, cheapestPrice, cheapestChain, savings),
+    HEAD_EXTRA:       buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, {
+      cheapestPrice, cheapestChain, savings,
+      mostExpensivePrice, mostExpensiveChain,
+      tankCost15, tankCost20, stateAvg,
+    }),
     CITY_SLUG:        town.slug,
     CITY_NAME:        town.name,
     CITY_NAME_FULL:   `${town.name}, TX`,
@@ -248,6 +273,13 @@ function buildPage(town, fuel) {
     CHEAPEST_CHAIN:   cheapestChain,
     SAVINGS:          savings,
     NEARBY_CITIES:    buildNearbyCitiesHtml(town),
+    MOST_EXPENSIVE_PRICE:      mostExpensivePrice,
+    MOST_EXPENSIVE_CHAIN:      mostExpensiveChain,
+    TANK_COST_15:              tankCost15,
+    TANK_COST_20:              tankCost20,
+    TANK_SAVINGS_VS_EXPENSIVE: tankSavingsVsExpensive,
+    STATE_AVG:                 stateAvg,
+    NUM_STATIONS:              String(numStations),
   });
 }
 

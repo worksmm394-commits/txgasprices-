@@ -33,6 +33,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ft{padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid rgba(0,0,0,.1);background:#f1efe8;color:#6b6b66;transition:all .15s;text-decoration:none}
 .ft.on{background:#E1F5EE;border-color:#5DCAA5;color:#085041;font-weight:500}
 .slabel{font-size:11px;font-weight:500;color:#9a9990;text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}
+.h-label{margin-top:0;font-size:inherit;font-weight:inherit;line-height:inherit;display:inline-block}
+.trustbar{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px;font-size:11.5px;color:#6b6b66}
+.trustbar .tb-item{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.trustbar .tb-item::before{content:"✓";color:#1D9E75;font-weight:700;font-size:12px}
 
 /* ── CHAIN CARDS ── */
 .chains{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:18px}
@@ -187,6 +191,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nearby-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 16px}
 .nearby-list a{color:#1D9E75;text-decoration:none;font-size:13px}
 .nearby-list a:hover{text-decoration:underline}
+.faq{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:18px 20px 10px}
+.faq>h2{font-size:13px;font-weight:500;color:#1a1a18;margin:0 0 12px;letter-spacing:.02em;text-transform:uppercase}
+.faq details{border-top:1px solid rgba(0,0,0,.06);padding:10px 0}
+.faq details:first-of-type{border-top:0}
+.faq summary{list-style:none;cursor:pointer;font-size:14px;font-weight:500;color:#1a1a18;padding:4px 28px 4px 0;position:relative;line-height:1.4}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:400;color:#9a9990;transition:transform .15s,color .15s}
+.faq details[open]>summary{color:#1D9E75}
+.faq details[open]>summary::after{content:"−";color:#1D9E75;transform:translateY(-50%) rotate(0)}
+.faq .faq-a{padding:8px 0 2px;font-size:13px;line-height:1.55;color:#4a4a45}
+.faq .faq-a b{color:#1a1a18;font-weight:500}
 
 /* estimates banner */
 .estnote{background:#FFF8E1;border:0.5px solid #EAC36A;border-radius:8px;padding:9px 13px;margin-bottom:14px;font-size:12px;color:#5a4510;line-height:1.45}
@@ -212,6 +227,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div>
       <h1 class="hero-title"><span id="page-title">{{HERO_TITLE}}</span><span id="weather"></span></h1>
       <div class="updated"><span class="live-dot"></span>Updated {{UPDATED}}</div>
+      <div class="trustbar"><span class="tb-item">Updated {{UPDATED}}</span><span class="tb-item">Source: AAA Texas</span><span class="tb-item">{{NUM_STATIONS}} stations tracked</span></div>
     </div>
     <div class="city-sel">
       <select onchange="switchCity(this)">
@@ -224,7 +240,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 {{FUEL_TABS}}
   </div>
 
-  <div class="slabel">Price by chain — today</div>
+  <h2 class="slabel h-label">Price by chain — today</h2>
 {{EST_BANNER}}
   <div class="chains" id="chains"></div>
 
@@ -239,7 +255,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <p class="map-note">Tap any pin → Google Maps opens with directions. Launches Maps app on mobile.</p>
 
   <div class="slabel slabel-row">
-    <span>Stations sorted by price</span>
+    <h2 class="h-label">Stations sorted by price</h2>
     <button class="reset-btn" id="reset-chain" onclick="setChainFilter(null)">All chains</button>
   </div>
   <div class="station-grid" id="stations"></div>
@@ -250,12 +266,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   Gas prices in <b>{{CITY_NAME}}, TX</b> are updated hourly from AAA state average data.
   Today the cheapest regular unleaded is <b>${{CHEAPEST_PRICE}}/gal</b> at <b>{{CHEAPEST_CHAIN}}</b>.
   {{CITY_NAME}} drivers can save up to <b>${{SAVINGS}}/gal</b> compared to the most expensive local option.
+  Filling a 15-gallon tank at {{CHEAPEST_CHAIN}} costs <b>${{TANK_COST_15}}</b> — saving <b>${{TANK_SAVINGS_VS_EXPENSIVE}}</b> compared to {{MOST_EXPENSIVE_CHAIN}}.
   Use the trip calculator below to find your exact fuel cost for any journey.
 </div>
 
 <!-- CALCULATOR -->
 <div class="calc-card" id="calculator">
-  <div class="slabel" style="margin-bottom:14px">Trip cost calculator</div>
+  <h2 class="slabel h-label" style="margin-bottom:14px">Trip cost calculator</h2>
 
   <!-- ROUTE -->
   <div class="slabel">Your route</div>
@@ -304,8 +321,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="car-sec">
       <div class="cargrid">
         <div class="f"><label>Make</label>
-          <select id="sel-make" onchange="onMakeChange()">
-            <option value="">Select make</option>
+          <select id="sel-make" onchange="onMakeChange()" onfocus="ensureMakesLoaded()" onmousedown="ensureMakesLoaded()">
+            <option value="">Tap to load cars</option>
           </select>
         </div>
         <div class="f"><label>Model</label>
@@ -410,6 +427,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <!-- NEARBY CITIES -->
 {{NEARBY_CITIES}}
+
+<!-- FAQ -->
+<section class="faq">
+  <h2>Gas prices in {{CITY_NAME}} — common questions</h2>
+  <details>
+    <summary>What is the cheapest gas in {{CITY_NAME}} right now?</summary>
+    <div class="faq-a">{{CHEAPEST_CHAIN}} is currently the cheapest at <b>${{CHEAPEST_PRICE}}/gal</b> for regular unleaded. Prices last updated {{UPDATED}}.</div>
+  </details>
+  <details>
+    <summary>How much does a full tank cost in {{CITY_NAME}}?</summary>
+    <div class="faq-a">At current prices, filling a 15-gallon tank costs <b>${{TANK_COST_15}}</b> at {{CHEAPEST_CHAIN}}. A 20-gallon tank costs <b>${{TANK_COST_20}}</b>.</div>
+  </details>
+  <details>
+    <summary>How do {{CITY_NAME}} gas prices compare to the Texas average?</summary>
+    <div class="faq-a">The Texas state average for regular is <b>${{STATE_AVG}}/gal</b>. {{CITY_NAME}} drivers pay the state average — choose {{CHEAPEST_CHAIN}} to pay below average.</div>
+  </details>
+  <details>
+    <summary>Which gas station is most expensive in {{CITY_NAME}}?</summary>
+    <div class="faq-a">{{MOST_EXPENSIVE_CHAIN}} is currently the most expensive at <b>${{MOST_EXPENSIVE_PRICE}}/gal</b> — <b>${{SAVINGS}}/gal</b> more than {{CHEAPEST_CHAIN}}.</div>
+  </details>
+</section>
 
 <div class="footer">
   <span>{{FOOTER_NOTE}}</span>
@@ -853,7 +891,7 @@ function loadCarDb() {
 
 async function loadMakes() {
   const sel = document.getElementById('sel-make');
-  sel.innerHTML = '<option value="">Loading...</option>';
+  sel.innerHTML = '<option value="">⟳ Loading cars...</option>';
   try {
     const db = await loadCarDb();
     const skipEV = ['Rivian','Lucid','Fisker','Canoo','Bollinger','Polestar'];
@@ -997,12 +1035,20 @@ function getGasPrice() {
 ═══════════════════════════════════════════════ */
 let pax=1, roundTrip=false, vMode='car';
 
+let _makesLoaded = false;
+function ensureMakesLoaded() {
+  if (_makesLoaded) return;
+  _makesLoaded = true;
+  loadMakes();
+}
+
 function setVMode(m) {
   vMode=m;
   document.getElementById('m-car').classList.toggle('on',m==='car');
   document.getElementById('m-mpg').classList.toggle('on',m==='mpg');
   document.getElementById('car-sec').style.display=m==='car'?'block':'none';
   document.getElementById('mpg-sec').style.display=m==='mpg'?'block':'none';
+  if (m==='car') ensureMakesLoaded();
   calcTrip();
 }
 function getMpg() {
@@ -1128,7 +1174,8 @@ populateChainSel();
 buildChips();
 matchRoute();
 calcTrip();
-loadMakes();
+// Car database (car-db.json) is loaded lazily on first interaction with the
+// Make dropdown or the "Pick my car" button — see ensureMakesLoaded().
 loadWeather(encodeURIComponent('{{CITY_NAME}}') + ',US');
 </script>
 <script>
