@@ -21,3 +21,6 @@ murphy-debug.html
 Thumbs.db
 *.swp
 *.swo
+
+# Claude Code local settings (can capture secrets via command log)
+.claude/
