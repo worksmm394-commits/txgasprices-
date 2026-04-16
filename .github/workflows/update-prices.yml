@@ -37,6 +37,9 @@ jobs:
       - name: Generate static pages
         run: node generate.js
 
+      - name: Copy car-db.json into output
+        run: cp car-db.json output/car-db.json
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:

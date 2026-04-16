@@ -820,23 +820,28 @@ async function feFetch(url) {
   return r.json();
 }
 
+let CAR_DB = null, CAR_DB_PROMISE = null;
+function loadCarDb() {
+  if (CAR_DB) return Promise.resolve(CAR_DB);
+  if (!CAR_DB_PROMISE) {
+    CAR_DB_PROMISE = fetch('/car-db.json', {cache:'force-cache'})
+      .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(d => { CAR_DB = d; return d; });
+  }
+  return CAR_DB_PROMISE;
+}
+
 async function loadMakes() {
   const sel = document.getElementById('sel-make');
   sel.innerHTML = '<option value="">Loading...</option>';
   try {
-    const data = await feFetch(`${FEGOV}/vehicle/menu/make?year={{CURRENT_YEAR}}`);
-    const items = toArr(data.menuItem);
-    sel.innerHTML = '<option value="">Select make</option>';
+    const db = await loadCarDb();
     const skipEV = ['Rivian','Lucid','Fisker','Canoo','Bollinger','Polestar'];
-    items.forEach(m => {
-      if (skipEV.includes(m.value)) return;
-      sel.innerHTML += `<option>${m.value}</option>`;
+    sel.innerHTML = '<option value="">Select make</option>';
+    Object.keys(db.models).sort((a,b)=>a.localeCompare(b)).forEach(m => {
+      if (skipEV.includes(m)) return;
+      sel.innerHTML += `<option>${m}</option>`;
     });
-    // Add legacy brands
-    sel.innerHTML += '<option disabled>── Older brands ──</option>';
-    ['Pontiac','Saturn','Oldsmobile','Mercury','Hummer','Saab','Isuzu','Suzuki','Scion','Plymouth','Eagle','Geo'].forEach(b =>
-      sel.innerHTML += `<option>${b}</option>`
-    );
   } catch(e) {
     sel.innerHTML = '<option value="">Could not load — check connection</option>';
     showCarErr('Could not load car makes. Check your internet and try again, or enter MPG manually below.');
@@ -850,13 +855,11 @@ async function onMakeChange() {
   yrSel.innerHTML = '<option value="">Select year</option>'; yrSel.disabled = true;
   resetMpgDisplay();
   if (!make) { moSel.innerHTML = '<option value="">Select model</option>'; return; }
-  const legacyYear = {Pontiac:2010,Saturn:2010,Oldsmobile:2004,Mercury:2011,Hummer:2010,Saab:2011,Isuzu:2008,Suzuki:2013,Scion:2016,Plymouth:2001,Eagle:1998,Geo:1997};
-  const refYear = legacyYear[make] || {{CURRENT_YEAR}};
   try {
-    const data = await feFetch(`${FEGOV}/vehicle/menu/model?year=${refYear}&make=${encodeURIComponent(make)}`);
-    const items = toArr(data.menuItem);
+    const db = await loadCarDb();
+    const models = Object.keys(db.models[make] || {}).sort((a,b)=>a.localeCompare(b));
     moSel.innerHTML = '<option value="">Select model</option>';
-    items.forEach(m => moSel.innerHTML += `<option>${m.value}</option>`);
+    models.forEach(m => moSel.innerHTML += `<option>${m}</option>`);
     moSel.disabled = false;
     hideCarErr();
   } catch(e) {
@@ -869,27 +872,18 @@ async function onModelChange() {
   const make = document.getElementById('sel-make').value;
   const model = document.getElementById('sel-model').value;
   const yrSel = document.getElementById('sel-year');
-  yrSel.innerHTML = '<option value="">Loading years...</option>'; yrSel.disabled = true;
+  yrSel.innerHTML = '<option value="">Select year</option>'; yrSel.disabled = true;
   resetMpgDisplay();
   if (!model) return;
-  const legacyYear = {Pontiac:2010,Saturn:2010,Oldsmobile:2004,Mercury:2011,Hummer:2010,Saab:2011,Isuzu:2008,Suzuki:2013,Scion:2016,Plymouth:2001,Eagle:1998,Geo:1997};
-  const maxY = legacyYear[make] || {{CURRENT_YEAR}};
-  const years = [];
-  for (let i=0; i<=(maxY-1984); i+=8) {
-    const batch = [];
-    for (let j=i; j<Math.min(i+8,maxY-1984+1); j++) batch.push(maxY-j);
-    const results = await Promise.allSettled(
-      batch.map(y => feFetch(`${FEGOV}/vehicle/menu/model?year=${y}&make=${encodeURIComponent(make)}`))
-    );
-    results.forEach((r,idx) => {
-      if (r.status==='fulfilled' && toArr(r.value.menuItem).some(m=>m.value===model)) years.push(batch[idx]);
-    });
+  try {
+    const db = await loadCarDb();
+    const years = ((db.models[make] && db.models[make][model]) || []).slice().sort((a,b)=>b-a);
+    yrSel.innerHTML = '<option value="">Select year</option>';
+    years.forEach(y => yrSel.innerHTML += `<option>${y}</option>`);
+    yrSel.disabled = false;
+  } catch(e) {
+    yrSel.innerHTML = '<option value="">Error loading years</option>';
   }
-  yrSel.innerHTML = '<option value="">Select year</option>';
-  (years.length ? years.sort((a,b)=>b-a) : Array.from({length:15},(_,i)=>maxY-i)).forEach(y =>
-    yrSel.innerHTML += `<option>${y}</option>`
-  );
-  yrSel.disabled = false;
 }
 
 async function onYearChange() {
