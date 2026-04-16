@@ -263,11 +263,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <!-- SEO TEXT -->
 <div class="seo-text">
-  Gas prices in <b>{{CITY_NAME}}, TX</b> are updated hourly from AAA state average data.
-  Today the cheapest regular unleaded is <b>${{CHEAPEST_PRICE}}/gal</b> at <b>{{CHEAPEST_CHAIN}}</b>.
-  {{CITY_NAME}} drivers can save up to <b>${{SAVINGS}}/gal</b> compared to the most expensive local option.
-  Filling a 15-gallon tank at {{CHEAPEST_CHAIN}} costs <b>${{TANK_COST_15}}</b> — saving <b>${{TANK_SAVINGS_VS_EXPENSIVE}}</b> compared to {{MOST_EXPENSIVE_CHAIN}}.
-  Use the trip calculator below to find your exact fuel cost for any journey.
+  Gas prices in <b>{{CITY_NAME}}, {{COUNTY}} County</b> are updated hourly.
+  {{CITY_NAME}} is a city of <b>{{POPULATION_FORMATTED}}</b> residents in {{REGION_DESC}}.
+  The cheapest regular unleaded today is <b>${{CHEAPEST_PRICE}}/gal</b> at <b>{{CHEAPEST_CHAIN}}</b> — filling a 15-gallon tank costs <b>${{TANK_COST_15}}</b>.
+  Compared to the Texas state average of <b>${{STATE_AVG}}/gal</b>, {{CITY_NAME}} drivers {{ABOVE_BELOW}} the statewide average.
 </div>
 
 <!-- CALCULATOR -->
@@ -440,12 +439,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="faq-a">At current prices, filling a 15-gallon tank costs <b>${{TANK_COST_15}}</b> at {{CHEAPEST_CHAIN}}. A 20-gallon tank costs <b>${{TANK_COST_20}}</b>.</div>
   </details>
   <details>
-    <summary>How do {{CITY_NAME}} gas prices compare to the Texas average?</summary>
-    <div class="faq-a">The Texas state average for regular is <b>${{STATE_AVG}}/gal</b>. {{CITY_NAME}} drivers pay the state average — choose {{CHEAPEST_CHAIN}} to pay below average.</div>
+    <summary>{{FAQ_Q3_QUESTION}}</summary>
+    <div class="faq-a">{{FAQ_Q3_ANSWER}}</div>
   </details>
   <details>
-    <summary>Which gas station is most expensive in {{CITY_NAME}}?</summary>
-    <div class="faq-a">{{MOST_EXPENSIVE_CHAIN}} is currently the most expensive at <b>${{MOST_EXPENSIVE_PRICE}}/gal</b> — <b>${{SAVINGS}}/gal</b> more than {{CHEAPEST_CHAIN}}.</div>
+    <summary>{{FAQ_Q4_QUESTION}}</summary>
+    <div class="faq-a">{{FAQ_Q4_ANSWER}}</div>
   </details>
 </section>
 
