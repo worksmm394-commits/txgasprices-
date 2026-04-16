@@ -14,9 +14,12 @@ const fs   = require('fs');
 const path = require('path');
 
 // ── data ──────────────────────────────────────────────────────
-const prices   = JSON.parse(fs.readFileSync('./prices.json', 'utf8'));
-const towns    = JSON.parse(fs.readFileSync('./towns.json',  'utf8'));
-const TEMPLATE = fs.readFileSync('./texas_gas_site_ui_mockup.html', 'utf8');
+const prices    = JSON.parse(fs.readFileSync('./prices.json', 'utf8'));
+const towns     = JSON.parse(fs.readFileSync('./towns.json',  'utf8'));
+const CITY_INFO = fs.existsSync('./cities-info.json')
+  ? JSON.parse(fs.readFileSync('./cities-info.json', 'utf8'))
+  : {};
+const TEMPLATE  = fs.readFileSync('./texas_gas_site_ui_mockup.html', 'utf8');
 
 const FUELS        = ['regular', 'midgrade', 'premium', 'diesel'];
 const hasEstimates = prices.chains.some(c => c.priceMode === 'estimated');
@@ -251,63 +254,213 @@ function buildFuelTabs(slug, currentFuel) {
   }).join('\n');
 }
 
-// Shared FAQ data. Drives both the visible FAQ tokens AND the FAQPage JSON-LD
-// so Google sees identical Q/A strings (required for rich results).
+// ── dynamic FAQ ──────────────────────────────────────────────
+// Drives both the visible FAQ <details> block AND the FAQPage JSON-LD.
+// Answers contain inline <b> for price highlights; JSON-LD strips tags.
+//
+// Every city gets Q1 (cheapest) + Q2 (tank cost). Additional questions are
+// added conditionally from cities-info.json:
+//   - cheapest chain is a warehouse club → membership question
+//   - refinery_nearby                     → refinery question
+//   - oil_rigs_nearby > 0                 → oil-paradox question
+//   - border_town                         → border question
+//   - military_base                       → military question
+//   - college_town                        → college/game-day question
+// If no conditionals match and we're under 3 items, a state-average
+// comparison fallback is appended. Each city gets 3–6 items total.
+
+const FAQ_MIN = 3;
+const FAQ_MAX = 6;
+// Walmart and Walmart Neighborhood Market sell fuel to the general public
+// without a membership card — only warehouse-club chains (Sam's, Costco, BJ's)
+// require a paid card for their posted pump price.
+const MEMBERSHIP_FAQ_CHAINS = new Set([
+  "Sam's Club", 'Costco', "BJ's",
+]);
+
+function stripHtml(s) { return String(s).replace(/<[^>]+>/g, ''); }
+
+// FAQ answers show prices at 2 decimals (consumer-friendly). The underlying
+// tokens (page title, meta description) keep 3-decimal precision for SEO
+// and accuracy — this helper converts only inside FAQ composition.
+function faq2dec(s) {
+  const n = Number(s);
+  return Number.isFinite(n) ? n.toFixed(2) : String(s);
+}
+
+function countyFor(town) {
+  return town.county ? town.county : null;
+}
+
+// ── conditional-question generators — each returns {q, a} or null ────────
+function faqMembership(town, d, info, townChains) {
+  const altChain = (townChains || []).find(c => !MEMBERSHIP_FAQ_CHAINS.has(c.chain));
+  const altPart = altChain
+    ? ` The next-cheapest non-membership chain in ${town.name} is <b>${altChain.chain}</b> at <b>$${faq2dec(altChain.regular)}/gal</b>.`
+    : '';
+  return {
+    q: `Do I need a membership to get the cheapest gas in ${town.name}?`,
+    a: `Yes — <b>${d.cheapestChain}</b>'s posted $${faq2dec(d.cheapestPrice)}/gal requires a paid membership card.${altPart}`,
+  };
+}
+
+function faqRefinery(town, d, info) {
+  if (!info.refinery_name) return null;
+  const miles = info.refinery_miles;
+  const milesPart = Number.isFinite(miles) && miles >= 0
+    ? ` — roughly ${miles} mile${miles === 1 ? '' : 's'} away`
+    : '';
+  const factor = info.price_factor ? ` ${info.price_factor}.` : '';
+  return {
+    q: `Why is gas in ${town.name} often cheaper than the Texas average?`,
+    a: `${town.name} sits near ${info.refinery_name}${milesPart}.${factor}`,
+  };
+}
+
+function faqOilParadox(town, d, info) {
+  const rigs = info.oil_rigs_nearby;
+  if (!Number.isFinite(rigs) || rigs <= 0) return null;
+  // Cities with a local refinery AND nearby rigs (e.g. Big Spring) don't
+  // have the paradox: their fuel is already cheap. Skip the question to
+  // avoid contradicting the refinery answer on the same page.
+  if (info.refinery_nearby) return null;
+  const county = countyFor(town) || 'the county';
+  const factor = info.price_factor ? ` ${info.price_factor}.` : '';
+  return {
+    q: `Why aren't gas prices in ${town.name} lower given nearby oil production?`,
+    a: `Even with ${rigs}+ active rigs in ${county} County, Permian crude travels hundreds of miles to Gulf Coast refineries and returns as finished gasoline.${factor}`,
+  };
+}
+
+function faqBorder(town, d, info) {
+  const fact = info.local_fact ? ` ${info.local_fact}.` : '';
+  const factor = info.price_factor ? ` ${info.price_factor}.` : '';
+  return {
+    q: `Are gas prices cheaper near the Texas-Mexico border in ${town.name}?`,
+    a: `${town.name} sits on the border, where cross-border demand and regional competition shape pump prices.${factor}${fact}`,
+  };
+}
+
+// Normalize a military_base_name string for use inside a question sentence.
+//   - Strips the " — soldiers/acres" suffix
+//   - Expands common abbreviations (AFB → Air Force Base, JBSA → Joint Base San Antonio)
+//   - For "X adjacent (commuter access)" phrasing → rewrites as "proximity to X"
+//   - For "X nearby (Y)" phrasing → strips "nearby" but keeps the parenthetical
+function militaryDisplayName(raw) {
+  if (!raw) return raw;
+  let s = raw.split(' — ')[0].trim();
+  s = s.replace(/\bAFB\b/g, 'Air Force Base');
+  s = s.replace(/\bJBSA\b/g, 'Joint Base San Antonio');
+  const adjMatch = s.match(/^(.+?)\s+adjacent\s*(?:\(commuter[^)]*\))?\s*$/i);
+  if (adjMatch) return `proximity to ${adjMatch[1].trim()}`;
+  s = s.replace(/\s+nearby\s*\(/, ' (');
+  s = s.replace(/\s+nearby\s*$/, '');
+  return s;
+}
+
+function faqMilitary(town, d, info) {
+  if (!info.military_base_name) return null;
+  const display = militaryDisplayName(info.military_base_name);
+  const commute = info.commute_note ? ` ${info.commute_note}.` : '';
+  const startsWithProximity = /^proximity to\b/i.test(display);
+  const answerLead = startsWithProximity
+    ? `${town.name}'s ${display}`
+    : `${town.name} is adjacent to ${display}`;
+  return {
+    q: `How does ${display} affect ${town.name} gas demand?`,
+    a: `${answerLead}, and its shift changes drive predictable fuel-demand surges.${commute}`,
+  };
+}
+
+// Only Texas universities with large enrollments AND competitive football
+// programs get a college FAQ — game-day traffic is the mechanism the answer
+// describes, so small schools (Angelo State, Texas Lutheran, TAMIU Laredo,
+// UTRGV regional campuses, Midwestern State, Austin College, Southwestern,
+// Blinn, Howard) don't fit the premise and are excluded.
+const MAJOR_COLLEGE_PATTERNS = [
+  /university of texas at austin|\bUT Austin\b/i,
+  /texas a&m university(?!.*international)/i,   // includes TAMU College Station; excludes TAMIU
+  /texas tech/i,
+  /baylor/i,
+  /university of north texas|\bUNT\b/i,
+  /\bTCU\b|texas christian/i,
+  /university of texas at arlington|\bUT Arlington\b/i,
+  /university of texas at san antonio|\bUTSA\b/i,
+  /texas state university/i,
+  /sam houston state/i,
+  /\bUT Tyler\b|university of texas at tyler/i,
+  /stephen f\.?\s*austin/i,
+];
+function isMajorCollegeTown(universityName) {
+  if (!universityName) return false;
+  return MAJOR_COLLEGE_PATTERNS.some(re => re.test(universityName));
+}
+
+function faqCollege(town, d, info) {
+  if (!info.university_name) return null;
+  if (!isMajorCollegeTown(info.university_name)) return null;
+  const uniShort = info.university_name.split(' (')[0].split(',')[0].trim();
+  const factMentionsCampus = info.local_fact && (
+    /student|campus|university|college|stadium|football|\bA&M\b|\bTech\b|Baylor|\bUT\b/i.test(info.local_fact)
+  );
+  const factTail = factMentionsCampus ? ` ${info.local_fact}.` : '';
+  return {
+    q: `Do ${uniShort} events affect gas prices in ${town.name}?`,
+    a: `Home football weekends, graduations, and major campus events push local traffic and fuel demand above normal levels.${factTail}`,
+  };
+}
+
+function faqStateAvgFallback(town, d, info) {
+  const commute = info.commute_note ? ` ${info.commute_note}.` : '';
+  return {
+    q: `How do ${town.name} gas prices compare to the Texas state average?`,
+    a: `The Texas state average for regular is <b>$${faq2dec(d.stateAvg)}/gal</b>. ${town.name} drivers pay close to the statewide average — choose <b>${d.cheapestChain}</b> to pay below average.${commute}`,
+  };
+}
+
 function buildFaqItems(town, d) {
+  const info = CITY_INFO[town.slug] || {};
   const updatedHuman = formatUpdated(prices.updated);
-  const region = regionFor(town);
-  const city = town.name;
+  const townChains = chainsForTown(town);
+  const items = [];
 
-  const q1 = {
-    q: `What is the cheapest gas in ${city} right now?`,
-    a: `${d.cheapestChain} is currently the cheapest at $${d.cheapestPrice}/gal for regular unleaded. Prices last updated ${updatedHuman}.`,
-  };
-  const q2 = {
-    q: `How much does a full tank cost in ${city}?`,
-    a: `At current prices, filling a 15-gallon tank costs $${d.tankCost15} at ${d.cheapestChain}. A 20-gallon tank costs $${d.tankCost20}.`,
-  };
+  // Always-on Q1 + Q2 (per-gallon prices rounded to 2 decimals for FAQ)
+  items.push({
+    q: `What is the cheapest gas in ${town.name} right now?`,
+    a: `<b>${d.cheapestChain}</b> is currently the cheapest at <b>$${faq2dec(d.cheapestPrice)}/gal</b> for regular unleaded. Prices last updated ${updatedHuman}.`,
+  });
+  items.push({
+    q: `How much does a full tank cost in ${town.name}?`,
+    a: `At current prices, filling a 15-gallon tank costs <b>$${d.tankCost15}</b> at ${d.cheapestChain}. A 20-gallon tank costs <b>$${d.tankCost20}</b>.`,
+  });
 
-  let q3;
-  if (region === 'dfw') {
-    q3 = {
-      q: `How do ${city} gas prices compare to other DFW cities?`,
-      a: `${city} gas prices are in line with the DFW metro average. Murphy USA and HEB Gas are consistently the cheapest options across the Metroplex.`,
-    };
-  } else if (region === 'houston') {
-    if (city === 'Houston') {
-      q3 = {
-        q: `How do Houston gas prices compare to the Texas average?`,
-        a: `Houston tracks slightly below the Texas state average of $${d.stateAvg}/gal thanks to its proximity to Gulf Coast refineries. Murphy USA and Buc-ee's are consistently the cheapest options across the metro.`,
-      };
-    } else {
-      q3 = {
-        q: `How do ${city} gas prices compare to Houston?`,
-        a: `${city} tracks closely with the Greater Houston average. Murphy USA and Buc-ee's are typically the cheapest options across the metro area.`,
-      };
-    }
-  } else if (region === 'border') {
-    q3 = {
-      q: `Are gas prices cheaper near the Texas-Mexico border?`,
-      a: `South Texas border cities like ${city} typically have slightly lower gas prices than the state average due to lower transportation costs and regional competition.`,
-    };
-  } else if (region === 'west') {
-    q3 = {
-      q: `Why are gas prices higher in West Texas?`,
-      a: `Cities like ${city} in West Texas tend to pay slightly more for gas due to longer supply chain distances from major refineries.`,
-    };
-  } else {
-    q3 = {
-      q: `How do ${city} gas prices compare to the Texas average?`,
-      a: `The Texas state average for regular is $${d.stateAvg}/gal. ${city} drivers pay close to the statewide average — choose ${d.cheapestChain} to pay below average.`,
-    };
+  // Priority-ordered conditionals — appended in order, capped at FAQ_MAX
+  const isMembership = MEMBERSHIP_FAQ_CHAINS.has(d.cheapestChain);
+  const candidates = [];
+  if (isMembership)              candidates.push(faqMembership(town, d, info, townChains));
+  if (info.refinery_nearby)      candidates.push(faqRefinery(town, d, info));
+  if (info.oil_rigs_nearby > 0)  candidates.push(faqOilParadox(town, d, info));
+  if (info.border_town)          candidates.push(faqBorder(town, d, info));
+  if (info.military_base)        candidates.push(faqMilitary(town, d, info));
+  if (info.college_town)         candidates.push(faqCollege(town, d, info));
+
+  for (const c of candidates) {
+    if (c && items.length < FAQ_MAX) items.push(c);
   }
 
-  const q4 = {
-    q: `What is the cheapest day to buy gas in ${city}?`,
-    a: `Gas prices in ${city} are typically lowest on Monday and Tuesday mornings before weekly price adjustments. Prices often rise Thursday-Saturday ahead of weekend travel demand.`,
-  };
+  // Fallback if still under the minimum
+  if (items.length < FAQ_MIN) items.push(faqStateAvgFallback(town, d, info));
 
-  return [q1, q2, q3, q4];
+  return items;
+}
+
+// Server-render the FAQ <details> blocks. Sits inside the template's
+// <section class="faq"><h2>…</h2>{{FAQ_ITEMS_HTML}}</section>.
+function buildFaqItemsHtml(faqItems) {
+  return faqItems.map(item => `  <details>
+    <summary>${escHtml(item.q)}</summary>
+    <div class="faq-a">${item.a}</div>
+  </details>`).join('\n');
 }
 
 function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, faqItems, opts = {}) {
@@ -326,7 +479,10 @@ function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, faqItems
     mainEntity: faqItems.map(item => ({
       '@type': 'Question',
       name:    item.q,
-      acceptedAnswer: { '@type': 'Answer', text: item.a },
+      // JSON-LD must match visible text semantically. Visible answers have
+      // <b> around prices; strip tags here so rich-result validators see
+      // plain text identical to what users read.
+      acceptedAnswer: { '@type': 'Answer', text: stripHtml(item.a) },
     })),
   };
   const lines = [
@@ -386,9 +542,9 @@ function defaultToCity(currentName) {
 // ── chain card server-rendering ──────────────────────────────
 // Chains where the posted price requires a paid membership.
 const MEMBERSHIP_CHAINS = new Set([
-  "Sam's Club", 'Costco', 'Walmart', 'Walmart Neighborhood Market', "BJ's",
+  "Sam's Club", 'Costco', "BJ's",
 ]);
-const MEMBERSHIP_TOOLTIP = "Requires Sam's Club / Costco / Walmart+ membership";
+const MEMBERSHIP_TOOLTIP = "Requires Sam's Club / Costco / BJ's membership";
 
 function escAttr(s) {
   return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -492,7 +648,7 @@ function buildPage(town, fuel, opts = {}) {
   const faqItems = buildFaqItems(town, {
     cheapestPrice, cheapestChain, tankCost15, tankCost20, stateAvg,
   });
-  const [, , q3, q4] = faqItems;
+  const faqItemsHtml = buildFaqItemsHtml(faqItems);
 
   const population = Number(town.population) || 0;
   const populationFormatted = population > 0 ? population.toLocaleString('en-US') : 'many';
@@ -536,10 +692,7 @@ function buildPage(town, fuel, opts = {}) {
     POPULATION_FORMATTED:      populationFormatted,
     REGION_DESC:               regionDesc(town),
     ABOVE_BELOW:               aboveBelow(mult),
-    FAQ_Q3_QUESTION:           q3.q,
-    FAQ_Q3_ANSWER:             q3.a,
-    FAQ_Q4_QUESTION:           q4.q,
-    FAQ_Q4_ANSWER:             q4.a,
+    FAQ_ITEMS_HTML:            faqItemsHtml,
     DATA_SOURCE:               dataSourceFor(town),
     INITIAL_CHAINS_HTML:       renderInitialChainsHtml(town),
   });

@@ -432,25 +432,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- NEARBY CITIES -->
 {{NEARBY_CITIES}}
 
-<!-- FAQ -->
+<!-- FAQ — items server-rendered dynamically from cities-info.json -->
 <section class="faq">
   <h2>Gas prices in {{CITY_NAME}} — common questions</h2>
-  <details>
-    <summary>What is the cheapest gas in {{CITY_NAME}} right now?</summary>
-    <div class="faq-a">{{CHEAPEST_CHAIN}} is currently the cheapest at <b>${{CHEAPEST_PRICE}}/gal</b> for regular unleaded. Prices last updated {{UPDATED}}.</div>
-  </details>
-  <details>
-    <summary>How much does a full tank cost in {{CITY_NAME}}?</summary>
-    <div class="faq-a">At current prices, filling a 15-gallon tank costs <b>${{TANK_COST_15}}</b> at {{CHEAPEST_CHAIN}}. A 20-gallon tank costs <b>${{TANK_COST_20}}</b>.</div>
-  </details>
-  <details>
-    <summary>{{FAQ_Q3_QUESTION}}</summary>
-    <div class="faq-a">{{FAQ_Q3_ANSWER}}</div>
-  </details>
-  <details>
-    <summary>{{FAQ_Q4_QUESTION}}</summary>
-    <div class="faq-a">{{FAQ_Q4_ANSWER}}</div>
-  </details>
+{{FAQ_ITEMS_HTML}}
 </section>
 
 <div class="footer">
@@ -479,7 +464,7 @@ let chainsExpanded = false;
 // Chains where the posted price requires a paid membership. We flag these
 // so users know why warehouse-store prices beat every branded chain.
 const MEMBERSHIP_CHAINS = new Set([
-  "Sam's Club", 'Costco', 'Walmart', 'Walmart Neighborhood Market', "BJ's",
+  "Sam's Club", 'Costco', "BJ's",
 ]);
 
 function toggleChainsExpanded() {
@@ -511,7 +496,7 @@ function renderHero() {
       ? `<div class="cc-stations">${c.sc} station${c.sc === 1 ? '' : 's'} nearby</div>`
       : '';
     const memberBadge = isMember
-      ? `<div><span class="cc-mbr" title="Requires Sam&#39;s Club / Costco / Walmart+ membership">⚑ membership price</span></div>`
+      ? `<div><span class="cc-mbr" title="Requires Sam&#39;s Club / Costco / BJ&#39;s membership">⚑ membership price</span></div>`
       : '';
     return `<div class="cc${i===0?' best':''}${isSel?' sel':''}" data-chain="${escAttr(c.n)}" onclick="setChainFilter(this.dataset.chain)">
       ${i===0?'<div class="cc-badge">cheapest</div>':''}
