@@ -58,6 +58,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cc-price{font-size:22px;font-weight:500;margin-bottom:2px}
 .cc.best .cc-price{color:#085041}
 .cc-ch{font-size:11px}.ch-up{color:#A32D2D}.ch-dn{color:#0F6E56}.ch-nc{color:#9a9990}
+.cc-mbr{display:inline-block;font-size:9px;color:#6b6b66;background:#e8e5da;border-radius:3px;padding:1px 5px;margin-top:4px;letter-spacing:.02em;cursor:help}
+.cc-stations{font-size:10.5px;color:#9a9990;margin-top:3px}
+.chains-toggle{display:flex;justify-content:center;margin-top:10px}
+.chains-toggle button{background:#fff;border:0.5px solid rgba(0,0,0,.14);border-radius:20px;padding:7px 16px;font-size:12px;color:#1D9E75;font-weight:500;cursor:pointer;transition:border-color .15s,background .15s}
+.chains-toggle button:hover{border-color:#1D9E75;background:#f8fbf9}
 
 /* ── MAP ── */
 .map-frame{border-radius:10px;overflow:hidden;border:0.5px solid rgba(0,0,0,.09);height:340px;margin-bottom:10px}
@@ -227,7 +232,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div>
       <h1 class="hero-title"><span id="page-title">{{HERO_TITLE}}</span><span id="weather"></span></h1>
       <div class="updated"><span class="live-dot"></span>Updated {{UPDATED}}</div>
-      <div class="trustbar"><span class="tb-item">Updated {{UPDATED}}</span><span class="tb-item">Source: AAA Texas</span><span class="tb-item">{{NUM_STATIONS}} stations tracked</span></div>
+      <div class="trustbar"><span class="tb-item">Updated {{UPDATED}} CT</span><span class="tb-item">Source: GasBuddy data</span><span class="tb-item">Prices change 3-4x/week</span></div>
     </div>
     <div class="city-sel">
       <select onchange="switchCity(this)">
@@ -469,6 +474,18 @@ let heroCity = '{{CITY_NAME_FULL}}';
 let heroLat  = '{{CITY_LAT}}';
 let heroLng  = '{{CITY_LNG}}';
 let chainFilter = null;
+let chainsExpanded = false;
+
+// Chains where the posted price requires a paid membership. We flag these
+// so users know why warehouse-store prices beat every branded chain.
+const MEMBERSHIP_CHAINS = new Set([
+  "Sam's Club", 'Costco', 'Walmart', 'Walmart Neighborhood Market', "BJ's",
+]);
+
+function toggleChainsExpanded() {
+  chainsExpanded = !chainsExpanded;
+  renderHero();
+}
 
 function dirUrl(addr, city) {
   return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(addr + ', ' + city);
@@ -479,23 +496,40 @@ function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot
 function renderHero() {
   const list = priceData[heroFuel];
 
-  // Hero cards are capped at the 8 cheapest chains so the grid never
-  // overflows on mobile even for ZIPs that return a long brand list.
-  // The station list below shows every chain.
-  const HERO_MAX = 8;
-  const heroList = list.slice(0, HERO_MAX);
+  // Hero cards show the 6 cheapest chains by default. If the city has more,
+  // a "Show all X chains" toggle expands the grid to the full list.
+  const HERO_MAX = 6;
+  const needsToggle = list.length > HERO_MAX;
+  const heroList = (needsToggle && !chainsExpanded) ? list.slice(0, HERO_MAX) : list;
 
-  document.getElementById('chains').innerHTML = heroList.map((c,i) => {
+  const chainCards = heroList.map((c,i) => {
     const sym = c.ch==='up'?'▲ +0.03':c.ch==='dn'?'▼ −0.02':'— no change';
     const cls = c.ch==='up'?'ch-up':c.ch==='dn'?'ch-dn':'ch-nc';
     const isSel = c.n === chainFilter;
+    const isMember = MEMBERSHIP_CHAINS.has(c.n);
+    const stationsLine = c.sc && c.sc > 0
+      ? `<div class="cc-stations">${c.sc} station${c.sc === 1 ? '' : 's'} nearby</div>`
+      : '';
+    const memberBadge = isMember
+      ? `<div><span class="cc-mbr" title="Requires membership card">membership price</span></div>`
+      : '';
     return `<div class="cc${i===0?' best':''}${isSel?' sel':''}" data-chain="${escAttr(c.n)}" onclick="setChainFilter(this.dataset.chain)">
       ${i===0?'<div class="cc-badge">cheapest</div>':''}
       <div class="cc-name">${c.n}</div>
       <div class="cc-price">$${c.p.toFixed(2)}</div>
       <div class="cc-ch ${cls}">${sym}</div>
+      ${stationsLine}
+      ${memberBadge}
     </div>`;
   }).join('');
+
+  const toggleBtn = needsToggle
+    ? `<div class="chains-toggle"><button type="button" onclick="toggleChainsExpanded()">${
+        chainsExpanded ? 'Show less ▲' : `Show all ${list.length} chains ▼`
+      }</button></div>`
+    : '';
+
+  document.getElementById('chains').innerHTML = chainCards + toggleBtn;
 
   const filtered = chainFilter ? list.filter(s => s.n === chainFilter) : list;
   document.getElementById('stations').innerHTML = filtered.map((s,i) =>

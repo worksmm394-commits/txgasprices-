@@ -133,24 +133,26 @@ function chainsForTown(town) {
     return live.map(c => {
       const reg = Number(c.regular);
       return {
-        chain:     c.chain,
-        priceMode: 'live',
-        address:   c.address || null,
-        station:   c.station || null,
-        regular:   round3(reg),
-        midgrade:  round3(reg + diff.midgrade),
-        premium:   round3(reg + diff.premium),
-        diesel:    round3(reg + diff.diesel),
+        chain:        c.chain,
+        priceMode:    'live',
+        address:      c.address || null,
+        station:      c.station || null,
+        stationCount: c.stationCount || null,
+        regular:      round3(reg),
+        midgrade:     round3(reg + diff.midgrade),
+        premium:      round3(reg + diff.premium),
+        diesel:       round3(reg + diff.diesel),
       };
     });
   }
 
   return prices.chains.map(c => {
     const row = {
-      chain:     c.chain,
-      priceMode: c.priceMode || 'estimated',
-      address:   null,
-      station:   null,
+      chain:        c.chain,
+      priceMode:    c.priceMode || 'estimated',
+      address:      null,
+      station:      null,
+      stationCount: null,
     };
     for (const f of FUELS) row[f] = round3(c[f] * mult);
     return row;
@@ -225,6 +227,7 @@ function buildPriceData(town) {
       ch: 'same', // day-over-day delta not tracked yet
       a:  c.address || STATION_META[c.chain]?.a || '1000 Main St',
       d:  STATION_META[c.chain]?.d || 'nearby',
+      sc: c.stationCount || null, // station count from Apify (null for fallback)
     }));
   }
   return out;
