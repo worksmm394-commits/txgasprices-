@@ -848,8 +848,10 @@ function buildPage(town, fuel, opts = {}) {
 
   // Canonical always points to the regular page. The /cheapest alias gets
   // noindex so duplicate content doesn't dilute the primary URL.
-  const regularPath  = `/gas-prices/${town.slug}`;
-  const fuelPath     = fuel === 'regular' ? regularPath : `${regularPath}/${fuel}`;
+  // Trailing slash matches Cloudflare's 308 target so sitemap, canonical,
+  // og:url, and the final redirect destination are all the same URL.
+  const regularPath  = `/gas-prices/${town.slug}/`;
+  const fuelPath     = fuel === 'regular' ? regularPath : `/gas-prices/${town.slug}/${fuel}/`;
   const canonicalPath = isCheapestAlias ? regularPath : fuelPath;
 
   const cheapestPrice          = money3(cheap[fuel]);
@@ -964,7 +966,7 @@ function buildRedirects() {
   ];
   for (const t of towns) {
     for (const suffix of ['midgrade', 'premium', 'diesel', 'cheapest']) {
-      lines.push(`/gas-prices/${t.slug}/${suffix}  /gas-prices/${t.slug}  301`);
+      lines.push(`/gas-prices/${t.slug}/${suffix}  /gas-prices/${t.slug}/  301`);
     }
   }
   return lines.join('\n') + '\n';
@@ -990,16 +992,15 @@ function buildSitemap() {
   // Homepage — priority 1.0, lastmod from prices.json.updated
   urls.push(`  <url><loc>${base}/</loc><lastmod>${homeLastmod}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>`);
 
-  // 100 city pages — fuel subpages consolidated into each main page, so
-  // only one URL per city in the sitemap. Dead /midgrade, /premium, /diesel,
-  // /cheapest paths are 301-redirected via output/_redirects.
+  // 100 city pages — trailing slash matches Cloudflare's canonical URL,
+  // so Googlebot hits the final destination directly (no 308 hop).
   towns.forEach(t => {
-    urls.push(`  <url><loc>${base}/gas-prices/${t.slug}</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
+    urls.push(`  <url><loc>${base}/gas-prices/${t.slug}/</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
   });
 
-  // Two hub pages
-  urls.push(`  <url><loc>${base}/cheapest-gas-texas</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
-  urls.push(`  <url><loc>${base}/trip-cost-calculator</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+  // Two hub pages (trailing slash for the same reason)
+  urls.push(`  <url><loc>${base}/cheapest-gas-texas/</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
+  urls.push(`  <url><loc>${base}/trip-cost-calculator/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -1327,7 +1328,7 @@ ${mockupScriptWithTokens}
 
 // ── cheapest-gas-texas hub page ──────────────────────────────
 function buildCheapestGasPage() {
-  const canonical = 'https://txgasprices.net/cheapest-gas-texas';
+  const canonical = 'https://txgasprices.net/cheapest-gas-texas/';
   const updatedHuman  = formatUpdated(prices.updated);
   const updatedTimeCt = formatUpdatedTime(prices.updated);
 
@@ -1761,7 +1762,7 @@ ${faqItemsHtml}
 
 // ── trip-cost-calculator hub page ────────────────────────────
 function buildTripCalcPage() {
-  const canonical = 'https://txgasprices.net/trip-cost-calculator';
+  const canonical = 'https://txgasprices.net/trip-cost-calculator/';
   const updatedHuman  = formatUpdated(prices.updated);
   const updatedTimeCt = formatUpdatedTime(prices.updated);
   const stateAvgReg   = prices.stateAverage && prices.stateAverage.regular;
