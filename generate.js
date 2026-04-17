@@ -218,6 +218,28 @@ function formatUpdated(iso) {
   });
 }
 
+// Time-only render (e.g. "4:05 PM CT") for the FAQ header's live-dot line.
+function formatUpdatedTime(iso) {
+  const d = new Date(iso);
+  const t = d.toLocaleTimeString('en-US', {
+    timeZone: 'America/Chicago',
+    hour: 'numeric', minute: '2-digit',
+  });
+  return `${t} CT`;
+}
+
+// Short population format: 139K, 2.3M. Returns null for 0/invalid inputs.
+function formatPopShort(pop) {
+  const n = Number(pop);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  if (n >= 1_000_000) {
+    const m = n / 1_000_000;
+    return m.toFixed(1) + 'M';
+  }
+  if (n >= 1000) return Math.round(n / 1000) + 'K';
+  return String(n);
+}
+
 // Build the priceData object literal the client-side JS expects.
 // Shape per fuel: [{n, p, ch, a, d}] sorted cheapest-first.
 // Address preference: real Apify address > fallback STATION_META > generic.
@@ -278,6 +300,48 @@ const MEMBERSHIP_FAQ_CHAINS = new Set([
   "Sam's Club", 'Costco', "BJ's",
 ]);
 
+// ── FAQ header metadata (pills + elevation) ──────────────────
+const REGION_PILL_NAME = {
+  'houston-metro':      'Greater Houston',
+  'dfw-metro':          'DFW Metroplex',
+  'sa-metro':           'San Antonio Metro',
+  'austin-metro':       'Austin Metro',
+  'austin-sa-corridor': 'Austin–SA Corridor',
+  'rio-grande-valley':  'Rio Grande Valley',
+  'coastal-tx':         'Gulf Coast',
+  'west-tx':            'West Texas',
+  'south-tx':           'South Texas',
+  'central-tx':         'Central Texas',
+  'east-tx':            'East Texas',
+  'north-tx':           'North Texas',
+};
+// Permian-basin cities override the generic "West Texas" pill with the
+// sub-region name and keep "West Texas" as an additional broad pill.
+const CITY_PRIMARY_REGION = {
+  'midland-tx':    'Permian Basin',
+  'odessa-tx':     'Permian Basin',
+  'big-spring-tx': 'Permian Basin',
+};
+const CITY_BROAD_REGION = {
+  'midland-tx':    'West Texas',
+  'odessa-tx':     'West Texas',
+  'big-spring-tx': 'West Texas',
+};
+// Elevation (ft) — omitted cities skip the pill.
+const CITY_ELEVATION = {
+  'houston-tx': 80, 'dallas-tx': 430, 'austin-tx': 489, 'san-antonio-tx': 650,
+  'fort-worth-tx': 653, 'el-paso-tx': 3740, 'midland-tx': 2779, 'odessa-tx': 2890,
+  'lubbock-tx': 3256, 'amarillo-tx': 3605, 'abilene-tx': 1710, 'big-spring-tx': 2398,
+  'arlington-tx': 614, 'plano-tx': 705, 'garland-tx': 571, 'irving-tx': 495,
+  'mckinney-tx': 686, 'frisco-tx': 692, 'denton-tx': 642, 'carrollton-tx': 524,
+  'laredo-tx': 438, 'brownsville-tx': 33, 'mcallen-tx': 122, 'edinburg-tx': 88,
+  'mission-tx': 128, 'pharr-tx': 108, 'corpus-christi-tx': 10, 'galveston-tx': 7,
+  'beaumont-tx': 25, 'port-arthur-tx': 16, 'pasadena-tx': 39, 'pearland-tx': 52,
+  'sugar-land-tx': 82, 'league-city-tx': 17, 'baytown-tx': 27, 'friendswood-tx': 39,
+  'missouri-city-tx': 79, 'waco-tx': 470, 'college-station-tx': 328,
+  'round-rock-tx': 719, 'killeen-tx': 833, 'tyler-tx': 544, 'wichita-falls-tx': 948,
+};
+
 function stripHtml(s) { return String(s).replace(/<[^>]+>/g, ''); }
 
 // FAQ answers show prices at 2 decimals (consumer-friendly). The underlying
@@ -296,11 +360,18 @@ function countyFor(town) {
 function faqMembership(town, d, info, townChains) {
   const altChain = (townChains || []).find(c => !MEMBERSHIP_FAQ_CHAINS.has(c.chain));
   const altPart = altChain
-    ? ` The next-cheapest non-membership chain in ${town.name} is <b>${altChain.chain}</b> at <b>$${faq2dec(altChain.regular)}/gal</b>.`
+    ? ` The next-cheapest non-membership chain in ${town.name}, TX is <b>${altChain.chain}</b> at <b>$${faq2dec(altChain.regular)}/gal</b>.`
+    : '';
+  // Breakeven math: annual gallons × price diff must clear the $50 Sam's fee
+  // (industry standard). If it does, membership pays for itself.
+  const memberFee = 50;
+  const annualGal = 12000 / 25;
+  const breakevenPart = altChain
+    ? ` Break-even: the $${memberFee}/yr membership pays for itself if you buy at least <b>${Math.ceil(memberFee / Math.max(Number(altChain.regular) - Number(d.cheapestPrice), 0.01))}</b> gallons per year there.`
     : '';
   return {
-    q: `Do I need a membership to get the cheapest gas in ${town.name}?`,
-    a: `Yes — <b>${d.cheapestChain}</b>'s posted $${faq2dec(d.cheapestPrice)}/gal requires a paid membership card.${altPart}`,
+    q: `Do I need a membership to get the cheapest fuel in ${town.name}, TX?`,
+    a: `Yes — <b>${d.cheapestChain}</b> <span class="faq-mbr">membership price</span> posts $${faq2dec(d.cheapestPrice)}/gal and requires a paid membership card to fuel up.${altPart}${breakevenPart}`,
   };
 }
 
@@ -311,9 +382,12 @@ function faqRefinery(town, d, info) {
     ? ` — roughly ${miles} mile${miles === 1 ? '' : 's'} away`
     : '';
   const factor = info.price_factor ? ` ${info.price_factor}.` : '';
+  const highwayPart = info.highway_primary
+    ? ` Finished fuel travels <b>${info.highway_primary}</b> to local terminals.`
+    : '';
   return {
-    q: `Why is gas in ${town.name} often cheaper than the Texas average?`,
-    a: `${town.name} sits near ${info.refinery_name}${milesPart}.${factor}`,
+    q: `Why is gas in ${town.name}, TX often cheaper than the Texas average?`,
+    a: `${town.name}, TX sits near <b>${info.refinery_name}</b>${milesPart}.${factor}${highwayPart}`,
   };
 }
 
@@ -327,17 +401,16 @@ function faqOilParadox(town, d, info) {
   const county = countyFor(town) || 'the county';
   const factor = info.price_factor ? ` ${info.price_factor}.` : '';
   return {
-    q: `Why aren't gas prices in ${town.name} lower given nearby oil production?`,
-    a: `Even with ${rigs}+ active rigs in ${county} County, Permian crude travels hundreds of miles to Gulf Coast refineries and returns as finished gasoline.${factor}`,
+    q: `Why aren't gas prices in ${town.name}, TX lower given nearby oil production?`,
+    a: `Even with <b>${rigs}+ active rigs</b> in <b>${county} County</b>, Permian crude travels hundreds of miles to Gulf Coast refineries and returns as finished gasoline.${factor}`,
   };
 }
 
 function faqBorder(town, d, info) {
-  const fact = info.local_fact ? ` ${info.local_fact}.` : '';
   const factor = info.price_factor ? ` ${info.price_factor}.` : '';
   return {
-    q: `Are gas prices cheaper near the Texas-Mexico border in ${town.name}?`,
-    a: `${town.name} sits on the border, where cross-border demand and regional competition shape pump prices.${factor}${fact}`,
+    q: `Are fuel prices cheaper near the Texas-Mexico border in ${town.name}, TX?`,
+    a: `${town.name}, TX sits on the border, where cross-border demand and regional competition shape pump prices.${factor}`,
   };
 }
 
@@ -367,7 +440,7 @@ function faqMilitary(town, d, info) {
     ? `${town.name}'s ${display}`
     : `${town.name} is adjacent to ${display}`;
   return {
-    q: `How does ${display} affect ${town.name} gas demand?`,
+    q: `How does ${display} affect ${town.name}, TX gas demand?`,
     a: `${answerLead}, and its shift changes drive predictable fuel-demand surges.${commute}`,
   };
 }
@@ -405,7 +478,7 @@ function faqCollege(town, d, info) {
   );
   const factTail = factMentionsCampus ? ` ${info.local_fact}.` : '';
   return {
-    q: `Do ${uniShort} events affect gas prices in ${town.name}?`,
+    q: `Do ${uniShort} events affect gas prices in ${town.name}, TX?`,
     a: `Home football weekends, graduations, and major campus events push local traffic and fuel demand above normal levels.${factTail}`,
   };
 }
@@ -413,8 +486,8 @@ function faqCollege(town, d, info) {
 function faqStateAvgFallback(town, d, info) {
   const commute = info.commute_note ? ` ${info.commute_note}.` : '';
   return {
-    q: `How do ${town.name} gas prices compare to the Texas state average?`,
-    a: `The Texas state average for regular is <b>$${faq2dec(d.stateAvg)}/gal</b>. ${town.name} drivers pay close to the statewide average — choose <b>${d.cheapestChain}</b> to pay below average.${commute}`,
+    q: `How do ${town.name}, TX gas prices compare to the Texas state average?`,
+    a: `The Texas state average for regular is <b>$${faq2dec(d.stateAvg)}/gal</b>. ${town.name}, TX drivers pay close to the statewide average — choose <b>${d.cheapestChain}</b> to pay below average.${commute}`,
   };
 }
 
@@ -425,13 +498,15 @@ function buildFaqItems(town, d) {
   const items = [];
 
   // Always-on Q1 + Q2 (per-gallon prices rounded to 2 decimals for FAQ)
+  const isMember = MEMBERSHIP_FAQ_CHAINS.has(d.cheapestChain);
+  const memberBadge = isMember ? ' <span class="faq-mbr">membership price</span>' : '';
   items.push({
-    q: `What is the cheapest gas in ${town.name} right now?`,
-    a: `<b>${d.cheapestChain}</b> is currently the cheapest at <b>$${faq2dec(d.cheapestPrice)}/gal</b> for regular unleaded. Prices last updated ${updatedHuman}.`,
+    q: `What is the cheapest gas station in ${town.name}, TX right now?`,
+    a: `<b>${d.cheapestChain}</b>${memberBadge} is currently the cheapest at <b>$${faq2dec(d.cheapestPrice)}/gal</b> for regular unleaded. Prices last updated ${updatedHuman}.`,
   });
   items.push({
-    q: `How much does a full tank cost in ${town.name}?`,
-    a: `At current prices, filling a 15-gallon tank costs <b>$${d.tankCost15}</b> at ${d.cheapestChain}. A 20-gallon tank costs <b>$${d.tankCost20}</b>.`,
+    q: `How much does a full tank cost in ${town.name}, TX?`,
+    a: `At current prices, filling a <b>15-gallon</b> tank costs <b>$${d.tankCost15}</b> at <b>${d.cheapestChain}</b>. A <b>20-gallon</b> tank costs <b>$${d.tankCost20}</b>.`,
   });
 
   // Priority-ordered conditionals — appended in order, capped at FAQ_MAX
@@ -465,105 +540,72 @@ function buildFaqItemsHtml(faqItems, sourceLine) {
   </details>`).join('\n');
 }
 
-// Build 3 stat cards above the FAQ accordion, keyed off what the city
-// actually is in cities-info.json. Category priority:
-//   oil rigs > border > refinery > military > college > price fallback.
-// Each card shows a short uppercase label, a bold value, and a context line.
+// Build the 4-card stat grid per faq-design-spec.md:
+// population · vehicles per household · truck ownership % · est. monthly fuel.
+// Monthly fuel formula: cheapestPrice * vehiclesPerHousehold * 12000 / 25 / 12
 function buildFaqStatsHtml(town, d, info) {
   const pop = Number(town.population) || 0;
-  const popFmt = pop > 0 ? pop.toLocaleString('en-US') : null;
-  const cards = [];
+  const popShort = formatPopShort(pop) || '—';
+  const vph = Number.isFinite(Number(info.vehicles_per_household))
+    ? Number(info.vehicles_per_household).toFixed(1)
+    : '2.0';
+  const truckPct = Number.isFinite(Number(info.truck_ownership_pct))
+    ? Number(info.truck_ownership_pct)
+    : 20;
+  const vphNum = Number(vph);
+  const priceNum = Number(d.cheapestPrice);
+  const monthlyFuel = Math.round(priceNum * vphNum * 12000 / 25 / 12);
 
-  const pushCard = (label, value, context) => {
-    if (value == null || value === '') return;
-    cards.push({ label, value, context: context || '' });
-  };
+  const cards = [
+    { val: popShort,             lbl: 'population' },
+    { val: vph,                  lbl: 'vehicles / household' },
+    { val: `${truckPct}%`,       lbl: 'truck ownership' },
+    { val: `~$${monthlyFuel}`,   lbl: 'est. monthly fuel' },
+  ];
 
-  if (info.oil_rigs_nearby && info.oil_rigs_nearby > 0) {
-    pushCard('Active oil rigs',
-      `${info.oil_rigs_nearby}+`,
-      `in ${town.county || 'the county'} County`);
-    if (info.refinery_miles) {
-      pushCard('Miles to refinery',
-        `${info.refinery_miles} mi`,
-        'round-trip for finished fuel');
-    }
-    pushCard('Truck ownership',
-      `${info.truck_ownership_pct || 0}%`,
-      'of household vehicles');
-  } else if (info.border_town) {
-    pushCard('Truck share of traffic',
-      `${info.truck_traffic_pct || 0}%`,
-      'cross-border freight flow');
-    if (info.daily_traffic_count) {
-      pushCard('Daily traffic',
-        info.daily_traffic_count.toLocaleString('en-US'),
-        `vehicles on ${info.highway_primary || 'primary highway'}`);
-    }
-    if (popFmt) pushCard('Population', popFmt, 'residents');
-  } else if (info.refinery_nearby && info.refinery_name) {
-    const capMatch = info.refinery_name.match(/([\d,]+)\s*bbl\/day/i);
-    const refShort = info.refinery_name.split('—')[0].trim();
-    pushCard('Nearest refinery capacity',
-      capMatch ? `${capMatch[1]} bbl/day` : 'major refinery',
-      refShort);
-    pushCard('Distance',
-      `${info.refinery_miles || 0} mi`,
-      `from ${town.name}`);
-    if (info.fuel_terminal_miles != null) {
-      pushCard('Fuel terminal',
-        `${info.fuel_terminal_miles} mi`,
-        'to nearest pipeline terminal');
-    }
-  } else if (info.military_base && info.military_base_name) {
-    const soldierMatch = info.military_base_name.match(/([\d,]+)\s*active-duty/i);
-    const sqMiMatch    = info.military_base_name.match(/([\d.,]+)\s*square miles/i);
-    const acreMatch    = info.military_base_name.match(/([\d,]+)\s*acres/i);
-    const baseShort    = info.military_base_name.split(/[—(]/)[0].trim();
-    pushCard('Military base', baseShort, `adjacent to ${town.name}`);
-    if (soldierMatch) {
-      pushCard('Active-duty personnel', soldierMatch[1], 'stationed at base');
-    }
-    if (sqMiMatch) {
-      pushCard('Base size',
-        `${sqMiMatch[1]} sq mi`,
-        acreMatch ? `${acreMatch[1]} acres` : 'land area');
-    } else if (acreMatch) {
-      pushCard('Base size', `${acreMatch[1]} acres`, 'land area');
-    }
-  } else if (info.college_town && info.university_name) {
-    const enrollMatch = info.university_name.match(/([\d,]+)\s*students/i);
-    const uniShort = info.university_name.split(' (')[0].split(',')[0].trim();
-    pushCard('Anchor university', uniShort, 'largest local institution');
-    if (enrollMatch) {
-      pushCard('Students enrolled', enrollMatch[1], 'full- and part-time');
-    }
-    if (popFmt) pushCard('City population', popFmt, 'residents');
-  }
-
-  // Fill to 3 with price-based cards (also used as the sole fallback for
-  // cities with none of the conditional categories).
-  if (cards.length < 3) {
-    pushCard('Cheapest gas',
-      `$${faq2dec(d.cheapestPrice)}/gal`,
-      `at ${d.cheapestChain}`);
-  }
-  if (cards.length < 3) {
-    pushCard('15-gallon tank', `$${d.tankCost15}`, 'full tank cost');
-  }
-  if (cards.length < 3) {
-    const diff = Number(d.stateAvg) - Number(d.cheapestPrice);
-    const abs = Math.abs(diff).toFixed(2);
-    pushCard(diff >= 0 ? 'Saved vs state avg' : 'Above state avg',
-      `$${abs}/gal`, 'vs Texas average');
-  }
-
-  const out = cards.slice(0, 3).map(c => `    <div class="faq-stat">
-      <div class="fs-label">${escHtml(c.label)}</div>
-      <div class="fs-value">${escHtml(c.value)}</div>
-      <div class="fs-context">${escHtml(c.context)}</div>
+  const out = cards.map(c => `    <div class="faq-stat">
+      <div class="faq-stat-val">${escHtml(c.val)}</div>
+      <div class="faq-stat-lbl">${escHtml(c.lbl)}</div>
     </div>`).join('\n');
   return `  <div class="faq-stats">\n${out}\n  </div>`;
+}
+
+// ── FAQ header helpers (per faq-design-spec.md) ──────────────
+function buildFaqCityTitle(town) {
+  return `Fuel prices &amp; local data — ${escHtml(town.name)}, TX ⛽`;
+}
+
+function buildFaqPillsHtml(town, info) {
+  const pills = [];
+  if (town.county) pills.push(`${town.county} County`);
+
+  // Primary region: Permian sub-region if defined, otherwise cities-info region.
+  const primary = CITY_PRIMARY_REGION[town.slug]
+    || (info.region && REGION_PILL_NAME[info.region])
+    || null;
+  if (primary) pills.push(primary);
+
+  // Broad region (e.g. "West Texas" for Permian cities)
+  const broad = CITY_BROAD_REGION[town.slug];
+  if (broad && broad !== primary) pills.push(broad);
+
+  if (info.highway_primary) pills.push(`${info.highway_primary} corridor`);
+
+  const pop = Number(town.population) || 0;
+  if (pop > 0) pills.push(`${pop.toLocaleString('en-US')} residents`);
+
+  const elev = CITY_ELEVATION[town.slug];
+  if (Number.isFinite(elev)) pills.push(`${elev.toLocaleString('en-US')} ft elevation`);
+
+  return pills.map(p => `<span class="pill">${escHtml(p)}</span>`).join('');
+}
+
+function buildFaqContext(town, info) {
+  if (!info || !info.local_fact) return '';
+  // Local facts in cities-info.json end without a period; add one for prose.
+  const fact = String(info.local_fact).trim();
+  const withPeriod = /[.!?]$/.test(fact) ? fact : fact + '.';
+  return escHtml(withPeriod);
 }
 
 function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, faqItems, opts = {}) {
@@ -753,12 +795,16 @@ function buildPage(town, fuel, opts = {}) {
   });
   const updatedHuman = formatUpdated(prices.updated);
   const sourceLine = townHasLiveData(town)
-    ? `Source: GasBuddy via Apify · ${updatedHuman}`
-    : `Source: AAA Texas · ${updatedHuman}`;
+    ? `Source: GasBuddy via Apify, updated ${updatedHuman} CT`
+    : `Source: AAA Texas, updated ${updatedHuman} CT`;
   const faqItemsHtml = buildFaqItemsHtml(faqItems, sourceLine);
+  const cityInfo = CITY_INFO[town.slug] || {};
   const faqStatsHtml = buildFaqStatsHtml(town, {
     cheapestPrice, cheapestChain, tankCost15, tankCost20, stateAvg,
-  }, CITY_INFO[town.slug] || {});
+  }, cityInfo);
+  const faqPillsHtml = buildFaqPillsHtml(town, cityInfo);
+  const faqCityTitle = buildFaqCityTitle(town);
+  const faqContext   = buildFaqContext(town, cityInfo);
 
   const population = Number(town.population) || 0;
   const populationFormatted = population > 0 ? population.toLocaleString('en-US') : 'many';
@@ -804,6 +850,10 @@ function buildPage(town, fuel, opts = {}) {
     ABOVE_BELOW:               aboveBelow(mult),
     FAQ_ITEMS_HTML:            faqItemsHtml,
     FAQ_STATS_HTML:            faqStatsHtml,
+    FAQ_PILLS_HTML:            faqPillsHtml,
+    FAQ_CITY_TITLE:            faqCityTitle,
+    FAQ_CONTEXT:               faqContext,
+    UPDATED_TIME:              formatUpdatedTime(prices.updated),
     DATA_SOURCE:               dataSourceFor(town),
     INITIAL_CHAINS_HTML:       renderInitialChainsHtml(town),
   });

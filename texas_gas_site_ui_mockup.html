@@ -196,24 +196,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .nearby-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 16px}
 .nearby-list a{color:#1D9E75;text-decoration:none;font-size:13px}
 .nearby-list a:hover{text-decoration:underline}
-.faq{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:18px 20px 10px}
-.faq>h2{font-size:13px;font-weight:500;color:#1a1a18;margin:0 0 12px;letter-spacing:.02em;text-transform:uppercase}
-.faq details{border-top:1px solid rgba(0,0,0,.06);padding:10px 0}
-.faq details:first-of-type{border-top:0}
-.faq summary{list-style:none;cursor:pointer;font-size:14px;font-weight:500;color:#1a1a18;padding:4px 28px 4px 0;position:relative;line-height:1.4}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:400;color:#9a9990;transition:transform .15s,color .15s}
-.faq details[open]>summary{color:#1D9E75}
-.faq details[open]>summary::after{content:"−";color:#1D9E75;transform:translateY(-50%) rotate(0)}
-.faq .faq-a{padding:8px 0 2px;font-size:13px;line-height:1.55;color:#4a4a45}
-.faq .faq-a b{color:#1a1a18;font-weight:500}
-.faq .faq-src{font-size:11px;color:#9a9990;margin:6px 0 2px;font-style:italic;letter-spacing:.01em}
-.faq-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 14px}
-.faq-stat{background:#f8f6ef;border-radius:8px;padding:12px 14px;border:0.5px solid rgba(0,0,0,.08)}
-.fs-label{font-size:10px;color:#9a9990;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-.fs-value{font-size:16px;font-weight:600;color:#1a1a18;line-height:1.25}
-.fs-context{font-size:11px;color:#6b6b66;margin-top:3px;line-height:1.35}
-@media (max-width:600px){.faq-stats{grid-template-columns:1fr}}
+/* FAQ section — follows faq-design-spec.md */
+.faq-section{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;overflow:hidden}
+.faq-header{padding:13px 16px;border-bottom:0.5px solid rgba(0,0,0,.08)}
+.faq-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.faq-title{font-size:13px;font-weight:500;color:#1a1a18}
+.faq-live{display:flex;align-items:center;gap:8px;font-size:11px;color:#6b6b66;flex-shrink:0}
+.faq-live .live-dot{width:5px;height:5px;border-radius:50%;background:#1D9E75;flex-shrink:0;display:inline-block}
+.faq-live .faq-weather{font-size:12px;font-weight:500;color:#1a1a18}
+.pills{display:flex;flex-wrap:wrap;gap:4px}
+.pill{font-size:10px;padding:2px 7px;border-radius:20px;background:#f8f6ef;color:#6b6b66;border:0.5px solid rgba(0,0,0,.08)}
+.faq-context{padding:9px 16px;font-size:11.5px;color:#6b6b66;line-height:1.6;border-bottom:0.5px solid rgba(0,0,0,.08);background:#f8f6ef;font-style:italic}
+.faq-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:10px 16px;border-bottom:0.5px solid rgba(0,0,0,.08)}
+.faq-stat{background:#f8f6ef;border-radius:7px;padding:7px 8px;text-align:center}
+.faq-stat-val{font-size:14px;font-weight:500;color:#1a1a18}
+.faq-stat-lbl{font-size:9px;color:#6b6b66;margin-top:2px;line-height:1.3}
+.faq-items{padding:6px 16px 10px}
+.faq-items details{border-top:1px solid rgba(0,0,0,.06);padding:11px 0 9px;transition:border-left-color .15s,padding-left .15s}
+.faq-items details:first-of-type{border-top:0}
+.faq-items details[open]{border-left:3px solid #1D9E75;padding-left:13px;margin-left:-3px}
+.faq-items summary{list-style:none;cursor:pointer;font-size:14px;font-weight:500;color:#1a1a18;padding:0 28px 0 0;position:relative;line-height:1.4}
+.faq-items summary::-webkit-details-marker{display:none}
+.faq-items summary::after{content:"+";position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:400;color:#9a9990;transition:transform .15s,color .15s}
+.faq-items details[open]>summary{color:#1D9E75}
+.faq-items details[open]>summary::after{content:"−";color:#1D9E75;transform:translateY(-50%)}
+.faq-items .faq-a{padding:8px 0 2px;font-size:13px;line-height:1.55;color:#4a4a45}
+.faq-items .faq-a b{color:#1a1a18;font-weight:500}
+.faq-items .faq-src{font-size:10px;color:#9a9990;margin-top:5px;display:block;border-top:0.5px solid rgba(0,0,0,.08);padding-top:4px;letter-spacing:.01em}
+.faq-mbr{display:inline-block;background:#FEF3C7;color:#92400E;border:1px solid #F59E0B;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:500;margin-left:2px;vertical-align:baseline}
+@media (max-width:600px){.faq-stats{grid-template-columns:repeat(2,1fr)}.faq-title-row{flex-direction:column;align-items:flex-start;gap:4px}}
 
 /* estimates banner */
 .estnote{background:#FFF8E1;border:0.5px solid #EAC36A;border-radius:8px;padding:9px 13px;margin-bottom:14px;font-size:12px;color:#5a4510;line-height:1.45}
@@ -439,11 +450,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- NEARBY CITIES -->
 {{NEARBY_CITIES}}
 
-<!-- FAQ — items server-rendered dynamically from cities-info.json -->
-<section class="faq">
-  <h2>Gas prices in {{CITY_NAME}} — common questions</h2>
-{{FAQ_STATS_HTML}}
+<!-- FAQ — structured per faq-design-spec.md -->
+<section class="faq-section">
+  <div class="faq-header">
+    <div class="faq-title-row">
+      <div class="faq-title">{{FAQ_CITY_TITLE}}</div>
+      <div class="faq-live">
+        <span class="live-dot"></span>
+        <span>{{UPDATED_TIME}}</span>
+        <span class="faq-weather" id="faq-weather"></span>
+      </div>
+    </div>
+    <div class="pills">{{FAQ_PILLS_HTML}}</div>
+  </div>
+  <div class="faq-context">{{FAQ_CONTEXT}}</div>
+  {{FAQ_STATS_HTML}}
+  <div class="faq-items">
 {{FAQ_ITEMS_HTML}}
+  </div>
 </section>
 
 <div class="footer">
