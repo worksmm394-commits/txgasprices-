@@ -972,6 +972,47 @@ function buildRedirects() {
   return lines.join('\n') + '\n';
 }
 
+// ── _headers (Cloudflare Pages cache-control) ────────────────
+// Long-cache static assets that rarely change; short-cache the JSON/XML
+// files that get regenerated on every build.
+function buildHeaders() {
+  return [
+    '/*.css',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
+    '/*.js',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
+    '/*.png',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
+    '/*.ico',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
+    '/favicon*',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
+    '/og-image.png',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
+    '/apple-touch-icon.png',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
+    '/car-db.json',
+    '  Cache-Control: public, max-age=86400',
+    '',
+    '/prices.json',
+    '  Cache-Control: public, max-age=300',
+    '',
+    '/sitemap.xml',
+    '  Cache-Control: public, max-age=3600',
+    '',
+    '/robots.txt',
+    '  Cache-Control: public, max-age=86400',
+    '',
+  ].join('\n');
+}
+
 // ── robots.txt ───────────────────────────────────────────────
 function buildRobotsTxt() {
   return [
@@ -1248,6 +1289,8 @@ ${sharedStyles}
   </div>
 </div>
 
+<main>
+
 <!-- HERO -->
 <div class="hero">
   <div class="hero-top">
@@ -1257,7 +1300,7 @@ ${sharedStyles}
       <div class="trustbar"><span class="tb-item">Updated ${updatedHuman} CT</span><span class="tb-item">Source: AAA Texas + GasBuddy via Apify</span><span class="tb-item">Prices change 3-4x/week</span></div>
     </div>
     <div class="city-sel">
-      <select onchange="if (this.value) window.location.href='/gas-prices/' + this.value" aria-label="Jump to a city">
+      <select onchange="if (this.value) window.location.href='/gas-prices/' + this.value" aria-label="Select a Texas city">
         <option value="">Select a city</option>
 ${cityOptionsHtml}
       </select>
@@ -1313,6 +1356,8 @@ ${faqStatsHtml}
 ${faqItemsHtml}
   </div>
 </section>
+
+</main>
 
 <div class="footer">
   <span>${buildFooterNote()}</span>
@@ -1590,6 +1635,8 @@ ${sharedStyles}
   </div>
 </div>
 
+<main>
+
 <!-- HERO + big callout -->
 <section class="hub-hero">
   <h1>Cheapest Gas in Texas Today</h1>
@@ -1694,6 +1741,8 @@ ${faqStatsHtml}
 ${faqItemsHtml}
   </div>
 </section>
+
+</main>
 
 <div class="footer">
   <span>${buildFooterNote()}</span>
@@ -1977,6 +2026,8 @@ ${sharedStyles}
   </div>
 </div>
 
+<main>
+
 <!-- HERO -->
 <section class="hub-hero">
   <h1>Trip Cost Calculator</h1>
@@ -2044,6 +2095,8 @@ ${faqStatsHtml}
 ${faqItemsHtml}
   </div>
 </section>
+
+</main>
 
 <div class="footer">
   <span>${buildFooterNote()}</span>
@@ -2248,6 +2301,7 @@ fs.mkdirSync('./output', { recursive: true });
 fs.writeFileSync('./output/sitemap.xml', buildSitemap());
 fs.writeFileSync('./output/robots.txt', buildRobotsTxt());
 fs.writeFileSync('./output/_redirects', buildRedirects());
+fs.writeFileSync('./output/_headers', buildHeaders());
 fs.writeFileSync('./output/index.html', buildHomepage());
 fs.mkdirSync('./output/trip-cost-calculator', { recursive: true });
 fs.writeFileSync('./output/trip-cost-calculator/index.html', buildTripCalcPage());

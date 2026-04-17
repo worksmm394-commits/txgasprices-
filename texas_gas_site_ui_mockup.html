@@ -69,6 +69,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .map-frame{border-radius:10px;overflow:hidden;border:0.5px solid rgba(0,0,0,.09);height:340px;margin-bottom:10px}
 .map-frame iframe{display:block;width:100%;height:100%;border:0}
 .map-note{font-size:11px;color:#9a9990;margin-top:5px}
+.map-placeholder{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;width:100%;height:100%}
+.map-placeholder img{display:block;width:100%;height:100%;object-fit:cover;background:#e8e6df}
+.map-placeholder-overlay{position:absolute;bottom:12px;left:50%;transform:translateX(-50%)}
+.map-load-btn{background:rgba(0,0,0,0.75);color:#fff;border:none;padding:10px 16px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;backdrop-filter:blur(4px)}
+.map-load-btn:hover{background:rgba(0,0,0,0.9)}
 
 /* ── STATION CARDS ── */
 .station-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:7px}
@@ -194,9 +199,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .seo-text b{color:#1a1a18;font-weight:500}
 .nearby{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:16px 20px}
 .nearby h2{font-size:13px;font-weight:500;color:#1a1a18;margin-bottom:10px;letter-spacing:.02em;text-transform:uppercase}
-.nearby-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 16px}
-.nearby-list a{color:#1D9E75;text-decoration:none;font-size:13px}
-.nearby-list a:hover{text-decoration:underline}
+.nearby-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.nearby-list a,.nearby a{display:inline-block;padding:12px 16px;margin:4px 6px;min-height:44px;line-height:1.4;color:#1D9E75;text-decoration:none;font-size:13px}
+.nearby-list a:hover,.nearby a:hover{text-decoration:underline}
+@media (max-width:640px){.nearby-list a,.nearby a{padding:14px 18px;margin:6px 4px}}
 /* FAQ section — follows faq-design-spec.md */
 .faq-section{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;overflow:hidden}
 .faq-header{padding:13px 16px;border-bottom:0.5px solid rgba(0,0,0,.08)}
@@ -245,6 +251,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<main>
+
 <!-- HERO -->
 <div class="hero">
   <div class="hero-top">
@@ -255,7 +263,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="trustbar"><span class="tb-item">Updated {{UPDATED}} CT</span><span class="tb-item">Source: {{DATA_SOURCE}}</span><span class="tb-item">Prices change 3-4x/week</span></div>
     </div>
     <div class="city-sel">
-      <select onchange="switchCity(this)">
+      <select onchange="switchCity(this)" aria-label="Select a Texas city">
 {{CITY_OPTIONS}}
       </select>
     </div>
@@ -270,12 +278,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="chains" id="chains">{{INITIAL_CHAINS_HTML}}</div>
 
   <div class="slabel">Find nearest stations — tap a pin for directions</div>
-  <div class="map-frame">
-    <iframe id="gmap"
-      width="100%" height="340" style="border:0"
-      allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-      src="https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI&q=gas+station+near+{{CITY_NAME_URL}}&center={{CITY_LAT}},{{CITY_LNG}}&zoom=11">
-    </iframe>
+  <div class="map-frame" id="map-container-{{CITY_SLUG}}">
+    <div class="map-placeholder" onclick="loadInteractiveMap('{{CITY_SLUG}}', '{{CITY_LAT}}', '{{CITY_LNG}}', '{{CITY_NAME}}', '{{CITY_NAME_URL}}')">
+      <img src="https://maps.googleapis.com/maps/api/staticmap?center={{CITY_LAT}},{{CITY_LNG}}&zoom=12&size=800x340&scale=2&maptype=roadmap&markers=color:red%7C{{CITY_LAT}},{{CITY_LNG}}&key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI"
+        alt="Gas stations map for {{CITY_NAME}}, TX" width="800" height="340" loading="lazy">
+      <div class="map-placeholder-overlay">
+        <button type="button" class="map-load-btn">🗺️ Tap to load interactive map</button>
+      </div>
+    </div>
   </div>
   <p class="map-note">Tap any pin → Google Maps opens with directions. Launches Maps app on mobile.</p>
 
@@ -345,15 +355,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="car-sec">
       <div class="cargrid">
         <div class="f"><label>Make</label>
-          <select id="sel-make" onchange="onMakeChange()" onfocus="ensureMakesLoaded()" onmousedown="ensureMakesLoaded()">
+          <select id="sel-make" aria-label="Select vehicle make" onchange="onMakeChange()" onfocus="ensureMakesLoaded()" onmousedown="ensureMakesLoaded()">
             <option value="">Tap to load cars</option>
           </select>
         </div>
         <div class="f"><label>Model</label>
-          <select id="sel-model" onchange="onModelChange()" disabled><option value="">Select model</option></select>
+          <select id="sel-model" aria-label="Select vehicle model" onchange="onModelChange()" disabled><option value="">Select model</option></select>
         </div>
         <div class="f"><label>Year</label>
-          <select id="sel-year" onchange="onYearChange()" disabled><option value="">Select year</option></select>
+          <select id="sel-year" aria-label="Select vehicle year" onchange="onYearChange()" disabled><option value="">Select year</option></select>
         </div>
       </div>
       <div class="mpg-pill" id="mpg-pill">
@@ -393,7 +403,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <div id="gas-auto-sec">
           <div class="gasgrid">
             <div class="f"><label>Fuel type</label>
-              <select id="calc-fuel" onchange="onCalcFuelChange()">
+              <select id="calc-fuel" aria-label="Select fuel type" onchange="onCalcFuelChange()">
                 <option value="regular">Regular</option>
                 <option value="midgrade">Midgrade</option>
                 <option value="premium">Premium</option>
@@ -401,7 +411,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
               </select>
             </div>
             <div class="f"><label>Station</label>
-              <select id="chain-sel" onchange="calcTrip()"></select>
+              <select id="chain-sel" aria-label="Select gas station" onchange="calcTrip()"></select>
             </div>
           </div>
           <div class="price-row">
@@ -471,6 +481,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 {{FAQ_ITEMS_HTML}}
   </div>
 </section>
+
+</main>
 
 <div class="footer">
   <span>{{FOOTER_NOTE}}</span>
@@ -557,7 +569,7 @@ function renderHero() {
       <div class="sc-addr">${s.a}, ${heroCity}</div>
       <div class="sc-bot">
         <span class="sc-dist">${s.d} away</span>
-        <a class="dir-btn" href="${dirUrl(s.a, heroCity)}" target="_blank" rel="noopener">
+        <a class="dir-btn" href="${dirUrl(s.a, heroCity)}" target="_blank" rel="noopener" aria-label="Get directions to ${s.n} at ${s.a}, ${heroCity}">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
           Directions
         </a>
@@ -598,6 +610,21 @@ function updateMap() {
     : 'gas+station+near+' + cityQ;
   const centerParam = (heroLat && heroLng) ? '&center=' + heroLat + ',' + heroLng : '';
   gmap.src = 'https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI&q=' + q + centerParam + '&zoom=11';
+}
+
+// Swap the static-map placeholder for the full interactive Maps Embed iframe.
+// Saves ~3 Google Maps script requests per page-load for users who never open
+// the map. Called from the placeholder's onclick.
+function loadInteractiveMap(slug, lat, lng, city, cityUrl) {
+  const container = document.getElementById('map-container-' + slug);
+  if (!container) return;
+  const src = 'https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI' +
+    '&q=gas+station+near+' + cityUrl +
+    '&center=' + lat + ',' + lng + '&zoom=11';
+  container.innerHTML =
+    '<iframe id="gmap" width="100%" height="340" style="border:0" ' +
+    'allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" ' +
+    'title="Gas stations map for ' + city + ', TX" src="' + src + '"></iframe>';
 }
 
 function setChainFilter(chain) {
