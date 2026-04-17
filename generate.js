@@ -1920,8 +1920,13 @@ ${sharedStyles}
   <div class="updated" style="margin-top:8px"><span class="live-dot"></span>Updated ${updatedHuman} CT · default gas price $${stateAvgFmt2}/gal (TX regular)</div>
 </section>
 
-<!-- FULL CALCULATOR — reused from city-page mockup, empty From/To -->
-${extractCalcHtml('', '')}
+<!-- FULL CALCULATOR — reused from city-page mockup, empty From/To.
+     Trip-calc page has its own Popular Routes section below, so we strip the
+     orphan "Popular routes" label + chips that's embedded in the shared calc. -->
+${extractCalcHtml('', '').replace(
+  /\s*<div class="slabel">Popular routes<\/div>\s*<div class="chips" id="chips"><\/div>/,
+  ''
+)}
 
 <!-- POPULAR ROUTES — default 6, JS swaps when From changes -->
 <section class="routes-wrap">
@@ -2041,18 +2046,88 @@ ${mockupScriptWithTokens}
     sub.textContent = 'Popular routes from ' + fromName + ', TX. Tap a card to prefill.';
   }
 
-  // Card click — prefill calc + scroll to top of calc, stop default nav.
-  grid.addEventListener('click', (e) => {
+  // Card click — drive the calc exactly as if the user manually filled it:
+  //  1) Populate From/To
+  //  2) Switch to "Pick my car", then select Toyota → Camry → nearest-to-2023
+  //     year, triggering the same async code path as manual selection. If
+  //     fueleconomy.gov can't return MPG we fall back to manual MPG = 32.
+  //  3) Ensure "Use live price" tab active, fuel=Regular, station=first
+  //     (cheapest) option
+  //  4) Run calcTrip()
+  //  5) Smooth-scroll to the .calc-result row (not page top)
+  grid.addEventListener('click', async (e) => {
     const card = e.target.closest('.route-card');
     if (!card) return;
     e.preventDefault();
+
     const fromName = card.getAttribute('data-from-name') || '';
     const toName   = card.getAttribute('data-to-name') || '';
+
+    // 1. Populate route inputs
     if (fromIn) { fromIn.value = fromName; fromIn.dispatchEvent(new Event('input', { bubbles: true })); }
     if (toIn)   { toIn.value   = toName;   toIn.dispatchEvent(new Event('input', { bubbles: true })); }
-    if (typeof window.calcTrip === 'function') window.calcTrip();
-    const calcEl = document.getElementById('calculator');
-    if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // 2. Vehicle selection: Toyota Camry, nearest year to 2023
+    const setManualMpg = () => {
+      const mpgM = document.getElementById('mpg-m');
+      if (!mpgM) return;
+      mpgM.value = '32';
+      if (typeof onManualMpg === 'function') onManualMpg();
+    };
+
+    try {
+      if (typeof setVMode === 'function') setVMode('car');
+      if (typeof loadMakes === 'function') await loadMakes();
+
+      const makeSel = document.getElementById('sel-make');
+      const hasToyota = makeSel && Array.from(makeSel.options).some(o => o.value === 'Toyota');
+      if (!hasToyota) { setManualMpg(); } else {
+        makeSel.value = 'Toyota';
+        if (typeof onMakeChange === 'function') await onMakeChange();
+
+        const modelSel = document.getElementById('sel-model');
+        const hasCamry = modelSel && Array.from(modelSel.options).some(o => o.value === 'Camry');
+        if (!hasCamry) { setManualMpg(); } else {
+          modelSel.value = 'Camry';
+          if (typeof onModelChange === 'function') await onModelChange();
+
+          const yearSel = document.getElementById('sel-year');
+          const years = yearSel ? Array.from(yearSel.options).map(o => Number(o.value)).filter(Number.isFinite) : [];
+          if (!years.length) { setManualMpg(); } else {
+            const target = years.includes(2023)
+              ? 2023
+              : years.reduce((best, y) => Math.abs(y - 2023) < Math.abs(best - 2023) ? y : best);
+            yearSel.value = String(target);
+            if (typeof onYearChange === 'function') await onYearChange();
+
+            // If fueleconomy.gov couldn't return MPG (offline, blocked, no
+            // data for this trim), the pill shows "MPG not found". Fall back.
+            const pillText = (document.getElementById('mpg-pill-text') || {}).textContent || '';
+            if (/not found/i.test(pillText)) setManualMpg();
+          }
+        }
+      }
+    } catch (err) {
+      // Any unexpected error during the async chain → safe fallback.
+      setManualMpg();
+    }
+
+    // 3. Live-price mode, Regular fuel, default (cheapest) chain
+    if (typeof setGasMode === 'function') setGasMode('auto');
+    const calcFuel = document.getElementById('calc-fuel');
+    if (calcFuel) {
+      calcFuel.value = 'regular';
+      if (typeof onCalcFuelChange === 'function') onCalcFuelChange();
+    }
+    const chainSel = document.getElementById('chain-sel');
+    if (chainSel && chainSel.options.length) chainSel.selectedIndex = 0;
+
+    // 4. Run the calculation (also re-runs after any subsequent user edit).
+    if (typeof calcTrip === 'function') calcTrip();
+
+    // 5. Scroll to results row, not page top.
+    const resultEl = document.querySelector('.calc-result');
+    if (resultEl) resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
   // From-field change → swap routes (debounce slightly).
