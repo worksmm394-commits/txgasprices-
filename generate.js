@@ -630,6 +630,18 @@ function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, faqItems
       acceptedAnswer: { '@type': 'Answer', text: stripHtml(item.a) },
     })),
   };
+  // 2-level BreadcrumbList: Home → {City}, TX. Enables SERP breadcrumb
+  // navigation trail, which tends to lift CTR on city-page impressions.
+  const breadcrumb = {
+    '@context':       'https://schema.org',
+    '@type':          'BreadcrumbList',
+    itemListElement:  [
+      { '@type': 'ListItem', position: 1, name: 'Texas Gas Prices',
+        item: 'https://txgasprices.net/' },
+      { '@type': 'ListItem', position: 2, name: `${town.name}, TX`,
+        item: `https://txgasprices.net/gas-prices/${town.slug}/` },
+    ],
+  };
   const lines = [
     `<meta name="description" content="${metaDesc}">`,
     `<link rel="canonical" href="https://txgasprices.net${canonicalPath}">`,
@@ -651,6 +663,9 @@ function buildHeadExtra(town, fuel, canonicalPath, pageTitle, metaDesc, faqItems
   lines.push(
     `<script type="application/ld+json">`,
     JSON.stringify(webPage, null, 2),
+    `</script>`,
+    `<script type="application/ld+json">`,
+    JSON.stringify(breadcrumb, null, 2),
     `</script>`,
     `<script type="application/ld+json">`,
     JSON.stringify(faq, null, 2),
@@ -838,6 +853,7 @@ function buildPage(town, fuel, opts = {}) {
   const canonicalPath = isCheapestAlias ? regularPath : fuelPath;
 
   const cheapestPrice          = money3(cheap[fuel]);
+  const cheapestPrice2         = money2(cheap[fuel]);
   const cheapestChain          = cheap.chain;
   const mostExpensivePrice     = money3(expensive[fuel]);
   const mostExpensiveChain     = expensive.chain;
@@ -849,17 +865,20 @@ function buildPage(town, fuel, opts = {}) {
   const stateAvg               = stateAvgNum != null ? money3(stateAvgNum) : cheapestPrice;
   const numStations            = prices.chains.length;
 
+  // Short SEO title: "{City}, TX Gas Prices Today — $X.XX/gal" (~40 chars).
+  // Drops "| TXGasPrices" suffix and 3rd decimal.
   const pageTitle = fuel === 'regular'
-    ? `Gas Prices in ${town.name}, TX Today — Cheapest $${cheapestPrice}/gal | TXGasPrices`
-    : `${fLabel} Gas Prices in ${town.name}, TX Today — Cheapest $${cheapestPrice}/gal | TXGasPrices`;
+    ? `${town.name}, TX Gas Prices Today — $${cheapestPrice2}/gal`
+    : `${fLabel} Gas Prices in ${town.name}, TX Today — $${cheapestPrice2}/gal`;
 
   const heroTitle = fuel === 'regular'
-    ? `Gas prices in ${town.name}, TX`
-    : `${fLabel} gas prices in ${town.name}, TX`;
+    ? `Gas prices in ${town.name}, TX today`
+    : `${fLabel} gas prices in ${town.name}, TX today`;
 
-  const metaDesc = `Live ${fuel === 'regular' ? '' : fuel + ' '}gas prices in ${town.name}, TX `
-    + `updated hourly from AAA. Cheapest: ${cheapestChain} at $${cheapestPrice}/gal. `
-    + `Compare Murphy USA, HEB, Shell, Chevron and more across local stations.`;
+  // Short meta description (~124 chars) — no chain-list tail.
+  const metaDesc = fuel === 'regular'
+    ? `Live ${town.name}, TX gas prices updated hourly. Cheapest today: ${cheapestChain} at $${cheapestPrice2}/gal. Compare all major stations on one map.`
+    : `Live ${town.name}, TX ${fuel} gas prices updated hourly. Cheapest today: ${cheapestChain} at $${cheapestPrice2}/gal. Compare all major stations on one map.`;
 
   const faqItems = buildFaqItems(town, {
     cheapestPrice, cheapestChain, tankCost15, tankCost20, stateAvg,
@@ -936,7 +955,13 @@ function buildPage(town, fuel, opts = {}) {
 // one 301 per town per dead fuel/cheapest subpage (4 × 100 = 400 lines).
 // Total: 401 lines.
 function buildRedirects() {
-  const lines = ['/gas-prices-by-city-texas  /  301'];
+  // Top-level aliases that were serving a Cloudflare SPA fallback (200 OK
+  // duplicate of homepage) — force them to canonical "/" via 301.
+  const lines = [
+    '/gas-prices-by-city-texas  /  301',
+    '/gas-prices                /  301',
+    '/texas-gas-prices          /  301',
+  ];
   for (const t of towns) {
     for (const suffix of ['midgrade', 'premium', 'diesel', 'cheapest']) {
       lines.push(`/gas-prices/${t.slug}/${suffix}  /gas-prices/${t.slug}  301`);
@@ -1463,7 +1488,7 @@ function buildCheapestGasPage() {
     sortedBy[f].map(r => ({ slug: r.town.slug, name: r.town.name, chain: r.regularChain, p: money3(r[f]) }))
   ]));
 
-  const title = 'Cheapest Gas in Texas Today — 100 Cities Ranked by Regular, Midgrade, Premium, Diesel';
+  const title = 'Cheapest Gas in Texas Today — 100 Cities Ranked';
   const description = `Cheapest gas in Texas today: ${globalMin.regularChain} in ${globalMin.town.name}, TX at $${money2(globalMin.regular)}/gal. Full rankings for ${towns.length} Texas cities across all 4 fuel grades.`;
 
   return `<!DOCTYPE html>
