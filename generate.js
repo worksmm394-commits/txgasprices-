@@ -894,6 +894,7 @@ function buildRedirects() {
     '/gas-prices-by-city-texas  /  301',
     '/gas-prices                /  301',
     '/texas-gas-prices          /  301',
+    '/trip-calculator           /trip-cost-calculator  301',
     '',
   ].join('\n');
 }
@@ -942,23 +943,62 @@ ${urls.join('\n')}
 function buildHomepage() {
   const canonical = 'https://txgasprices.net/';
   const updatedHuman = formatUpdated(prices.updated);
-  const stateAvgRegular = prices.stateAverage && prices.stateAverage.regular;
-  const stateAvgFmt = stateAvgRegular != null ? money3(stateAvgRegular) : null;
 
-  // Compute each town's cheapest regular and find the global minimum.
-  const townCheap = towns.map(t => {
-    const c = cheapestForTown(t, 'regular');
-    return { town: t, chain: c.chain, price: c.regular };
-  });
-  const globalMin = townCheap.reduce((a, b) => b.price < a.price ? b : a);
+  // Per-fuel cheapest-in-Texas + per-fuel state average, all server-rendered
+  // so the fuel tab JS can swap without any fetch.
+  const perFuel = {};
+  for (const f of FUELS) {
+    const townList = towns.map(t => {
+      const c = cheapestForTown(t, f);
+      return { town: t, chain: c.chain, price: c[f] };
+    });
+    const gm = townList.reduce((a, b) => b.price < a.price ? b : a);
+    perFuel[f] = {
+      townPrices: townList,
+      globalMin:  { slug: gm.town.slug, name: gm.town.name, chain: gm.chain, price: money3(gm.price) },
+      stateAvg:   prices.stateAverage && prices.stateAverage[f] != null ? money3(prices.stateAverage[f]) : null,
+    };
+  }
+  const stateAvgFmt = perFuel.regular.stateAvg;
+  const globalMin   = perFuel.regular.globalMin;
 
-  const cardGridHtml = townCheap
+  // Population-sorted card grid. Each card embeds all 4 fuel prices so the
+  // fuel tab JS only toggles displayed text — no re-sort, no price lookup.
+  const cardGridHtml = towns
     .slice()
-    .sort((a, b) => (b.town.population || 0) - (a.town.population || 0))
-    .map(x => `    <a class="city-card" href="/gas-prices/${x.town.slug}">
-      <span class="cc-name">${x.town.name}</span>
-      <span class="cc-price">$${money3(x.price)}<span class="cc-gal">/gal</span></span>
-    </a>`).join('\n');
+    .sort((a, b) => (b.population || 0) - (a.population || 0))
+    .map(t => {
+      const attrs = FUELS.map(f => {
+        const c = cheapestForTown(t, f);
+        return `data-${f}="${money3(c[f])}"`;
+      }).join(' ');
+      const regPrice = money3(cheapestForTown(t, 'regular').regular);
+      return `    <a class="city-card" href="/gas-prices/${t.slug}" ${attrs}>
+      <span class="cc-name">${t.name}</span>
+      <span class="cc-price">$<span class="cc-val">${regPrice}</span><span class="cc-gal">/gal</span></span>
+    </a>`;
+    }).join('\n');
+
+  // City list for trip-calc datalist (both From and To use the same list).
+  const tripCalcCityOptions = towns
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(t => `    <option value="${t.name}, TX">`).join('\n');
+
+  // Per-fuel data for client-side swap. Minimal JSON: just the globalMin
+  // per fuel (hero stat) + the state avg per fuel (summary box).
+  const fuelDataJson = JSON.stringify(
+    Object.fromEntries(FUELS.map(f => [f, {
+      min:     perFuel[f].globalMin,
+      avg:     perFuel[f].stateAvg,
+    }]))
+  );
+
+  // Lat/lng lookup for client-side trip-calc distance math (haversine).
+  const cityCoords = Object.fromEntries(
+    towns.filter(t => t.lat != null && t.lng != null)
+      .map(t => [t.name.toLowerCase(), { lat: t.lat, lng: t.lng }])
+  );
 
   const webPage = {
     '@context':   'https://schema.org',
@@ -1021,9 +1061,22 @@ html{scroll-behavior:smooth}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1efe8;color:#1a1a18;padding:16px;font-size:14px}
 .site{display:flex;flex-direction:column;gap:10px;max-width:960px;margin:0 auto}
 .topbar{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:11px 20px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:16px;font-weight:500}.logo em{color:#1D9E75;font-style:normal}
+.logo{font-size:16px;font-weight:500;text-decoration:none;color:#1a1a18}.logo em{color:#1D9E75;font-style:normal}
 .nav{display:flex;gap:20px}.nav a{font-size:13px;color:#6b6b66;text-decoration:none}
 .nav a.on{color:#1a1a18;font-weight:500}
+.ftabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.ftabs .ft{padding:6px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:0.5px solid rgba(0,0,0,.1);background:#f1efe8;color:#6b6b66;transition:all .15s}
+.ftabs .ft.on{background:#E1F5EE;border-color:#5DCAA5;color:#085041;font-weight:500}
+.tripcalc{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:18px 20px}
+.tripcalc h2{font-size:16px;font-weight:500;margin-bottom:12px;letter-spacing:-.01em}
+.tripcalc .tc-row{display:grid;grid-template-columns:1fr 1fr 100px auto;gap:8px;align-items:end}
+.tripcalc label{font-size:11px;color:#9a9990;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+.tripcalc input{width:100%;padding:8px 10px;border:0.5px solid rgba(0,0,0,.18);border-radius:8px;font-size:13px;background:#fff;color:#1a1a18}
+.tripcalc button{padding:9px 18px;border-radius:8px;border:0;background:#1D9E75;color:#fff;font-size:13px;font-weight:500;cursor:pointer}
+.tripcalc button:hover{background:#148a63}
+.tripcalc .tc-result{margin-top:12px;font-size:13px;color:#1a1a18;min-height:18px}
+.tripcalc .tc-result b{color:#1D9E75;font-weight:500}
+@media (max-width:600px){.tripcalc .tc-row{grid-template-columns:1fr 1fr;gap:8px}.tripcalc button{grid-column:1/-1}}
 .hero{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:22px 24px}
 .hero h1{font-size:24px;font-weight:500;margin-bottom:6px;letter-spacing:-.01em}
 .hero .sub{font-size:13px;color:#6b6b66}
@@ -1051,12 +1104,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="site">
 
 <div class="topbar">
-  <div class="logo">TX<em>Gas</em>Prices</div>
+  <a class="logo" href="/">TX<em>Gas</em>Prices</a>
   <div class="nav">
     <a class="on" href="/">Home</a>
-    <a href="/gas-prices/houston-tx">Houston</a>
-    <a href="/gas-prices/dallas-tx">Dallas</a>
-    <a href="/gas-prices/austin-tx">Austin</a>
+    <a href="/cheapest-gas-texas">Cheapest Gas</a>
+    <a href="/trip-cost-calculator">Trip Calculator</a>
   </div>
 </div>
 
@@ -1066,14 +1118,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="updated"><span class="dot"></span>Updated ${updatedHuman}</div>
   <div class="summary">
     <div class="sbox">
-      <div class="slabel">Cheapest in Texas</div>
-      <div class="sval g">$${money3(globalMin.price)}<span style="font-size:13px;color:#9a9990;font-weight:400">/gal</span></div>
-      <div class="ssub">${globalMin.chain} · <a href="/gas-prices/${globalMin.town.slug}" style="color:#1D9E75;text-decoration:none">${globalMin.town.name}</a></div>
+      <div class="slabel"><span id="min-label">Cheapest regular in Texas</span></div>
+      <div class="sval g">$<span id="min-price">${globalMin.price}</span><span style="font-size:13px;color:#9a9990;font-weight:400">/gal</span></div>
+      <div class="ssub"><span id="min-chain">${globalMin.chain}</span> · <a id="min-link" href="/gas-prices/${globalMin.slug}" style="color:#1D9E75;text-decoration:none"><span id="min-town">${globalMin.name}</span></a></div>
     </div>
     ${stateAvgFmt ? `<div class="sbox">
-      <div class="slabel">Texas state average</div>
-      <div class="sval">$${stateAvgFmt}<span style="font-size:13px;color:#9a9990;font-weight:400">/gal</span></div>
-      <div class="ssub">Regular unleaded · AAA</div>
+      <div class="slabel"><span id="avg-label">Texas regular average</span></div>
+      <div class="sval">$<span id="avg-price">${stateAvgFmt}</span><span style="font-size:13px;color:#9a9990;font-weight:400">/gal</span></div>
+      <div class="ssub">From AAA · updated hourly</div>
     </div>` : ''}
     <div class="sbox">
       <div class="slabel">Cities tracked</div>
@@ -1083,9 +1135,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<section class="tripcalc" id="tripcalc">
+  <h2>Calculate Your Texas Trip Gas Cost</h2>
+  <form class="tc-row" onsubmit="return tcCalc(event)">
+    <div><label for="tc-from">From</label><input id="tc-from" list="tc-cities" placeholder="City, TX" autocomplete="off"></div>
+    <div><label for="tc-to">To</label><input id="tc-to" list="tc-cities" placeholder="City, TX" autocomplete="off"></div>
+    <div><label for="tc-mpg">MPG</label><input id="tc-mpg" type="number" min="5" max="80" step="1" value="25"></div>
+    <button type="submit">Calculate</button>
+  </form>
+  <datalist id="tc-cities">
+${tripCalcCityOptions}
+  </datalist>
+  <div class="tc-result" id="tc-result"></div>
+</section>
+
 <section class="cities">
-  <h2>All Texas cities — cheapest regular unleaded</h2>
-  <div class="city-grid">
+  <h2>All Texas cities — cheapest gas</h2>
+  <div class="ftabs" id="fuel-tabs" role="tablist">
+    <button type="button" class="ft on" data-fuel="regular" role="tab" aria-selected="true">Regular</button>
+    <button type="button" class="ft" data-fuel="midgrade" role="tab" aria-selected="false">Midgrade</button>
+    <button type="button" class="ft" data-fuel="premium" role="tab" aria-selected="false">Premium</button>
+    <button type="button" class="ft" data-fuel="diesel" role="tab" aria-selected="false">Diesel</button>
+  </div>
+  <div class="city-grid" id="city-grid">
 ${cardGridHtml}
   </div>
 </section>
@@ -1096,6 +1168,374 @@ ${cardGridHtml}
 </div>
 
 </div>
+<script>
+(function(){
+  const FUEL_DATA = ${fuelDataJson};
+  const FUEL_LABELS = { regular:'regular', midgrade:'midgrade', premium:'premium', diesel:'diesel' };
+
+  // Fuel tab: swap card prices + hero stats. No fetch — all data is in
+  // data-{fuel} attrs on cards and in FUEL_DATA for hero summary.
+  const tabs = document.querySelectorAll('#fuel-tabs .ft');
+  const cards = document.querySelectorAll('#city-grid .city-card');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    const fuel = tab.dataset.fuel;
+    tabs.forEach(t => {
+      const on = t === tab;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    cards.forEach(c => {
+      const v = c.getAttribute('data-' + fuel);
+      if (v) c.querySelector('.cc-val').textContent = v;
+    });
+    const d = FUEL_DATA[fuel];
+    if (d) {
+      const min = d.min;
+      document.getElementById('min-label').textContent = 'Cheapest ' + FUEL_LABELS[fuel] + ' in Texas';
+      document.getElementById('min-price').textContent = min.price;
+      document.getElementById('min-chain').textContent = min.chain;
+      document.getElementById('min-town').textContent  = min.name;
+      document.getElementById('min-link').setAttribute('href', '/gas-prices/' + min.slug);
+      const avgEl = document.getElementById('avg-price');
+      if (avgEl && d.avg) avgEl.textContent = d.avg;
+      const avgLabel = document.getElementById('avg-label');
+      if (avgLabel) avgLabel.textContent = 'Texas ' + FUEL_LABELS[fuel] + ' average';
+    }
+  }));
+
+  // Trip calc (client-side). Uses haversine between the two cities if both
+  // match an entry in CITY_COORDS; otherwise falls back to a gentle error.
+  const CITY_COORDS = ${JSON.stringify(cityCoords)};
+  const STATE_AVG_REG = ${stateAvgFmt || 'null'};
+  function haversineMi(a, b) {
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const x = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+    return 6371 * 2 * Math.asin(Math.sqrt(x)) * 0.621371;
+  }
+  function cityKey(s) {
+    return String(s || '').toLowerCase().replace(/,\\s*tx\\s*$/, '').trim();
+  }
+  window.tcCalc = function(e) {
+    e.preventDefault();
+    const from = cityKey(document.getElementById('tc-from').value);
+    const to   = cityKey(document.getElementById('tc-to').value);
+    const mpg  = Math.max(5, Math.min(80, Number(document.getElementById('tc-mpg').value) || 25));
+    const out  = document.getElementById('tc-result');
+    const a = CITY_COORDS[from], b = CITY_COORDS[to];
+    if (!a || !b) {
+      out.innerHTML = 'Pick two Texas cities from the list to see a cost estimate.';
+      return false;
+    }
+    const miles = haversineMi(a, b);
+    const gallons = miles / mpg;
+    const price = STATE_AVG_REG || 3.50;
+    const cost = gallons * price;
+    out.innerHTML =
+      '<b>' + miles.toFixed(0) + ' mi</b> one-way · ' +
+      '<b>' + gallons.toFixed(1) + ' gal</b> at ' + mpg + ' MPG · ' +
+      'about <b>$' + cost.toFixed(2) + '</b> in fuel (TX avg $' + Number(price).toFixed(2) + '/gal). ' +
+      '<a href="/trip-cost-calculator" style="color:#1D9E75;text-decoration:none">See full calculator →</a>';
+    return false;
+  };
+})();
+</script>
+</body>
+</html>
+`;
+}
+
+// ── trip-cost-calculator hub page ────────────────────────────
+function buildTripCalcPage() {
+  const canonical = 'https://txgasprices.net/trip-cost-calculator';
+  const updatedHuman = formatUpdated(prices.updated);
+  const stateAvgReg = prices.stateAverage && prices.stateAverage.regular;
+  const stateAvgFmt = stateAvgReg != null ? money3(stateAvgReg) : null;
+  const stateAvgPrice = stateAvgReg != null ? stateAvgReg : 3.50;
+  const DEFAULT_MPG = 25;
+
+  const townByName = Object.fromEntries(towns.map(t => [t.name, t]));
+  const ROUTE_PAIRS = [
+    ['Houston', 'Dallas'],
+    ['Austin', 'San Antonio'],
+    ['Dallas', 'Houston'],
+    ['Houston', 'Austin'],
+    ['El Paso', 'Dallas'],
+    ['Houston', 'San Antonio'],
+    ['Dallas', 'Austin'],
+    ['Corpus Christi', 'Houston'],
+    ['Dallas', 'Fort Worth'],
+    ['San Antonio', 'Austin'],
+  ];
+
+  const routeCardsHtml = ROUTE_PAIRS.map(([fromName, toName]) => {
+    const a = townByName[fromName];
+    const b = townByName[toName];
+    if (!a || !b || a.lat == null || b.lat == null) return '';
+    const miles = haversineKm(a, b) * 0.621371;
+    const gallons = miles / DEFAULT_MPG;
+    const cost = gallons * stateAvgPrice;
+    return `    <a class="route-card" href="/gas-prices/${a.slug}">
+      <div class="rc-route">${fromName} → ${toName}</div>
+      <div class="rc-stats"><span class="rc-miles">${miles.toFixed(0)} mi</span><span class="rc-cost">$${cost.toFixed(2)}</span></div>
+      <div class="rc-note">${gallons.toFixed(1)} gal at ${DEFAULT_MPG} MPG · $${money2(stateAvgPrice)}/gal</div>
+    </a>`;
+  }).filter(Boolean).join('\n');
+
+  const cityOptions = towns
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(t => `    <option value="${t.name}, TX">`).join('\n');
+  const cityCoords = Object.fromEntries(
+    towns.filter(t => t.lat != null && t.lng != null)
+      .map(t => [t.name.toLowerCase(), { lat: t.lat, lng: t.lng }])
+  );
+
+  const faqItems = [
+    {
+      q: 'How is the trip distance calculated?',
+      a: `Great-circle (as-the-crow-flies) distance between the two city centers. Real driving distance along highways is typically 10–20% longer, so actual fuel use will be slightly higher than the estimate.`,
+    },
+    {
+      q: 'What MPG should I enter?',
+      a: `Use your vehicle's real-world combined fuel economy. Modern sedans average 30–35 MPG, SUVs 22–28 MPG, and trucks 16–22 MPG. The EPA sticker value is usually close; mileage on I-10 at 75 mph will be a bit lower.`,
+    },
+    {
+      q: 'What gas price does the calculator use?',
+      a: `The current Texas state average for regular unleaded from AAA (${stateAvgFmt != null ? '$' + stateAvgFmt : 'today\u2019s'}/gal). For the most accurate estimate, check the cheapest station page for your destination city and use that price instead.`,
+    },
+    {
+      q: 'Does the estimate include tolls, parking, or wear-and-tear?',
+      a: `No — only fuel. Texas toll roads (TxTag, SH 130, Harris County EZ Tag) can add $5–$30 per one-way trip on long drives. Maintenance averages another ~$0.10/mile over a car's lifetime.`,
+    },
+    {
+      q: 'How often is the gas price updated?',
+      a: `The Texas state average refreshes hourly from AAA data. Per-city station prices refresh every 3 days. Last updated ${updatedHuman} CT.`,
+    },
+  ];
+
+  const faqHtml = faqItems.map(it =>
+    `  <div class="faq-q">${it.q}</div>
+  <div class="faq-a">${it.a}</div>`
+  ).join('\n');
+
+  const webPage = {
+    '@context':   'https://schema.org',
+    '@type':      'WebPage',
+    name:         'Texas Trip Gas Cost Calculator',
+    description:  'Estimate fuel cost for any Texas city-to-city drive using current Texas gas prices and your vehicle MPG.',
+    dateModified: prices.updated,
+    url:          canonical,
+  };
+  const webApp = {
+    '@context':        'https://schema.org',
+    '@type':           'WebApplication',
+    name:              'Texas Trip Gas Cost Calculator',
+    url:               canonical,
+    applicationCategory: 'TravelApplication',
+    operatingSystem:   'Any',
+    browserRequirements: 'Requires JavaScript',
+    offers:            { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  };
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type':    'FAQPage',
+    mainEntity: faqItems.map(it => ({
+      '@type':         'Question',
+      name:            it.q,
+      acceptedAnswer:  { '@type': 'Answer', text: it.a },
+    })),
+  };
+  const breadcrumb = {
+    '@context':       'https://schema.org',
+    '@type':          'BreadcrumbList',
+    itemListElement:  [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://txgasprices.net/' },
+      { '@type': 'ListItem', position: 2, name: 'Trip Calculator', item: canonical },
+    ],
+  };
+
+  const title = 'Texas Trip Gas Cost Calculator — Fuel Cost Between Any TX Cities';
+  const description = 'Calculate the fuel cost for any Texas city-to-city drive using live Texas gas prices. Enter your MPG and two cities — get miles, gallons used, and total cost.';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title}</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#1a1a18">
+<meta name="description" content="${description}">
+<link rel="canonical" href="${canonical}">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${description}">
+<meta property="og:url" content="${canonical}">
+<meta property="og:image" content="https://txgasprices.net/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://txgasprices.net/og-image.png">
+<script type="application/ld+json">
+${JSON.stringify(webPage, null, 2)}
+</script>
+<script type="application/ld+json">
+${JSON.stringify(webApp, null, 2)}
+</script>
+<script type="application/ld+json">
+${JSON.stringify(breadcrumb, null, 2)}
+</script>
+<script type="application/ld+json">
+${JSON.stringify(faqSchema, null, 2)}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1efe8;color:#1a1a18;padding:16px;font-size:14px}
+.site{display:flex;flex-direction:column;gap:10px;max-width:960px;margin:0 auto}
+.topbar{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:11px 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:16px;font-weight:500;text-decoration:none;color:#1a1a18}.logo em{color:#1D9E75;font-style:normal}
+.nav{display:flex;gap:20px}.nav a{font-size:13px;color:#6b6b66;text-decoration:none}
+.nav a.on{color:#1a1a18;font-weight:500}
+.hero{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:22px 24px}
+.hero h1{font-size:24px;font-weight:500;margin-bottom:6px;letter-spacing:-.01em}
+.hero .sub{font-size:13px;color:#6b6b66}
+.card{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:18px 20px}
+.card h2{font-size:15px;font-weight:500;margin-bottom:12px;letter-spacing:-.005em}
+.tc-row{display:grid;grid-template-columns:1fr 1fr 110px auto;gap:10px;align-items:end}
+.tc-row label{font-size:11px;color:#9a9990;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px}
+.tc-row input{width:100%;padding:9px 10px;border:0.5px solid rgba(0,0,0,.18);border-radius:8px;font-size:13px;background:#fff;color:#1a1a18}
+.tc-row button{padding:10px 20px;border-radius:8px;border:0;background:#1D9E75;color:#fff;font-size:13px;font-weight:500;cursor:pointer}
+.tc-row button:hover{background:#148a63}
+.tc-result{margin-top:14px;padding:12px 14px;background:#f8f6ef;border-radius:8px;font-size:13px;min-height:18px;color:#1a1a18}
+.tc-result b{color:#1D9E75;font-weight:500}
+.tc-hint{font-size:12px;color:#9a9990;margin-top:8px}
+.route-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.route-card{display:block;padding:12px 14px;border:0.5px solid rgba(0,0,0,.08);border-radius:10px;background:#fff;text-decoration:none;color:#1a1a18;transition:border-color .15s,background .15s}
+.route-card:hover{border-color:#1D9E75;background:#f8fbf9}
+.rc-route{font-size:13.5px;font-weight:500;margin-bottom:6px}
+.rc-stats{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.rc-miles{color:#6b6b66}
+.rc-cost{color:#1D9E75;font-weight:500;font-variant-numeric:tabular-nums}
+.rc-note{font-size:11px;color:#9a9990}
+.howit ol{margin:0 0 0 18px;font-size:13px;color:#1a1a18;line-height:1.55}
+.howit li{margin-bottom:4px}
+.faq{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:18px 20px}
+.faq h2{font-size:15px;font-weight:500;margin-bottom:12px}
+.faq-q{font-size:13.5px;font-weight:500;color:#1a1a18;margin-top:12px}
+.faq-q:first-of-type{margin-top:0}
+.faq-a{font-size:13px;color:#6b6b66;line-height:1.55;margin-top:4px}
+.footer{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:11px 20px;font-size:12px;color:#9a9990}
+.updated-line{font-size:12px;color:#6b6b66;margin-top:4px}
+.updated-line .dot{display:inline-block;width:6px;height:6px;background:#1D9E75;border-radius:50%;margin-right:5px;vertical-align:middle}
+@media (max-width:600px){.tc-row{grid-template-columns:1fr 1fr;gap:8px}.tc-row button{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="site">
+
+<div class="topbar">
+  <a class="logo" href="/">TX<em>Gas</em>Prices</a>
+  <div class="nav">
+    <a href="/">Home</a>
+    <a href="/cheapest-gas-texas">Cheapest Gas</a>
+    <a class="on" href="/trip-cost-calculator">Trip Calculator</a>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>Texas Trip Gas Cost Calculator</h1>
+  <div class="sub">Estimate fuel cost for any Texas city-to-city drive using live Texas gas prices.</div>
+  <div class="updated-line"><span class="dot"></span>Updated ${updatedHuman} · TX regular avg $${stateAvgFmt || '—'}/gal</div>
+</div>
+
+<section class="card">
+  <h2>Calculate Your Texas Trip Gas Cost</h2>
+  <form class="tc-row" onsubmit="return tcCalc(event)">
+    <div><label for="tc-from">From city</label><input id="tc-from" list="tc-cities" placeholder="e.g. Houston, TX" autocomplete="off"></div>
+    <div><label for="tc-to">To city</label><input id="tc-to" list="tc-cities" placeholder="e.g. Dallas, TX" autocomplete="off"></div>
+    <div><label for="tc-mpg">MPG</label><input id="tc-mpg" type="number" min="5" max="80" step="1" value="${DEFAULT_MPG}"></div>
+    <button type="submit">Calculate</button>
+  </form>
+  <datalist id="tc-cities">
+${cityOptions}
+  </datalist>
+  <div class="tc-result" id="tc-result">Pick two Texas cities to see miles, gallons used, and estimated fuel cost.</div>
+  <div class="tc-hint">Tip: results use straight-line distance between city centers. Real driving routes typically add 10–20% more miles.</div>
+</section>
+
+<section class="card">
+  <h2>Popular Texas routes</h2>
+  <div class="route-grid">
+${routeCardsHtml}
+  </div>
+</section>
+
+<section class="card howit">
+  <h2>How it works</h2>
+  <ol>
+    <li>We measure the straight-line distance between the two city centers you pick (great-circle / haversine).</li>
+    <li>Divide the miles by your vehicle's MPG to get gallons of fuel needed.</li>
+    <li>Multiply by the current Texas regular unleaded average from AAA (refreshed hourly).</li>
+    <li>For a more accurate number, look up the destination city's cheapest station on its city page and use that price.</li>
+  </ol>
+</section>
+
+<section class="faq">
+  <h2>Frequently asked questions</h2>
+${faqHtml}
+</section>
+
+<div class="footer">
+  <span>${buildFooterNote()}</span>
+</div>
+
+</div>
+<script>
+(function(){
+  const CITY_COORDS = ${JSON.stringify(cityCoords)};
+  const STATE_AVG_REG = ${stateAvgFmt || 'null'};
+  const DEFAULT_MPG = ${DEFAULT_MPG};
+  function haversineMi(a, b) {
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const x = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+    return 6371 * 2 * Math.asin(Math.sqrt(x)) * 0.621371;
+  }
+  function cityKey(s) {
+    return String(s || '').toLowerCase().replace(/,\\s*tx\\s*$/, '').trim();
+  }
+  window.tcCalc = function(e) {
+    e.preventDefault();
+    const from = cityKey(document.getElementById('tc-from').value);
+    const to   = cityKey(document.getElementById('tc-to').value);
+    const mpg  = Math.max(5, Math.min(80, Number(document.getElementById('tc-mpg').value) || DEFAULT_MPG));
+    const out  = document.getElementById('tc-result');
+    const a = CITY_COORDS[from], b = CITY_COORDS[to];
+    if (!a || !b) {
+      out.innerHTML = 'Pick two Texas cities from the list to see the trip cost.';
+      return false;
+    }
+    const miles = haversineMi(a, b);
+    const gallons = miles / mpg;
+    const price = STATE_AVG_REG || 3.50;
+    const cost = gallons * price;
+    const roundTrip = cost * 2;
+    out.innerHTML =
+      '<b>' + miles.toFixed(0) + ' mi</b> one-way · ' +
+      '<b>' + gallons.toFixed(1) + ' gal</b> at ' + mpg + ' MPG · ' +
+      'about <b>$' + cost.toFixed(2) + '</b> in fuel' +
+      ' (round trip ~$' + roundTrip.toFixed(2) + ')' +
+      '. Based on TX avg $' + Number(price).toFixed(2) + '/gal regular.';
+    return false;
+  };
+})();
+</script>
 </body>
 </html>
 `;
@@ -1129,6 +1569,8 @@ fs.writeFileSync('./output/sitemap.xml', buildSitemap());
 fs.writeFileSync('./output/robots.txt', buildRobotsTxt());
 fs.writeFileSync('./output/_redirects', buildRedirects());
 fs.writeFileSync('./output/index.html', buildHomepage());
+fs.mkdirSync('./output/trip-cost-calculator', { recursive: true });
+fs.writeFileSync('./output/trip-cost-calculator/index.html', buildTripCalcPage());
 
 console.log(`\n✓ Generated ${pageCount} pages across ${towns.length} towns`);
 console.log(`✓ Sitemap written with ${towns.length * 6 + 3} URLs`);
