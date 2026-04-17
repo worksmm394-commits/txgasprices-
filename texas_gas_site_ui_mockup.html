@@ -236,6 +236,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* estimates banner */
 .estnote{background:#FFF8E1;border:0.5px solid #EAC36A;border-radius:8px;padding:9px 13px;margin-bottom:14px;font-size:12px;color:#5a4510;line-height:1.45}
 .estnote b{font-weight:500;color:#3a2d00}
+
+/* ── mobile header fix ─────────────────────────────────────────
+   At narrow widths the 3-link nav squeezes the logo and the hero
+   city dropdown clips the right edge. Tighten sizes/spacing and
+   keep topbar single-row; let hero-top wrap so the dropdown sits
+   below the title instead of being crushed. */
+@media (max-width:768px){
+  .topbar{padding:9px 14px;gap:10px;flex-wrap:nowrap;min-width:0}
+  .logo{font-size:14px;flex-shrink:0}
+  .nav{gap:12px;flex-wrap:nowrap;min-width:0}
+  .nav a{font-size:11px;white-space:nowrap;padding:0}
+  .hero-top{flex-wrap:wrap;gap:10px}
+  .hero-top > div:first-child{flex:1 1 100%;min-width:0}
+  .city-sel{flex:0 0 auto;max-width:100%}
+  .city-sel select{font-size:11px;padding:6px 10px;max-width:100%}
+}
+@media (max-width:480px){
+  .topbar{padding:8px 12px;gap:6px}
+  .logo{font-size:13px}
+  .nav{gap:8px}
+  .nav a{font-size:10.5px}
+  .city-sel select{font-size:10.5px;padding:5px 8px}
+}
 </style>
 </head>
 <body>
