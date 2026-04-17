@@ -266,13 +266,13 @@ function buildCityOptions(currentFull) {
   }).join('\n');
 }
 
-function buildFuelTabs(slug, currentFuel) {
+function buildFuelTabs(_slug, currentFuel) {
+  // Client-side swap only — we no longer generate per-fuel subpages, so
+  // clicks must stay on-page. `setFuel` (mockup script) re-renders the
+  // hero/chains/stations from priceData, which has all 4 fuels embedded.
   return FUELS.map(f => {
-    const href = f === 'regular'
-      ? `/gas-prices/${slug}`
-      : `/gas-prices/${slug}/${f}`;
     const on = f === currentFuel ? ' on' : '';
-    return `    <a class="ft${on}" href="${href}">${fuelLabel(f)}</a>`;
+    return `    <button type="button" class="ft${on}" data-fuel="${f}" onclick="setFuel('${f}', this); return false;">${fuelLabel(f)}</button>`;
   }).join('\n');
 }
 
@@ -711,6 +711,17 @@ function renderInitialChainsHtml(town) {
   const needsToggle = list.length > HERO_MAX;
   const heroList = needsToggle ? list.slice(0, HERO_MAX) : list;
 
+  // Per-chain price lookup for each fuel — enables data-{fuel} attrs so
+  // the fuel tab JS can swap prices directly from the DOM without any
+  // recompute. Keyed by chain name for O(1) merge against the regular list.
+  const byChain = {};
+  for (const f of FUELS) {
+    for (const row of (pd[f] || [])) {
+      if (!byChain[row.n]) byChain[row.n] = {};
+      byChain[row.n][f] = row.p;
+    }
+  }
+
   const cards = heroList.map((c, i) => {
     const isMember = MEMBERSHIP_CHAINS.has(c.n);
     const stationsLine = c.sc && c.sc > 0
@@ -719,8 +730,12 @@ function renderInitialChainsHtml(town) {
     const memberBadge = isMember
       ? `      <div><span class="cc-mbr" title="${escAttr(MEMBERSHIP_TOOLTIP)}">⚑ membership price</span></div>`
       : '';
+    const fuelAttrs = FUELS.map(f => {
+      const v = byChain[c.n] && byChain[c.n][f];
+      return v != null ? `data-${f}="${Number(v).toFixed(2)}"` : '';
+    }).filter(Boolean).join(' ');
     const parts = [
-      `    <div class="cc${i === 0 ? ' best' : ''}" data-chain="${escAttr(c.n)}" onclick="setChainFilter(this.dataset.chain)">`,
+      `    <div class="cc${i === 0 ? ' best' : ''}" data-chain="${escAttr(c.n)}" ${fuelAttrs} onclick="setChainFilter(this.dataset.chain)">`,
       i === 0 ? `      <div class="cc-badge">cheapest</div>` : null,
       `      <div class="cc-name">${escHtml(c.n)}</div>`,
       `      <div class="cc-price">$${c.p.toFixed(2)}</div>`,
@@ -916,6 +931,31 @@ function buildPage(town, fuel, opts = {}) {
 }
 
 // ── sitemap ──────────────────────────────────────────────────
+// ── _redirects (Cloudflare Pages) ────────────────────────────
+// Consolidates the removed /gas-prices-by-city-texas ghost URL, then emits
+// one 301 per town per dead fuel/cheapest subpage (4 × 100 = 400 lines).
+// Total: 401 lines.
+function buildRedirects() {
+  const lines = ['/gas-prices-by-city-texas  /  301'];
+  for (const t of towns) {
+    for (const suffix of ['midgrade', 'premium', 'diesel', 'cheapest']) {
+      lines.push(`/gas-prices/${t.slug}/${suffix}  /gas-prices/${t.slug}  301`);
+    }
+  }
+  return lines.join('\n') + '\n';
+}
+
+// ── robots.txt ───────────────────────────────────────────────
+function buildRobotsTxt() {
+  return [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    'Sitemap: https://txgasprices.net/sitemap.xml',
+    '',
+  ].join('\n');
+}
+
 function buildSitemap() {
   const base  = 'https://txgasprices.net';
   const today = new Date().toISOString().split('T')[0];
@@ -925,18 +965,16 @@ function buildSitemap() {
   // Homepage — priority 1.0, lastmod from prices.json.updated
   urls.push(`  <url><loc>${base}/</loc><lastmod>${homeLastmod}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>`);
 
-  // 100 city pages + 400 fuel/cheapest subpages (left untouched per instructions)
+  // 100 city pages — fuel subpages consolidated into each main page, so
+  // only one URL per city in the sitemap. Dead /midgrade, /premium, /diesel,
+  // /cheapest paths are 301-redirected via output/_redirects.
   towns.forEach(t => {
     urls.push(`  <url><loc>${base}/gas-prices/${t.slug}</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
-    FUELS.slice(1).forEach(f => {
-      urls.push(`  <url><loc>${base}/gas-prices/${t.slug}/${f}</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.7</priority></url>`);
-    });
-    urls.push(`  <url><loc>${base}/gas-prices/${t.slug}/cheapest</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.7</priority></url>`);
   });
 
-  // Two hub pages (ghost /gas-prices-by-city-texas removed)
-  urls.push(`  <url><loc>${base}/trip-cost-calculator</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+  // Two hub pages
   urls.push(`  <url><loc>${base}/cheapest-gas-texas</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
+  urls.push(`  <url><loc>${base}/trip-cost-calculator</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -2169,28 +2207,21 @@ ${mockupScriptWithTokens}
 // ── run ──────────────────────────────────────────────────────
 let pageCount = 0;
 
+// Only the main city page. Fuel subpages (midgrade/premium/diesel) and the
+// /cheapest alias are consolidated — all 4 fuel prices are embedded in the
+// main page and swapped client-side by the fuel tab JS. Old URLs are handled
+// by 301 redirects in output/_redirects (see buildRedirects).
 towns.forEach(town => {
-  FUELS.forEach(fuel => {
-    const dir = fuel === 'regular'
-      ? `./output/gas-prices/${town.slug}`
-      : `./output/gas-prices/${town.slug}/${fuel}`;
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(`${dir}/index.html`, buildPage(town, fuel));
-    pageCount++;
-  });
-  // /cheapest alias: same content as regular, but noindex'd and canonical
-  // pointing at the regular path so the duplicate won't dilute rankings.
-  const cheapDir = `./output/gas-prices/${town.slug}/cheapest`;
-  fs.mkdirSync(cheapDir, { recursive: true });
-  fs.writeFileSync(
-    `${cheapDir}/index.html`,
-    buildPage(town, 'regular', { isCheapestAlias: true })
-  );
+  const dir = `./output/gas-prices/${town.slug}`;
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(`${dir}/index.html`, buildPage(town, 'regular'));
   pageCount++;
 });
 
 fs.mkdirSync('./output', { recursive: true });
 fs.writeFileSync('./output/sitemap.xml', buildSitemap());
+fs.writeFileSync('./output/robots.txt', buildRobotsTxt());
+fs.writeFileSync('./output/_redirects', buildRedirects());
 fs.writeFileSync('./output/index.html', buildHomepage());
 fs.mkdirSync('./output/trip-cost-calculator', { recursive: true });
 fs.writeFileSync('./output/trip-cost-calculator/index.html', buildTripCalcPage());
