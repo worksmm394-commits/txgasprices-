@@ -800,9 +800,14 @@ function buildPage(town, fuel, opts = {}) {
   const stateAvg               = stateAvgNum != null ? money3(stateAvgNum) : cheapestPrice;
   const numStations            = prices.chains.length;
 
+  // Abbreviate only in title/og:title to keep fuel subtype titles ≤60 chars;
+  // visible page content (hero, FAQ, breadcrumbs) still uses the full name.
+  const titleCityName = town.slug === 'north-richland-hills-tx'
+    ? 'N. Richland Hills'
+    : town.name;
   const pageTitle = fuel === 'regular'
-    ? `${town.name}, TX Gas Prices Today — $${cheapestPrice2}/gal`
-    : `${fLabel} Gas Prices in ${town.name}, TX Today — $${cheapestPrice2}/gal`;
+    ? `${titleCityName}, TX Gas Prices Today — $${cheapestPrice2}/gal`
+    : `${fLabel} Gas Prices in ${titleCityName}, TX Today — $${cheapestPrice2}/gal`;
 
   const heroTitle = fuel === 'regular'
     ? `Gas prices in ${town.name}, TX`
