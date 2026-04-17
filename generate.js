@@ -1706,46 +1706,79 @@ function buildTripCalcPage() {
   const stateAvgFmt2  = money2(stateAvgPrice);
 
   const townByName = Object.fromEntries(towns.map(t => [t.name, t]));
-  const ROUTE_PAIRS = [
-    ['Houston', 'Dallas'], ['Austin', 'San Antonio'], ['Dallas', 'Fort Worth'],
-    ['Houston', 'Austin'], ['Dallas', 'Houston'],     ['San Antonio', 'Austin'],
-    ['El Paso', 'Dallas'], ['Houston', 'San Antonio'],['Dallas', 'Austin'],
-    ['Corpus Christi', 'Houston'],
+  const townBySlug = Object.fromEntries(towns.map(t => [t.slug, t]));
+
+  // Default 6 routes shown before the user picks an origin.
+  const DEFAULT_ROUTES = [
+    ['Houston', 'Dallas'],      ['Houston', 'Austin'],
+    ['San Antonio', 'Austin'],  ['Dallas', 'Fort Worth'],
+    ['Austin', 'Dallas'],       ['Houston', 'San Antonio'],
   ];
 
-  const routeCardsHtml = ROUTE_PAIRS.map(([fromName, toName]) => {
+  // Shared renderer — takes a pair [fromName, toName] and returns a card
+  // that prefills the calc when clicked (handled by the page-end script).
+  function makeRouteCardHtml(fromName, toName) {
     const a = townByName[fromName], b = townByName[toName];
     if (!a || !b || a.lat == null || b.lat == null) return '';
     const miles = Math.round(haversineKm(a, b) * 0.621371);
     const sedanCost = (miles / 32) * stateAvgPrice;
     const truckCost = (miles / 20) * stateAvgPrice;
     const href = `/trip-cost-calculator?from=${a.slug}&to=${b.slug}`;
-    return `    <a class="route-card" href="${href}">
-      <h3 class="rc-route">${escHtml(fromName)} → ${escHtml(toName)} <span class="rc-miles">${miles} mi</span></h3>
-      <p class="rc-costs"><b>Sedan (32 MPG):</b> $${sedanCost.toFixed(2)} · <b>Truck (20 MPG):</b> $${truckCost.toFixed(2)}</p>
-      <p class="rc-note">Based on today's TX regular average of $${stateAvgFmt2}/gal.</p>
+    return `    <a class="route-card" href="${href}" data-from-slug="${escAttr(a.slug)}" data-to-slug="${escAttr(b.slug)}" data-from-name="${escAttr(fromName)}, TX" data-to-name="${escAttr(toName)}, TX">
+      <div class="rc-route"><b>${escHtml(fromName)} → ${escHtml(toName)}</b></div>
+      <div class="rc-line">${miles} mi · Sedan ~$${sedanCost.toFixed(0)}</div>
+      <div class="rc-line">Truck ~$${truckCost.toFixed(0)}</div>
+      <span class="rc-cta">Calculate →</span>
     </a>`;
-  }).filter(Boolean).join('\n');
+  }
+
+  const routeCardsHtml = DEFAULT_ROUTES
+    .map(([f, t]) => makeRouteCardHtml(f, t))
+    .filter(Boolean).join('\n');
+
+  // Precompute nearest-3 cities for each town so the client can swap route
+  // cards dynamically without recomputing haversine in the browser.
+  const ROUTE_BIG_CITY_SLUGS = ['houston-tx', 'san-antonio-tx', 'dallas-tx', 'austin-tx', 'fort-worth-tx', 'el-paso-tx'];
+  const nearestCitiesMap = {};
+  for (const t of towns) {
+    if (t.lat == null || t.lng == null) continue;
+    const ranked = towns
+      .filter(other => other.slug !== t.slug && other.lat != null && other.lng != null)
+      .map(other => ({ slug: other.slug, name: other.name, km: haversineKm(t, other) }))
+      .sort((a, b) => a.km - b.km)
+      .slice(0, 3)
+      .map(x => ({ slug: x.slug, name: x.name }));
+    nearestCitiesMap[t.slug] = ranked;
+  }
+  const bigCitiesData = ROUTE_BIG_CITY_SLUGS
+    .filter(s => townBySlug[s])
+    .map(s => ({ slug: s, name: townBySlug[s].name }));
+  const routeDataJson = JSON.stringify({
+    avgPrice:    stateAvgPrice,
+    bigCities:   bigCitiesData,
+    nearest:     nearestCitiesMap,
+    distances:   Object.fromEntries(towns.map(t => [t.slug, { lat: t.lat, lng: t.lng, name: t.name }])),
+  });
 
   const faqItems = [
-    { q: 'How accurate are the trip cost estimates?',
-      a: `Distances come from <b>Google Maps Distance Matrix</b> (real driving miles, not straight-line). Fuel costs use your selected chain's live price (or today's Texas state average of <b>$${stateAvgFmt2}/gal</b>). Actual pump prices may differ by a few cents per station.`,
-      src: `Source: Google Maps + AAA Texas, updated ${updatedHuman} CT` },
+    { q: 'How much does it cost to drive cross-country?',
+      a: `A 2,800-mile Los Angeles → New York drive in a <b>30 MPG sedan</b> burns ~93 gallons — about <b>$325</b> at the current US average. A <b>20 MPG truck or SUV</b> burns ~140 gallons ≈ <b>$490</b>. Shorter example: a Houston, TX → Denver trip (1,030 mi) is roughly <b>$120</b> in a sedan, <b>$180</b> in a truck.`,
+      src: `Source: AAA national gas-price average + fueleconomy.gov MPG data` },
     { q: 'What MPG should I use for my vehicle?',
       a: `Use the <b>Pick my car</b> tab to get EPA-certified MPG from <b>fueleconomy.gov</b> (covering all US gas vehicles 1984–${CURRENT_YEAR}). Combined MPG is a weighted city/highway mix — most accurate for mixed driving. Prefer Highway MPG for interstate-heavy trips.`,
       src: `Source: fueleconomy.gov (US Department of Energy)` },
-    { q: 'Why is my real fuel cost different from this estimate?',
-      a: `Real costs depend on driving style, traffic, headwinds, roof cargo, AC use, and vehicle age. Aggressive acceleration can cut MPG by 15–30%. The calculator assumes EPA test-cycle efficiency under steady conditions.`,
-      src: `Source: fueleconomy.gov driving tips` },
+    { q: 'Which states have the cheapest gas?',
+      a: `Low-tax states with refinery access — <b>Texas</b>, <b>Missouri</b>, <b>Oklahoma</b>, <b>Mississippi</b>, and <b>Louisiana</b> — typically post the cheapest pump prices. High-tax or supply-constrained states — <b>California</b>, <b>Pennsylvania</b>, <b>Washington</b>, and <b>Illinois</b> — run 50¢–$1.50/gal above the national average. Fueling up before crossing into CA or PA on a road trip can save $10–$25 on a full tank.`,
+      src: `Source: EIA state motor-fuel tax data + AAA state-average tracker` },
+    { q: 'What about tolls and other fees?',
+      a: `Most US states have toll roads — think I-95 in the Northeast, Florida's Turnpike, the Kansas Turnpike, and Texas toll examples like SH 130, TxTag, and Harris County EZ Tag. Plan for $5–$30 per long one-way trip, more in the Northeast corridor. The calculator estimates <b>fuel only</b>; tolls, parking, food, and maintenance are on top.`,
+      src: `Source: FHWA toll-road directory + state turnpike authorities` },
+    { q: 'Can I use this calculator for trips in any state?',
+      a: `Yes — the Google Maps Distance Matrix computes accurate driving distances between any two US addresses, and fueleconomy.gov covers vehicles sold nationwide. Enter any origin and destination in any of the <b>50 US states</b> (or even Canada/Mexico border crossings). For precise per-station prices outside Texas, use the <b>I'm at the pump</b> toggle to type today's local gas price.`,
+      src: `Source: Google Maps coverage + fueleconomy.gov database` },
     { q: 'Does the calculator handle round trips?',
       a: `Yes — toggle <b>Round trip</b> below the passenger selector. The calculator doubles the distance and fuel cost but keeps <b>per-person</b> math the same (round-trip cost ÷ passenger count).`,
-      src: `Source: TXGasPrices calculator logic` },
-    { q: 'Is this calculator free?',
-      a: `Yes — no signup, no tracking, no API limits. Prices refresh hourly from AAA and per-station data from GasBuddy every 3 days.`,
-      src: `Source: TXGasPrices.net · Updated ${updatedHuman} CT` },
-    { q: 'Can I use this for a trip outside Texas?',
-      a: `Yes — the Google Maps Distance Matrix works worldwide, but gas prices shown are Texas-statewide averages. For out-of-state trips, enter your expected pump price manually using the <b>I'm at the pump</b> tab.`,
-      src: `Source: TXGasPrices calculator notes` },
+      src: `Source: Trip Cost Calculator logic` },
   ];
 
   const faqItemsHtml = faqItems.map(it =>
@@ -1758,7 +1791,7 @@ function buildTripCalcPage() {
 
   const faqStatsCards = [
     { val: '30,000+', lbl: 'vehicles' },
-    { val: `${towns.length}`, lbl: 'Texas cities' },
+    { val: '50',      lbl: 'US states covered' },
     { val: '1984–' + CURRENT_YEAR, lbl: 'vehicle years' },
     { val: 'Free',   lbl: 'no signup' },
   ];
@@ -1774,13 +1807,13 @@ function buildTripCalcPage() {
 
   const webPage = {
     '@context':   'https://schema.org', '@type': 'WebPage',
-    name:         'Texas Trip Cost Calculator',
-    description:  'Free calculator that estimates fuel cost for any drive using real Google Maps distances, EPA MPG data, and live Texas gas prices.',
+    name:         'Trip Cost Calculator — Gas Cost for Any Road Trip',
+    description:  'Free calculator that estimates fuel cost for any road trip in the US using real Google Maps distances, EPA MPG data, and live gas prices.',
     dateModified: prices.updated, url: canonical,
   };
   const webApp = {
     '@context': 'https://schema.org', '@type': 'WebApplication',
-    name:       'Texas Trip Cost Calculator',
+    name:       'Trip Cost Calculator',
     url:        canonical,
     applicationCategory: 'TravelApplication',
     operatingSystem:     'Any',
@@ -1809,8 +1842,8 @@ function buildTripCalcPage() {
     .replace(/\{\{CITY_LNG\}\}/g, TX_LNG)
     .replace(/\{\{CURRENT_YEAR\}\}/g, String(CURRENT_YEAR));
 
-  const title = 'Texas Trip Cost Calculator — Live TX Gas Prices · EPA MPG Database';
-  const description = `Free Texas trip cost calculator. Real Google Maps distances, 30,000+ vehicle MPG database (1984–${CURRENT_YEAR}), and today's Texas gas prices ($${stateAvgFmt2}/gal regular average).`;
+  const title = 'Trip Cost Calculator — Gas Cost for Any Road Trip';
+  const description = `Free road-trip gas cost calculator. Real Google Maps driving distances, 30,000+ vehicle MPG database (1984–${CURRENT_YEAR}), and live gas prices. Works in all 50 US states.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1847,15 +1880,18 @@ ${sharedStyles}
 .hub-hero{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:22px 24px}
 .hub-hero h1{font-size:24px;font-weight:500;margin-bottom:6px;letter-spacing:-.01em}
 .hub-hero .sub{font-size:13px;color:#6b6b66}
-.route-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;padding:14px 16px;background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px}
-.route-grid > .rg-title{grid-column:1/-1;font-size:13px;font-weight:500;color:#1a1a18;margin:0 0 4px;letter-spacing:.02em;text-transform:uppercase}
-.route-card{display:block;padding:12px 14px;border:0.5px solid rgba(0,0,0,.08);border-radius:10px;background:#fff;text-decoration:none;color:#1a1a18;transition:border-color .15s,background .15s}
+.routes-wrap{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:14px 16px}
+.routes-wrap h2{font-size:13px;font-weight:500;color:#1a1a18;margin:0 0 4px;letter-spacing:.02em;text-transform:uppercase}
+.routes-wrap .routes-sub{font-size:11.5px;color:#9a9990;margin:0 0 10px}
+.route-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.route-card{display:block;padding:10px 12px;border:0.5px solid rgba(0,0,0,.08);border-radius:8px;background:#fff;text-decoration:none;color:#1a1a18;transition:border-color .15s,background .15s}
 .route-card:hover{border-color:#1D9E75;background:#f8fbf9}
-.rc-route{font-size:14px;font-weight:500;margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.rc-miles{color:#6b6b66;font-size:12px;font-weight:400}
-.rc-costs{font-size:13px;color:#1D9E75;margin:0 0 2px}
-.rc-costs b{color:#085041;font-weight:500}
-.rc-note{font-size:11px;color:#9a9990;margin:0}
+.rc-route{font-size:13px;color:#1a1a18;margin-bottom:3px}
+.rc-route b{font-weight:500}
+.rc-line{font-size:12px;color:#6b6b66;line-height:1.45}
+.rc-cta{display:inline-block;margin-top:4px;font-size:11.5px;color:#1D9E75;font-weight:500}
+@media (max-width:900px){.route-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.route-grid{grid-template-columns:1fr}}
 .howit{background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:18px 20px}
 .howit h2{font-size:13px;font-weight:500;margin:0 0 12px;letter-spacing:.02em;text-transform:uppercase}
 .howit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
@@ -1879,19 +1915,26 @@ ${sharedStyles}
 
 <!-- HERO -->
 <section class="hub-hero">
-  <h1>Texas Trip Cost Calculator</h1>
-  <div class="sub">Estimate fuel cost for any drive using real Google Maps distances, EPA MPG data, and today's Texas gas prices.</div>
-  <div class="updated" style="margin-top:8px"><span class="live-dot"></span>Updated ${updatedHuman} CT · TX regular avg $${stateAvgFmt2}/gal</div>
+  <h1>Trip Cost Calculator</h1>
+  <div class="sub">Estimate the gas cost of any US road trip using real Google Maps distances, EPA MPG data, and today's pump prices.</div>
+  <div class="updated" style="margin-top:8px"><span class="live-dot"></span>Updated ${updatedHuman} CT · default gas price $${stateAvgFmt2}/gal (TX regular)</div>
 </section>
 
 <!-- FULL CALCULATOR — reused from city-page mockup, empty From/To -->
 ${extractCalcHtml('', '')}
 
-<!-- POPULAR ROUTES -->
-<section class="route-grid">
-  <h2 class="rg-title">Popular Texas routes</h2>
+<!-- POPULAR ROUTES — default 6, JS swaps when From changes -->
+<section class="routes-wrap">
+  <h2>Popular routes</h2>
+  <p class="routes-sub" id="routes-sub">Tap a card to prefill the calculator.</p>
+  <div class="route-grid" id="route-grid">
 ${routeCardsHtml}
+  </div>
 </section>
+
+<script id="route-data" type="application/json">
+${routeDataJson}
+</script>
 
 <!-- HOW IT WORKS — 3 sections -->
 <section class="howit">
@@ -1906,8 +1949,8 @@ ${routeCardsHtml}
       <p>Pick your exact year, make, and model from the fueleconomy.gov database (30,000+ vehicles, 1984–${CURRENT_YEAR}). Or enter your own MPG manually if you track it yourself.</p>
     </div>
     <div class="howit-step">
-      <h3>3. Live Texas gas prices</h3>
-      <p>Fuel cost uses today's Texas state average ($${stateAvgFmt2}/gal regular, refreshed hourly from AAA). Prefer a specific chain or the price on the pump? Toggle to manual entry.</p>
+      <h3>3. Live gas prices</h3>
+      <p>Fuel cost defaults to the gas price we're currently tracking. Prefer a specific chain or the price you see on the pump? Toggle to manual entry and type any amount.</p>
     </div>
   </div>
 </section>
@@ -1924,7 +1967,7 @@ ${routeCardsHtml}
     </div>
     <div class="pills">${faqPillsHtml}</div>
   </div>
-  <div class="faq-context">The Texas Trip Cost Calculator combines EPA vehicle data, Google Maps routing, and live Texas gas prices so every drive you plan uses real-world numbers, not averages.</div>
+  <div class="faq-context">The Trip Cost Calculator combines EPA vehicle data, Google Maps routing, and live US gas prices so every drive you plan uses real-world numbers, not averages.</div>
   <div class="faq-stats">
 ${faqStatsHtml}
   </div>
@@ -1940,6 +1983,109 @@ ${faqItemsHtml}
 
 </div>
 ${mockupScriptWithTokens}
+<script>
+(function(){
+  // Route-data blob precomputed at build time (nearest-3 per city + big cities).
+  const RD = JSON.parse(document.getElementById('route-data').textContent);
+  const fromIn = document.getElementById('from-in');
+  const toIn   = document.getElementById('to-in');
+  const grid   = document.getElementById('route-grid');
+  const sub    = document.getElementById('routes-sub');
+
+  function fmtCost(miles, mpg) {
+    return '$' + Math.round((miles / mpg) * RD.avgPrice);
+  }
+  function haversineMi(a, b) {
+    const toRad = d => d * Math.PI / 180;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const x = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+    return 6371 * 2 * Math.asin(Math.sqrt(x)) * 0.621371;
+  }
+  function renderCard(fromSlug, fromName, toSlug, toName) {
+    const fPt = RD.distances[fromSlug], tPt = RD.distances[toSlug];
+    if (!fPt || !tPt) return '';
+    const miles = Math.round(haversineMi(fPt, tPt));
+    return '<a class="route-card" href="/trip-cost-calculator?from=' + fromSlug + '&to=' + toSlug +
+      '" data-from-slug="' + fromSlug + '" data-to-slug="' + toSlug +
+      '" data-from-name="' + fromName + ', TX" data-to-name="' + toName + ', TX">' +
+      '<div class="rc-route"><b>' + fromName + ' → ' + toName + '</b></div>' +
+      '<div class="rc-line">' + miles + ' mi · Sedan ~' + fmtCost(miles, 32) + '</div>' +
+      '<div class="rc-line">Truck ~' + fmtCost(miles, 20) + '</div>' +
+      '<span class="rc-cta">Calculate →</span>' +
+      '</a>';
+  }
+
+  // Lookup a town by typed input value (e.g. "Houston, TX"). Returns slug or null.
+  function slugFromInput(val) {
+    const key = String(val || '').trim().toLowerCase().replace(/,\s*tx\s*$/, '').trim();
+    if (!key) return null;
+    for (const slug in RD.distances) {
+      if (RD.distances[slug].name.toLowerCase() === key) return slug;
+    }
+    return null;
+  }
+
+  // On From change: show 3 biggest non-origin cities + 3 nearest from precompute.
+  function refreshRoutesForFrom(fromSlug) {
+    if (!fromSlug || !RD.distances[fromSlug] || !RD.nearest[fromSlug]) return; // keep defaults
+    const fromName = RD.distances[fromSlug].name;
+    const bigNonSelf = RD.bigCities.filter(c => c.slug !== fromSlug).slice(0, 3);
+    const nearest3  = RD.nearest[fromSlug].slice(0, 3);
+    const seen = new Set();
+    const picks = [...bigNonSelf, ...nearest3].filter(c => {
+      if (c.slug === fromSlug || seen.has(c.slug)) return false;
+      seen.add(c.slug); return true;
+    }).slice(0, 6);
+    grid.innerHTML = picks.map(c => renderCard(fromSlug, fromName, c.slug, c.name)).join('\n');
+    sub.textContent = 'Popular routes from ' + fromName + ', TX. Tap a card to prefill.';
+  }
+
+  // Card click — prefill calc + scroll to top of calc, stop default nav.
+  grid.addEventListener('click', (e) => {
+    const card = e.target.closest('.route-card');
+    if (!card) return;
+    e.preventDefault();
+    const fromName = card.getAttribute('data-from-name') || '';
+    const toName   = card.getAttribute('data-to-name') || '';
+    if (fromIn) { fromIn.value = fromName; fromIn.dispatchEvent(new Event('input', { bubbles: true })); }
+    if (toIn)   { toIn.value   = toName;   toIn.dispatchEvent(new Event('input', { bubbles: true })); }
+    if (typeof window.calcTrip === 'function') window.calcTrip();
+    const calcEl = document.getElementById('calculator');
+    if (calcEl) calcEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // From-field change → swap routes (debounce slightly).
+  let fromTimer = null;
+  function onFromTyped() {
+    clearTimeout(fromTimer);
+    fromTimer = setTimeout(() => {
+      const slug = slugFromInput(fromIn && fromIn.value);
+      if (slug) refreshRoutesForFrom(slug);
+    }, 250);
+  }
+  if (fromIn) {
+    fromIn.addEventListener('input', onFromTyped);
+    fromIn.addEventListener('change', onFromTyped);
+    fromIn.addEventListener('blur',   onFromTyped);
+  }
+
+  // ?from=/?to= URL params on page load — prefill inputs.
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const fromParam = params.get('from');
+    const toParam   = params.get('to');
+    if (fromParam && RD.distances[fromParam] && fromIn) {
+      fromIn.value = RD.distances[fromParam].name + ', TX';
+      refreshRoutesForFrom(fromParam);
+    }
+    if (toParam && RD.distances[toParam] && toIn) {
+      toIn.value = RD.distances[toParam].name + ', TX';
+    }
+    if ((fromParam || toParam) && typeof window.calcTrip === 'function') window.calcTrip();
+  } catch (err) { /* no-op: older browsers without URLSearchParams */ }
+})();
+</script>
 </body>
 </html>
 `;
