@@ -1013,6 +1013,26 @@ function buildHeaders() {
   ].join('\n');
 }
 
+// ── favicons / web manifest ──────────────────────────────────
+// Copies every file under "FAV upd/favicon/" into output/ so CI rebuilds
+// (which start from a clean gitignored output/) always include favicons.
+// Source folder is tracked in git; destination is gitignored.
+function copyFavicons() {
+  const src = './FAV upd/favicon';
+  if (!fs.existsSync(src)) {
+    console.warn('⚠ copyFavicons: source folder missing, skipping');
+    return 0;
+  }
+  let count = 0;
+  for (const name of fs.readdirSync(src)) {
+    const srcPath = `${src}/${name}`;
+    if (!fs.statSync(srcPath).isFile()) continue;
+    fs.copyFileSync(srcPath, `./output/${name}`);
+    count++;
+  }
+  return count;
+}
+
 // ── robots.txt ───────────────────────────────────────────────
 function buildRobotsTxt() {
   return [
@@ -1218,9 +1238,10 @@ ${badge}      <div class="cc-name">${escHtml(c.chain)}</div>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title}</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#1a1a18">
 <meta name="description" content="${description}">
 <link rel="canonical" href="${canonical}">
@@ -1544,9 +1565,10 @@ function buildCheapestGasPage() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title}</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#1a1a18">
 <meta name="description" content="${escAttr(description)}">
 <link rel="canonical" href="${canonical}">
@@ -1965,9 +1987,10 @@ function buildTripCalcPage() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${title}</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#1a1a18">
 <meta name="description" content="${escAttr(description)}">
 <link rel="canonical" href="${canonical}">
@@ -2302,6 +2325,8 @@ fs.writeFileSync('./output/sitemap.xml', buildSitemap());
 fs.writeFileSync('./output/robots.txt', buildRobotsTxt());
 fs.writeFileSync('./output/_redirects', buildRedirects());
 fs.writeFileSync('./output/_headers', buildHeaders());
+const faviconCount = copyFavicons();
+console.log(`✓ Copied ${faviconCount} favicon files into output/`);
 fs.writeFileSync('./output/index.html', buildHomepage());
 fs.mkdirSync('./output/trip-cost-calculator', { recursive: true });
 fs.writeFileSync('./output/trip-cost-calculator/index.html', buildTripCalcPage());
