@@ -804,12 +804,22 @@ function extractCalcHtml(fromDefault, toDefault) {
   return html;
 }
 
-// The mockup's <script> block owns the calc's client-side logic. We
-// reuse it verbatim on the homepage and /trip-cost-calculator so the
-// calc behaves identically across pages.
+// The mockup's <script> blocks own the calc's client-side logic. There are
+// three at the bottom of the template: (1) the big inline calc/routing
+// script, (2) the gm_authFailure handler, (3) the async Google Maps JS API
+// loader. The original regex only grabbed #1, which left homepage and
+// /trip-cost-calculator without google.maps.DistanceMatrixService loaded —
+// fireGoogleDistanceFetch would reject with "Maps JS not loaded" and the
+// calculator always fell back to the 250-mile haversine estimate. Now we
+// slice from the first <script> to the last </script> so all three tags
+// ship together.
 function extractMockupScript() {
-  const m = TEMPLATE.match(/<script>[\s\S]*?<\/script>/);
-  return m ? m[0] : '';
+  const start = TEMPLATE.indexOf('<script>');
+  if (start === -1) return '';
+  const endTag = '</script>';
+  const end = TEMPLATE.lastIndexOf(endTag);
+  if (end === -1 || end < start) return '';
+  return TEMPLATE.slice(start, end + endTag.length);
 }
 
 // Statewide priceData for the calc's "Use live price" mode when we're
@@ -2060,11 +2070,22 @@ ${sharedStyles}
 
 <!-- FULL CALCULATOR — reused from city-page mockup, empty From/To.
      Trip-calc page has its own Popular Routes section below, so we strip the
-     orphan "Popular routes" label + chips that's embedded in the shared calc. -->
-${extractCalcHtml('', '').replace(
-  /\s*<div class="slabel">Popular routes<\/div>\s*<div class="chips" id="chips"><\/div>/,
-  ''
-)}
+     orphan "Popular routes" label + chips; we also swap the demo result
+     values for neutral placeholders. A page-end script (below) re-runs the
+     reset post-INIT and guards calcTrip() against empty inputs. -->
+${extractCalcHtml('', '')
+  .replace(
+    /\s*<div class="slabel">Popular routes<\/div>\s*<div class="chips" id="chips"><\/div>/,
+    ''
+  )
+  .replace(
+    '<div class="rv" id="r-dist">239 mi</div>',
+    '<div class="rv" id="r-dist">— mi</div>'
+  )
+  .replace(
+    '<div class="dist-note" id="r-note">Houston → Dallas</div>',
+    '<div class="dist-note" id="r-note">Enter your route above</div>'
+  )}
 
 <!-- POPULAR ROUTES — default 6, JS swaps when From changes -->
 <section class="routes-wrap">
@@ -2128,6 +2149,37 @@ ${faqItemsHtml}
 
 </div>
 ${mockupScriptWithTokens}
+<script>
+// /trip-cost-calculator default-state guard (scoped to this page only).
+// The shared mockup calcTrip() runs once during its INIT with the calc's
+// default state, so we (a) reset the result DOM to neutral placeholders
+// post-INIT and (b) wrap calcTrip so future calls with empty From/To keep
+// the placeholders. City pages + homepage still see the original calcTrip.
+(function(){
+  function resetResultDisplay() {
+    const d = document.getElementById('r-dist');
+    const n = document.getElementById('r-note');
+    const t = document.getElementById('r-total');
+    const p = document.getElementById('r-per');
+    if (d) d.textContent = '— mi';
+    if (n) n.textContent = 'Enter your route above';
+    if (t) t.textContent = '—';
+    if (p) p.textContent = '—';
+  }
+  resetResultDisplay();
+  const orig = window.calcTrip;
+  if (typeof orig === 'function') {
+    window.calcTrip = function() {
+      const fromEl = document.getElementById('from-in');
+      const toEl   = document.getElementById('to-in');
+      const f = (fromEl && fromEl.value || '').trim();
+      const t = (toEl   && toEl.value   || '').trim();
+      if (!f || !t) { resetResultDisplay(); return; }
+      return orig.apply(this, arguments);
+    };
+  }
+})();
+</script>
 <script>
 (function(){
   // Route-data blob precomputed at build time (nearest-3 per city + big cities).
@@ -2262,8 +2314,15 @@ ${mockupScriptWithTokens}
     const chainSel = document.getElementById('chain-sel');
     if (chainSel && chainSel.options.length) chainSel.selectedIndex = 0;
 
-    // 4. Run the calculation (also re-runs after any subsequent user edit).
+    // 4. Run the calculation. Show immediate estimate via calcTrip, then
+    //    explicitly fire the Google DistanceMatrix fetch — route-card click
+    //    populates From/To via dispatchEvent('input'), which never triggers
+    //    the mockup's blur-based distance flow. fireGoogleDistanceFetch sets
+    //    routeDist to the real driving miles on success and re-runs calcTrip.
     if (typeof calcTrip === 'function') calcTrip();
+    if (typeof fireGoogleDistanceFetch === 'function') {
+      fireGoogleDistanceFetch(fromName, toName);
+    }
 
     // 5. Scroll to results row, not page top.
     const resultEl = document.querySelector('.calc-result');
@@ -2285,6 +2344,29 @@ ${mockupScriptWithTokens}
     fromIn.addEventListener('blur',   onFromTyped);
   }
 
+  // Typing fallback: the shared mockup's calcTrip/distance flow only fires
+  // the Google DistanceMatrix fetch on field blur (via onFieldBlur). Users
+  // who type and click Calculate without blurring never get a real route
+  // distance — they see the 250-mile haversine fallback. Here (trip-calc
+  // page only) we wire an input-event listener on both fields that fires
+  // fireGoogleDistanceFetch after 1200ms of typing silence whenever both
+  // fields are non-empty. calcTrip will then reflect the real driving miles.
+  let distTimer = null;
+  function queueDistanceFetch() {
+    clearTimeout(distTimer);
+    const f = (fromIn && fromIn.value || '').trim();
+    const t = (toIn   && toIn.value   || '').trim();
+    if (f.length < 2 || t.length < 2) return;
+    distTimer = setTimeout(() => {
+      distTimer = null;
+      if (typeof fireGoogleDistanceFetch === 'function') {
+        fireGoogleDistanceFetch(f, t);
+      }
+    }, 1200);
+  }
+  if (fromIn) fromIn.addEventListener('input', queueDistanceFetch);
+  if (toIn)   toIn.addEventListener('input', queueDistanceFetch);
+
   // ?from=/?to= URL params on page load — prefill inputs.
   try {
     const params = new URLSearchParams(window.location.search);
@@ -2298,6 +2380,15 @@ ${mockupScriptWithTokens}
       toIn.value = RD.distances[toParam].name + ', TX';
     }
     if ((fromParam || toParam) && typeof window.calcTrip === 'function') window.calcTrip();
+    // Also fire the DistanceMatrix when both params are set (same blur-miss
+    // issue as route-card click: values written programmatically, no blur).
+    if (fromParam && toParam && RD.distances[fromParam] && RD.distances[toParam]
+        && typeof fireGoogleDistanceFetch === 'function') {
+      fireGoogleDistanceFetch(
+        RD.distances[fromParam].name + ', TX',
+        RD.distances[toParam].name + ', TX'
+      );
+    }
   } catch (err) { /* no-op: older browsers without URLSearchParams */ }
 })();
 </script>
