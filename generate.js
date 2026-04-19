@@ -1364,8 +1364,20 @@ ${chainCardsHtml}
 ${topTenHtml}
 </section>
 
-<!-- TRIP CALCULATOR — full mockup component with empty From/To -->
-${extractCalcHtml('', '')}
+<!-- TRIP CALCULATOR — full mockup component with empty From/To.
+     Swap the mockup's demo result values ("239 mi", "Houston → Dallas") for
+     neutral placeholders so the homepage calc doesn't show a phantom
+     pre-filled trip. A page-end script (below) re-runs this reset post-INIT
+     and guards calcTrip() against empty inputs. -->
+${extractCalcHtml('', '')
+  .replace(
+    '<div class="rv" id="r-dist">239 mi</div>',
+    '<div class="rv" id="r-dist">— mi</div>'
+  )
+  .replace(
+    '<div class="dist-note" id="r-note">Houston → Dallas</div>',
+    '<div class="dist-note" id="r-note">Enter your route above</div>'
+  )}
 
 <!-- FAQ — spec-compliant with Texas-wide content -->
 <section class="faq-section">
@@ -1397,6 +1409,61 @@ ${faqItemsHtml}
 
 </div>
 ${mockupScriptWithTokens}
+<script>
+// Homepage calc default-state guard (same fix as /trip-cost-calculator).
+// The shared mockup calcTrip() runs once during its INIT with the calc's
+// default state, so we (a) reset the result DOM to neutral placeholders
+// post-INIT and (b) wrap calcTrip so future calls with empty From/To keep
+// the placeholders. City pages still see the original calcTrip.
+(function(){
+  function resetResultDisplay() {
+    const d = document.getElementById('r-dist');
+    const n = document.getElementById('r-note');
+    const t = document.getElementById('r-total');
+    const p = document.getElementById('r-per');
+    if (d) d.textContent = '— mi';
+    if (n) n.textContent = 'Enter your route above';
+    if (t) t.textContent = '—';
+    if (p) p.textContent = '—';
+  }
+  resetResultDisplay();
+  const orig = window.calcTrip;
+  if (typeof orig === 'function') {
+    window.calcTrip = function() {
+      const fromEl = document.getElementById('from-in');
+      const toEl   = document.getElementById('to-in');
+      const f = (fromEl && fromEl.value || '').trim();
+      const t = (toEl   && toEl.value   || '').trim();
+      if (!f || !t) { resetResultDisplay(); return; }
+      return orig.apply(this, arguments);
+    };
+  }
+
+  // Typing fallback: the shared mockup's calcTrip/distance flow only fires
+  // the Google DistanceMatrix fetch on field blur (via onFieldBlur). Users
+  // who type and click Calculate without blurring never get a real route
+  // distance — they see the 250-mile haversine fallback. Same input-event
+  // listener as /trip-cost-calculator: fires fireGoogleDistanceFetch after
+  // 1200ms of typing silence whenever both fields are non-empty.
+  const fromIn = document.getElementById('from-in');
+  const toIn   = document.getElementById('to-in');
+  let distTimer = null;
+  function queueDistanceFetch() {
+    clearTimeout(distTimer);
+    const f = (fromIn && fromIn.value || '').trim();
+    const t = (toIn   && toIn.value   || '').trim();
+    if (f.length < 2 || t.length < 2) return;
+    distTimer = setTimeout(() => {
+      distTimer = null;
+      if (typeof fireGoogleDistanceFetch === 'function') {
+        fireGoogleDistanceFetch(f, t);
+      }
+    }, 1200);
+  }
+  if (fromIn) fromIn.addEventListener('input', queueDistanceFetch);
+  if (toIn)   toIn.addEventListener('input', queueDistanceFetch);
+})();
+</script>
 </body>
 </html>
 `;
