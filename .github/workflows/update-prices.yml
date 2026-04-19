@@ -6,6 +6,9 @@ on:
     - cron: '0 * * * *'
   workflow_dispatch: {}
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: update-prices
   cancel-in-progress: false

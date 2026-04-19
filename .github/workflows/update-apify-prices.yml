@@ -9,6 +9,9 @@ on:
     - cron: '0 10 */3 * *'
   workflow_dispatch: {}
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: update-apify-prices
   cancel-in-progress: false
