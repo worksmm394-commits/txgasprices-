@@ -1055,23 +1055,22 @@ function buildRobotsTxt() {
 }
 
 function buildSitemap() {
-  const base  = 'https://txgasprices.net';
-  const today = new Date().toISOString().split('T')[0];
-  const homeLastmod = (prices.updated || today).split('T')[0];
-  const urls  = [];
+  const base = 'https://txgasprices.net';
+  // Pull lastmod from prices.json.updated so the sitemap reflects actual
+  // data freshness. Falls back to build-time date if the field is missing.
+  const lastmod = (prices.updated || new Date().toISOString()).split('T')[0];
+  const urls = [];
 
-  // Homepage — priority 1.0, lastmod from prices.json.updated
-  urls.push(`  <url><loc>${base}/</loc><lastmod>${homeLastmod}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>`);
+  urls.push(`  <url><loc>${base}/</loc><lastmod>${lastmod}</lastmod><changefreq>hourly</changefreq><priority>1.0</priority></url>`);
 
   // 100 city pages — trailing slash matches Cloudflare's canonical URL,
   // so Googlebot hits the final destination directly (no 308 hop).
   towns.forEach(t => {
-    urls.push(`  <url><loc>${base}/gas-prices/${t.slug}/</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
+    urls.push(`  <url><loc>${base}/gas-prices/${t.slug}/</loc><lastmod>${lastmod}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
   });
 
-  // Two hub pages (trailing slash for the same reason)
-  urls.push(`  <url><loc>${base}/cheapest-gas-texas/</loc><lastmod>${today}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
-  urls.push(`  <url><loc>${base}/trip-cost-calculator/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+  urls.push(`  <url><loc>${base}/cheapest-gas-texas/</loc><lastmod>${lastmod}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
+  urls.push(`  <url><loc>${base}/trip-cost-calculator/</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
