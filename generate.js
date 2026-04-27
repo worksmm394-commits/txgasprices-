@@ -2235,7 +2235,7 @@ ${cityOptions}
   </div>
 
   <h2 class="slabel h-label">Top charging networks in Texas</h2>
-  <div class="chains">
+  <div class="chains" id="ev-networks">
 ${networkCardsHtml}
   </div>
 
