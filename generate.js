@@ -1149,19 +1149,36 @@ function loadInteractiveMap(slug, lat, lng, city, cityUrl) {
 /* ════════════════════════════════════════════════
    STATE MAP — lazy-load the statewide Google Maps embed for the hub.
    Same lazy-load pattern as loadInteractiveMap but centered on Texas
-   (31.0, -99.0) at zoom 6, with the simpler "EV charging Texas" query
-   that returns statewide POI results.
+   (31.0, -99.0) at zoom 6.  When a hub network filter is active, the
+   query is prefixed with the network name so iframe pins narrow to
+   that operator (e.g. "ChargePoint+EV+charging+Texas").
 ════════════════════════════════════════════════ */
+function hubMapSrc() {
+  const q = hubNetworkFilter
+    ? encodeURIComponent(hubNetworkFilter + ' EV charging Texas').replace(/%20/g, '+')
+    : 'EV+charging+Texas';
+  return 'https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI' +
+    '&q=' + q +
+    '&center=31.0,-99.0&zoom=6';
+}
+
 function loadStateMap() {
   const container = document.getElementById('map-container-texas');
   if (!container) return;
-  const src = 'https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI' +
-    '&q=EV+charging+Texas' +
-    '&center=31.0,-99.0&zoom=6';
   container.innerHTML =
     '<iframe id="gmap" width="100%" height="340" style="border:0" ' +
     'allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" ' +
-    'title="EV charging map for Texas" src="' + src + '"></iframe>';
+    'title="EV charging map for Texas" src="' + hubMapSrc() + '"></iframe>';
+}
+
+// Called by setHubNetworkFilter — refreshes the iframe src if the map
+// has already been loaded.  If the user hasn't clicked the placeholder
+// yet, this is a no-op; the next click on the placeholder calls
+// loadStateMap() which already reads the current hubNetworkFilter.
+function updateHubMap() {
+  const gmap = document.getElementById('gmap');
+  if (!gmap) return;
+  gmap.src = hubMapSrc();
 }
 
 /* ════════════════════════════════════════════════
@@ -1330,6 +1347,9 @@ function setHubNetworkFilter(net) {
   // Reset button activation.
   const reset = document.getElementById('reset-hub-network');
   if (reset) reset.classList.toggle('active', !!hubNetworkFilter);
+  // If the iframe map has been loaded, refresh its src so pins narrow
+  // to the picked network.  No-op if user hasn't clicked the map yet.
+  updateHubMap();
 }
 
 /* ════════════════════════════════════════════════
