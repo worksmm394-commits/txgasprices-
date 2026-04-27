@@ -1147,6 +1147,24 @@ function loadInteractiveMap(slug, lat, lng, city, cityUrl) {
 }
 
 /* ════════════════════════════════════════════════
+   STATE MAP — lazy-load the statewide Google Maps embed for the hub.
+   Same lazy-load pattern as loadInteractiveMap but centered on Texas
+   (31.0, -99.0) at zoom 6, with the simpler "EV charging Texas" query
+   that returns statewide POI results.
+════════════════════════════════════════════════ */
+function loadStateMap() {
+  const container = document.getElementById('map-container-texas');
+  if (!container) return;
+  const src = 'https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI' +
+    '&q=EV+charging+Texas' +
+    '&center=31.0,-99.0&zoom=6';
+  container.innerHTML =
+    '<iframe id="gmap" width="100%" height="340" style="border:0" ' +
+    'allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" ' +
+    'title="EV charging map for Texas" src="' + src + '"></iframe>';
+}
+
+/* ════════════════════════════════════════════════
    NETWORK FILTER — clickable .cc cards filter station list
    Mirrors gas-page setChainFilter exactly: clicking a card toggles
    the filter, re-renders the .chains grid (with .sel highlight) and
@@ -2044,18 +2062,32 @@ function buildEVHubPage() {
   const calcCardHtml = buildEVCalcCard();
   const hubScript = buildEVPageScript(null, null);
 
-  // Map: statewide overview, same .map-frame / .map-placeholder.
+  // Map: statewide overview, same lazy-load pattern as city pages.  The
+  // static placeholder shows green dots for the top-10 cities by EV
+  // station count (joined with towns.json for lat/lng).  Click swaps in
+  // an iframe centered on Texas with zoom=6.  loadStateMap() lives in
+  // buildEVPageScript() below.
+  const top10Coords = top10
+    .map(c => {
+      const t = towns.find(x => x.slug === c.slug);
+      return t && t.lat != null && t.lng != null ? `${t.lat},${t.lng}` : null;
+    })
+    .filter(Boolean);
+  const top10Markers = top10Coords.length
+    ? `&markers=color:green%7C` + top10Coords.join('%7C')
+    : '';
+  const stateStaticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=31.0,-99.0&zoom=6&size=800x340&scale=2&maptype=roadmap${top10Markers}&key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI`;
   const mapBlock = `  <div class="slabel">Texas EV charging map</div>
-  <div class="map-frame">
-    <a class="map-placeholder" href="https://www.google.com/maps/search/ev+charging+texas" target="_blank" rel="noopener">
-      <img src="https://maps.googleapis.com/maps/api/staticmap?center=31.0,-99.0&zoom=6&size=800x340&scale=2&maptype=roadmap&markers=color:0x1D9E75%7C29.7604,-95.3698%7C32.7767,-96.7970%7C30.2672,-97.7431%7C29.4241,-98.4936%7C32.7555,-97.3308&key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI"
-        alt="EV charging stations across Texas" width="800" height="340" loading="lazy">
+  <div class="map-frame" id="map-container-texas">
+    <div class="map-placeholder" onclick="loadStateMap()">
+      <img src="${stateStaticMapUrl}"
+        alt="EV charging stations across Texas — top 10 cities marked" width="800" height="340" loading="lazy">
       <div class="map-placeholder-overlay">
-        <button type="button" class="map-load-btn">⚡ Tap to open Texas EV charging map</button>
+        <button type="button" class="map-load-btn">⚡ Tap to load interactive map</button>
       </div>
-    </a>
+    </div>
   </div>
-  <p class="map-note">Tap any pin → Google Maps opens with directions.</p>`;
+  <p class="map-note">Tap any pin → Google Maps opens with directions. Launches Maps app on mobile.</p>`;
 
   // Style snippet for the .st-row classes used in the top-10 list — these
   // exist on the gas homepage already, but the EV hub doesn't include the
