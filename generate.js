@@ -1056,7 +1056,7 @@ const EV_CATALOG_TREE = (() => {
 // the EV cost calculator, and the city dropdown handler.  Inlined
 // rather than delivered as an external script so EV pages have no
 // extra HTTP requests beyond the static-map preview.
-function buildEVPageScript(town, ev) {
+function buildEVPageScript(town, ev, hubData = null) {
   const cityQuery = town
     ? `loadWeather(encodeURIComponent('${escAttr(town.name)}') + ',US');`
     : `loadWeather('Austin,US');`;
@@ -1172,7 +1172,9 @@ function loadStateMap() {
    count display, and refreshes the map iframe if it's loaded.
 ════════════════════════════════════════════════ */
 ${pageData ? `const EV_PAGE_DATA = ${JSON.stringify(pageData)};` : 'const EV_PAGE_DATA = null;'}
+${hubData ? `const EV_HUB_DATA = ${JSON.stringify(hubData)};` : 'const EV_HUB_DATA = null;'}
 let networkFilter = null;
+let hubNetworkFilter = null;
 
 function evEscHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1286,6 +1288,48 @@ function updateEvMap() {
     : 'EV+charging+near+' + cityUrl;
   gmap.src = 'https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI' +
     '&q=' + q + '&center=' + lat + ',' + lng + '&zoom=11';
+}
+
+/* ════════════════════════════════════════════════
+   HUB NETWORK FILTER — clickable .cc cards on /ev-charging-texas/.
+   Filters the city directory grid to only cities that operate the
+   selected network.  EV_HUB_DATA.networkCities is a {network: [slugs]}
+   map built at generate time.  Toggling the same card or the reset
+   button clears the filter.
+════════════════════════════════════════════════ */
+function setHubNetworkFilter(net) {
+  if (!EV_HUB_DATA) return;
+  hubNetworkFilter = (net && hubNetworkFilter === net) ? null : (net || null);
+  // Toggle .sel highlight on the network cards.
+  document.querySelectorAll('#ev-networks .cc').forEach(card => {
+    card.classList.toggle('sel', card.dataset.network === hubNetworkFilter);
+  });
+  // Show/hide cities in the directory grid.
+  const slugSet = hubNetworkFilter
+    ? new Set(EV_HUB_DATA.networkCities[hubNetworkFilter] || [])
+    : null;
+  let visible = 0;
+  document.querySelectorAll('.az-grid li').forEach(li => {
+    if (!slugSet) {
+      li.style.display = '';
+      visible++;
+    } else if (slugSet.has(li.dataset.slug)) {
+      li.style.display = '';
+      visible++;
+    } else {
+      li.style.display = 'none';
+    }
+  });
+  // Update the count caption next to the directory heading.
+  const countEl = document.getElementById('hub-city-count');
+  if (countEl) {
+    countEl.textContent = hubNetworkFilter
+      ? visible + ' cities with ' + hubNetworkFilter
+      : '';
+  }
+  // Reset button activation.
+  const reset = document.getElementById('reset-hub-network');
+  if (reset) reset.classList.toggle('active', !!hubNetworkFilter);
 }
 
 /* ════════════════════════════════════════════════
@@ -1433,21 +1477,26 @@ ${cityQuery}
 // filter the station list below — same UX as gas-page chain cards.
 // "clickable" arg controls whether onclick is wired up; false for the
 // statewide hub page where the click has no station list to filter.
-function buildEVNetworkCards(networks, totalStations, clickable = true) {
+// `handler` is the JS click handler name (without parens) — defaults to
+// the city-page setNetworkFilter; the hub passes setHubNetworkFilter so
+// the hub can filter the city directory below the cards instead of a
+// station list.  Pass null to disable click handling entirely.
+// `percentLabel` controls the "X% of city" / "X% of Texas" label.
+function buildEVNetworkCards(networks, totalStations, handler = 'setNetworkFilter', percentLabel = 'of city') {
   const entries = Object.entries(networks || {})
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
   if (!entries.length) {
     return '<div style="font-size:12.5px;color:#6b6b66;padding:10px 4px">No charging networks listed for this city yet.</div>';
   }
-  const onclickAttr = clickable ? ' onclick="setNetworkFilter(this.dataset.network)"' : '';
+  const onclickAttr = handler ? ` onclick="${handler}(this.dataset.network)"` : '';
   return entries.map(([net, count], i) => {
     const pct = totalStations ? Math.round((count / totalStations) * 100) : 0;
     const badge = i === 0 ? `      <div class="cc-badge">most stations</div>\n` : '';
     return `    <div class="cc${i === 0 ? ' best' : ''}" data-network="${escAttr(net)}"${onclickAttr}>
 ${badge}      <div class="cc-name">${escHtml(net)}</div>
       <div class="cc-price">${count}</div>
-      <div class="cc-ch ch-nc">${pct}% of city</div>
+      <div class="cc-ch ch-nc">${pct}% ${escHtml(percentLabel)}</div>
       <div class="cc-stations">${count} station${count === 1 ? '' : 's'} nearby</div>
     </div>`;
   }).join('\n');
@@ -1973,19 +2022,40 @@ function buildEVHubPage() {
       <div class="st-price">${c.stations_count}<span class="st-gal"> stations</span></div>
     </a>`).join('\n');
 
-  // Networks across the state — re-uses the .chains/.cc grid.
-  const networkCardsHtml = buildEVNetworkCards(stateTotals.networks, totalStations, false);
+  // Networks across the state — re-uses the .chains/.cc grid.  Cards
+  // are clickable on the hub: setHubNetworkFilter() (defined inline in
+  // buildEVPageScript) filters the city directory below to only cities
+  // that operate the picked network.  Percent label says "of Texas"
+  // since this is the statewide aggregate.
+  const networkCardsHtml = buildEVNetworkCards(stateTotals.networks, totalStations, 'setHubNetworkFilter', 'of Texas');
+
+  // Network → cities map built at generate time.  For each network,
+  // record the slugs of the cities that have ≥1 station on it.  Embedded
+  // in the page as JSON so setHubNetworkFilter can look up which <li>s
+  // to show without re-querying the DOM.
+  const networkCities = {};
+  for (const [slug, c] of Object.entries(EV_DATA.cities || {})) {
+    if (!c || !c.stations_count) continue;
+    for (const net of Object.keys(c.networks || {})) {
+      if (!networkCities[net]) networkCities[net] = [];
+      networkCities[net].push(slug);
+    }
+  }
 
   // All-100 cities grid — shows all towns with their station count when
-  // available; greys out cities NREL has no entries for.
+  // available; greys out cities NREL has no entries for.  Each <li>
+  // carries data-slug so setHubNetworkFilter can show/hide it without
+  // re-rendering the whole list.
   const azTowns = towns.slice().sort((a, b) => a.name.localeCompare(b.name));
   const azHtml = azTowns.map(t => {
     const ev = EV_DATA.cities && EV_DATA.cities[t.slug];
     if (ev && ev.stations_count) {
-      return `      <li><a href="/ev-charging/${t.slug}/">${escHtml(t.name)}, TX <small style="color:#9a9990">(${ev.stations_count})</small></a></li>`;
+      return `      <li data-slug="${t.slug}"><a href="/ev-charging/${t.slug}/">${escHtml(t.name)}, TX <small style="color:#9a9990">(${ev.stations_count})</small></a></li>`;
     }
     // No EV page for this city — render as plain text, not a link.
-    return `      <li><span style="color:#9a9990;font-size:12.5px;padding:7px 4px;display:inline-block">${escHtml(t.name)}, TX</span></li>`;
+    // data-slug still set, but a network filter will always hide these
+    // (they have no networks in EV_HUB_DATA.networkCities).
+    return `      <li data-slug="${t.slug}"><span style="color:#9a9990;font-size:12.5px;padding:7px 4px;display:inline-block">${escHtml(t.name)}, TX</span></li>`;
   }).join('\n');
 
   // FAQ — same accordion classes.
@@ -2060,7 +2130,7 @@ function buildEVHubPage() {
   };
 
   const calcCardHtml = buildEVCalcCard();
-  const hubScript = buildEVPageScript(null, null);
+  const hubScript = buildEVPageScript(null, null, { networkCities });
 
   // Map: statewide overview, same lazy-load pattern as city pages.  The
   // static placeholder shows green dots for the top-10 cities by EV
@@ -2211,7 +2281,10 @@ ${faqItemsHtml}
 </section>
 
 <section class="nearby">
-  <h2>All 100 Texas cities — EV charging</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+    <h2 style="margin:0">All 100 Texas cities — EV charging</h2>
+    <span style="display:flex;gap:8px;align-items:center"><span id="hub-city-count" style="font-size:11px;color:#9a9990"></span><button class="reset-btn" id="reset-hub-network" onclick="setHubNetworkFilter(null)">All networks</button></span>
+  </div>
   <ul class="az-grid">
 ${azHtml}
   </ul>
