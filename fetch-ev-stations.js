@@ -13,9 +13,11 @@
 const axios = require('axios');
 const fs    = require('fs');
 
-const NREL_API_KEY = process.env.NREL_API_KEY || 'tr254TD6oPPOJLcFczxEinse7MRdfxzD9oGU9hTy';
+const NREL_API_KEY = process.env.NREL_API_KEY;
 if (!NREL_API_KEY) {
   console.error('ERROR: NREL_API_KEY env var is required.');
+  console.error('Get a free key at https://developer.nrel.gov/signup/ and set it');
+  console.error('via the NREL_API_KEY env var (locally) or as a GitHub Actions secret.');
   process.exit(1);
 }
 
