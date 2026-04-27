@@ -20,6 +20,12 @@ const CITY_INFO = fs.existsSync('./cities-info.json')
   ? JSON.parse(fs.readFileSync('./cities-info.json', 'utf8'))
   : {};
 const TEMPLATE  = fs.readFileSync('./texas_gas_site_ui_mockup.html', 'utf8');
+// ev-stations.json is produced by fetch-ev-stations.js (NREL).  Falls back
+// to an empty shell if the file isn't present yet so a fresh clone can
+// still run generate.js for the gas pages.
+const EV_DATA = fs.existsSync('./ev-stations.json')
+  ? JSON.parse(fs.readFileSync('./ev-stations.json', 'utf8'))
+  : { updated: new Date().toISOString(), total_stations_tx: 0, cities: {} };
 
 const FUELS        = ['regular', 'midgrade', 'premium', 'diesel'];
 const hasEstimates = prices.chains.some(c => c.priceMode === 'estimated');
@@ -958,7 +964,1239 @@ function buildPage(town, fuel, opts = {}) {
     UPDATED_TIME:              formatUpdatedTime(prices.updated),
     DATA_SOURCE:               dataSourceFor(town),
     INITIAL_CHAINS_HTML:       renderInitialChainsHtml(town),
+    EV_TEASER_HTML:            buildEVTeaserHtml(town),
   });
+}
+
+// ── EV charging integration ─────────────────────────────────
+// All EV-related builders live below.  Data comes from ev-stations.json
+// (NREL Alternative Fuel Stations API), keyed by towns.json slug.
+//
+// Design contract: EV pages reuse the gas-page CSS verbatim — same
+// .site/.topbar/.hero, same .chains/.cc for networks, same
+// .station-grid/.sc for charger lists, same .calc-card for the cost
+// calculator, same .faq-section accordion.  We pull the template <style>
+// block once at module load so EV pages share a single source of truth.
+
+function evDataFor(town) {
+  return (EV_DATA.cities && EV_DATA.cities[town.slug]) || null;
+}
+
+function evUpdatedHuman() {
+  return formatUpdated(EV_DATA.updated);
+}
+
+function evUpdatedTime() {
+  return formatUpdatedTime(EV_DATA.updated);
+}
+
+function evUpdatedShort() {
+  return (EV_DATA.updated || new Date().toISOString()).split('T')[0];
+}
+
+// EV teaser was removed from gas city pages per user request.  Function
+// kept as a stub so the render() token in buildPage() still resolves —
+// it just resolves to an empty string now.
+function buildEVTeaserHtml(_town) {
+  return '';
+}
+
+// Pull the template <style> block once so EV pages can reuse the gas-page
+// look without copy-pasting CSS.
+function extractTemplateStyle() {
+  const start = TEMPLATE.indexOf('<style>');
+  const end   = TEMPLATE.indexOf('</style>');
+  if (start === -1 || end === -1) return '';
+  return TEMPLATE.slice(start, end + '</style>'.length);
+}
+const TEMPLATE_STYLE = extractTemplateStyle();
+
+// Curated catalog of 20 popular EVs sold in Texas, with EPA-rated range
+// (mi) and battery capacity (kWh).  car-db.json has no fuel-type or EPA
+// data, so we drive the EV picker from this hard-coded list (per spec).
+// Order is by popularity in TX so the first option is a sensible default.
+const EV_CATALOG = [
+  // [make, model, trim, range_mi, kwh]
+  ['Tesla',    'Model Y',          'Long Range AWD',  330, 75],
+  ['Tesla',    'Model 3',          'Long Range AWD',  358, 82],
+  ['Tesla',    'Model S',          'AWD',             405, 100],
+  ['Tesla',    'Model X',          'AWD',             348, 100],
+  ['Ford',     'Mustang Mach-E',   'Standard Range',  230, 70],
+  ['Ford',     'Mustang Mach-E',   'Extended Range',  312, 91],
+  ['Ford',     'F-150 Lightning',  'Standard Range',  240, 98],
+  ['Ford',     'F-150 Lightning',  'Extended Range',  320, 131],
+  ['Chevrolet','Bolt EV',          'Standard',        259, 65],
+  ['Chevrolet','Bolt EUV',         'Standard',        247, 65],
+  ['Rivian',   'R1T',              'Large Pack',      314, 135],
+  ['Rivian',   'R1S',              'Large Pack',      321, 135],
+  ['Hyundai',  'IONIQ 5',          'Long Range RWD',  266, 77],
+  ['Hyundai',  'IONIQ 6',          'Long Range RWD',  361, 77],
+  ['Kia',      'EV6',              'Long Range RWD',  310, 77],
+  ['BMW',      'iX',               'xDrive50',        324, 111],
+  ['Mercedes', 'EQS',              '450+',            350, 107],
+  ['Lucid',    'Air',              'Grand Touring',   516, 118],
+  ['Nissan',   'Leaf',             'Plus',            212, 62],
+  ['Volkswagen','ID.4',            'Pro',             275, 82],
+];
+
+// Generated once and embedded in every EV page so the picker can run
+// fully client-side.  Shape: { Make: { Model: [{trim, range, kwh}, ...] } }
+const EV_CATALOG_TREE = (() => {
+  const tree = {};
+  for (const [make, model, trim, range, kwh] of EV_CATALOG) {
+    if (!tree[make]) tree[make] = {};
+    if (!tree[make][model]) tree[make][model] = [];
+    tree[make][model].push({ trim, range, kwh });
+  }
+  return tree;
+})();
+
+// Inline JS shared by every EV page — OpenWeatherMap loader (verbatim
+// copy of the gas-page implementation), Make/Model/Trim picker driving
+// the EV cost calculator, and the city dropdown handler.  Inlined
+// rather than delivered as an external script so EV pages have no
+// extra HTTP requests beyond the static-map preview.
+function buildEVPageScript(town, ev) {
+  const cityQuery = town
+    ? `loadWeather(encodeURIComponent('${escAttr(town.name)}') + ',US');`
+    : `loadWeather('Austin,US');`;
+  // Per-city page data: stations + networks + counts.  Embedded so the
+  // .chains and .station-grid can be re-rendered client-side when the
+  // user clicks a network card to filter.  Empty for the hub page (no
+  // station list to filter).
+  const pageData = (town && ev) ? {
+    slug: town.slug,
+    name: town.name,
+    lat: town.lat,
+    lng: town.lng,
+    totalStations: ev.stations_count,
+    dcFast: ev.dc_fast_count,
+    networks: ev.networks || {},
+    // Trim each station to just the fields the renderer needs (saves
+    // ~50% of payload vs. shipping the full NREL station record).
+    stations: (ev.stations || []).map(s => ({
+      n:   s.station_name,
+      a:   s.street_address || '',
+      net: s.ev_network || 'Non-Networked',
+      kw:  s.max_kw || 0,
+      f:   s.ev_dc_fast_num > 0 ? 1 : 0,
+      l2:  s.ev_level2_evse_num > 0 ? 1 : 0,
+      fr:  s.is_free ? 1 : 0,
+      h24: s.is_24h ? 1 : 0,
+      p:   s.total_ports || (s.ev_dc_fast_num + s.ev_level2_evse_num + s.ev_level1_evse_num),
+      lat: s.latitude || null,
+      lng: s.longitude || null,
+    })),
+  } : null;
+  return `<script>
+/* ════════════════════════════════════════════════
+   WEATHER — OpenWeatherMap (identical to gas pages)
+   Accepts an already-URL-encoded query (e.g. "Houston+TX")
+════════════════════════════════════════════════ */
+async function loadWeather(q) {
+  try {
+    const r = await fetch('https://api.openweathermap.org/data/2.5/weather?q=' + q + '&appid=a1bf91de430ddae8df5b8928d8ef3ab5&units=imperial');
+    if (!r.ok) return;
+    const d = await r.json();
+    const temp = Math.round(d.main.temp);
+    const id = d.weather && d.weather[0] && d.weather[0].id;
+    if (typeof id !== 'number' || isNaN(temp)) return;
+    let icon = '☀️';
+    if (id < 300) icon = '⛈️';
+    else if (id < 600) icon = '🌧️';
+    else if (id < 700) icon = '❄️';
+    else if (id < 800) icon = '🌫️';
+    else if (id === 800) icon = '☀️';
+    else icon = '⛅';
+    const heroEl = document.getElementById('weather');
+    if (heroEl) heroEl.textContent = ' · ' + temp + '°F ' + icon;
+    const faqEl = document.getElementById('faq-weather');
+    if (faqEl) faqEl.textContent = ' · ' + temp + '°F ' + icon;
+  } catch(e) { /* silent — never block the page on weather */ }
+}
+
+/* ════════════════════════════════════════════════
+   CITY SWITCHER — sends user to /ev-charging/{slug}/
+════════════════════════════════════════════════ */
+function switchEvCity(sel) {
+  const slug = sel.options[sel.selectedIndex].dataset.slug;
+  if (slug) window.location.href = '/ev-charging/' + slug + '/';
+}
+
+/* ════════════════════════════════════════════════
+   INTERACTIVE MAP — lazy-load Google Maps embed
+   Copy of the gas-page loadInteractiveMap (same signature, same zoom,
+   same iframe attrs) — only differences are the search query
+   ("EV+charging+near+" instead of "gas+station+near+") and the
+   iframe title.  When a network filter is active, prefixes the query
+   with the network name so iframe pins narrow to that operator.
+════════════════════════════════════════════════ */
+function loadInteractiveMap(slug, lat, lng, city, cityUrl) {
+  const container = document.getElementById('map-container-' + slug);
+  if (!container) return;
+  const q = networkFilter
+    ? encodeURIComponent(networkFilter + ' EV charging near ').replace(/%20/g, '+') + cityUrl
+    : 'EV+charging+near+' + cityUrl;
+  const src = 'https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI' +
+    '&q=' + q +
+    '&center=' + lat + ',' + lng + '&zoom=11';
+  container.innerHTML =
+    '<iframe id="gmap" width="100%" height="340" style="border:0" ' +
+    'allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" ' +
+    'title="EV charging map for ' + city + ', TX" src="' + src + '"></iframe>';
+}
+
+/* ════════════════════════════════════════════════
+   NETWORK FILTER — clickable .cc cards filter station list
+   Mirrors gas-page setChainFilter exactly: clicking a card toggles
+   the filter, re-renders the .chains grid (with .sel highlight) and
+   the .station-grid (only stations from that network), updates the
+   count display, and refreshes the map iframe if it's loaded.
+════════════════════════════════════════════════ */
+${pageData ? `const EV_PAGE_DATA = ${JSON.stringify(pageData)};` : 'const EV_PAGE_DATA = null;'}
+let networkFilter = null;
+
+function evEscHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function evEscAttr(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function evDirUrl(s) {
+  if (s.lat && s.lng) {
+    return 'https://www.google.com/maps/dir/?api=1&destination=' + s.lat + ',' + s.lng;
+  }
+  const q = encodeURIComponent([s.n, s.a, EV_PAGE_DATA.name, 'TX'].filter(Boolean).join(' '));
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + q;
+}
+
+function setNetworkFilter(net) {
+  // null/empty → clear.  Same network clicked again → toggle off.
+  networkFilter = (net && networkFilter === net) ? null : (net || null);
+  renderEvNetworks();
+  renderEvStations();
+  updateEvMap();
+  const reset = document.getElementById('reset-network');
+  if (reset) reset.classList.toggle('active', !!networkFilter);
+}
+
+function renderEvNetworks() {
+  if (!EV_PAGE_DATA) return;
+  const container = document.getElementById('ev-networks');
+  if (!container) return;
+  const total = EV_PAGE_DATA.totalStations;
+  const entries = Object.entries(EV_PAGE_DATA.networks)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  if (!entries.length) return;
+  container.innerHTML = entries.map(([net, count], i) => {
+    const isSel = net === networkFilter;
+    const pct = total ? Math.round((count / total) * 100) : 0;
+    const badge = i === 0 ? '<div class="cc-badge">most stations</div>' : '';
+    return '<div class="cc' + (i === 0 ? ' best' : '') + (isSel ? ' sel' : '') + '"' +
+      ' data-network="' + evEscAttr(net) + '"' +
+      ' onclick="setNetworkFilter(this.dataset.network)">' +
+      badge +
+      '<div class="cc-name">' + evEscHtml(net) + '</div>' +
+      '<div class="cc-price">' + count + '</div>' +
+      '<div class="cc-ch ch-nc">' + pct + '% of city</div>' +
+      '<div class="cc-stations">' + count + ' station' + (count === 1 ? '' : 's') + ' nearby</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderEvStations() {
+  if (!EV_PAGE_DATA) return;
+  const container = document.getElementById('ev-stations');
+  if (!container) return;
+  let list = EV_PAGE_DATA.stations.slice();
+  if (networkFilter) {
+    list = list.filter(s => s.net === networkFilter);
+  }
+  // Same sort order as the server-rendered initial list.
+  list.sort((a, b) => {
+    if (a.f !== b.f) return b.f - a.f;
+    if ((b.kw || 0) !== (a.kw || 0)) return (b.kw || 0) - (a.kw || 0);
+    if (a.fr !== b.fr) return b.fr - a.fr;
+    return 0;
+  });
+  const display = list.slice(0, 24);
+  if (!display.length) {
+    container.innerHTML = '<div style="font-size:12.5px;color:#6b6b66;padding:10px 4px">No stations match this filter — pick another network or click "All networks" to reset.</div>';
+  } else {
+    container.innerHTML = display.map((s, i) => {
+      const lvl = s.f ? 'DC Fast' : (s.l2 ? 'Level 2' : 'Level 1');
+      const headline = s.f && s.kw ? (s.kw + ' kW') : (s.fr ? 'Free' : lvl);
+      const meta = evEscHtml(s.net) + ' · ' + (s.p || '—') + ' port' + (s.p === 1 ? '' : 's') +
+        (s.fr ? ' · free' : '') + (s.h24 ? ' · 24h' : '');
+      return '<div class="sc' + (i === 0 && !networkFilter ? ' best' : '') + '"' +
+        ' data-network="' + evEscAttr(s.net) + '">' +
+        '<div class="sc-top">' +
+          '<div class="sc-name">' + evEscHtml(s.n) + '</div>' +
+          '<div class="sc-price">' + evEscHtml(headline) + '</div>' +
+        '</div>' +
+        '<div class="sc-addr">' + evEscHtml(s.a || EV_PAGE_DATA.name + ', TX') + '</div>' +
+        '<div class="sc-bot">' +
+          '<div class="sc-dist">' + meta + '</div>' +
+          '<a class="dir-btn" href="' + evDirUrl(s) + '" target="_blank" rel="noopener">Directions →</a>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  // Update the count display next to the section heading.
+  const countEl = document.getElementById('ev-station-count');
+  if (countEl) {
+    if (networkFilter) {
+      countEl.textContent = display.length + ' ' + networkFilter + ' station' + (display.length === 1 ? '' : 's');
+    } else {
+      countEl.textContent = EV_PAGE_DATA.totalStations + ' listed · ' + EV_PAGE_DATA.dcFast + ' DC fast';
+    }
+  }
+}
+
+function updateEvMap() {
+  if (!EV_PAGE_DATA) return;
+  const gmap = document.getElementById('gmap');
+  if (!gmap) return; // map not loaded yet — onclick will use latest networkFilter
+  const lat = EV_PAGE_DATA.lat;
+  const lng = EV_PAGE_DATA.lng;
+  // Same cityUrl encoding the gas pages use ("Houston+TX")
+  const cityUrl = encodeURIComponent(EV_PAGE_DATA.name + ' TX').replace(/%20/g, '+');
+  const q = networkFilter
+    ? encodeURIComponent(networkFilter + ' EV charging near ').replace(/%20/g, '+') + cityUrl
+    : 'EV+charging+near+' + cityUrl;
+  gmap.src = 'https://www.google.com/maps/embed/v1/search?key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI' +
+    '&q=' + q + '&center=' + lat + ',' + lng + '&zoom=11';
+}
+
+/* ════════════════════════════════════════════════
+   EV PICKER + COST CALCULATOR
+   Catalog tree is embedded as JSON below (20 EV trims).
+════════════════════════════════════════════════ */
+const EV_TREE = ${JSON.stringify(EV_CATALOG_TREE)};
+const EV_RATES = { home: 0.13, l2: 0.30, dcfast: 0.43 };
+const EV_LOSS  = { home: 1.05, l2: 1.07, dcfast: 1.10 }; // round-trip charging loss
+let evRateMode = 'home';
+let evCurrentTrim = null;
+
+function evPopulateMakes() {
+  const sel = document.getElementById('ev-make');
+  if (!sel) return;
+  const makes = Object.keys(EV_TREE).sort();
+  sel.innerHTML = '<option value="">Select make</option>' +
+    makes.map(m => '<option value="' + m + '">' + m + '</option>').join('');
+}
+
+function onEvMakeChange() {
+  const make = document.getElementById('ev-make').value;
+  const modelSel = document.getElementById('ev-model');
+  const trimSel  = document.getElementById('ev-trim');
+  modelSel.innerHTML = '<option value="">Select model</option>';
+  trimSel.innerHTML  = '<option value="">Select trim</option>';
+  trimSel.disabled = true;
+  evCurrentTrim = null;
+  if (!make || !EV_TREE[make]) {
+    modelSel.disabled = true;
+    evRender();
+    return;
+  }
+  const models = Object.keys(EV_TREE[make]);
+  modelSel.innerHTML = '<option value="">Select model</option>' +
+    models.map(m => '<option value="' + m + '">' + m + '</option>').join('');
+  modelSel.disabled = false;
+  evRender();
+}
+
+function onEvModelChange() {
+  const make  = document.getElementById('ev-make').value;
+  const model = document.getElementById('ev-model').value;
+  const trimSel = document.getElementById('ev-trim');
+  evCurrentTrim = null;
+  if (!make || !model || !EV_TREE[make] || !EV_TREE[make][model]) {
+    trimSel.innerHTML = '<option value="">Select trim</option>';
+    trimSel.disabled = true;
+    evRender();
+    return;
+  }
+  const trims = EV_TREE[make][model];
+  trimSel.innerHTML = '<option value="">Select trim</option>' +
+    trims.map((t, i) => '<option value="' + i + '">' + (t.trim || 'Standard') + ' — ' + t.range + ' mi · ' + t.kwh + ' kWh</option>').join('');
+  trimSel.disabled = false;
+  if (trims.length === 1) {
+    trimSel.value = '0';
+    onEvTrimChange();
+  } else {
+    evRender();
+  }
+}
+
+function onEvTrimChange() {
+  const make  = document.getElementById('ev-make').value;
+  const model = document.getElementById('ev-model').value;
+  const idx   = document.getElementById('ev-trim').value;
+  if (!make || !model || idx === '' || !EV_TREE[make] || !EV_TREE[make][model]) {
+    evCurrentTrim = null;
+  } else {
+    evCurrentTrim = EV_TREE[make][model][parseInt(idx, 10)] || null;
+  }
+  evRender();
+}
+
+function setEvRate(mode, btn) {
+  evRateMode = mode;
+  document.querySelectorAll('#ev-rate-tabs .gtab').forEach(el => el.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  evRender();
+}
+
+function onEvPctChange() {
+  const fromEl = document.getElementById('ev-from');
+  const toEl   = document.getElementById('ev-to');
+  let from = parseFloat(fromEl.value);
+  let to   = parseFloat(toEl.value);
+  if (!isFinite(from)) from = 0;
+  if (!isFinite(to))   to = 0;
+  if (from < 0) from = 0;
+  if (to > 100) to = 100;
+  if (to < from) to = from;
+  fromEl.value = from;
+  toEl.value = to;
+  evRender();
+}
+
+function evRender() {
+  const pillText = document.getElementById('ev-pill-text');
+  const pill     = document.getElementById('ev-pill');
+  const rKwh = document.getElementById('ev-r-kwh');
+  const rCost = document.getElementById('ev-r-cost');
+  const rRange = document.getElementById('ev-r-range');
+  const t = evCurrentTrim;
+  if (!t) {
+    if (pill) pill.classList.remove('show');
+    if (pillText) pillText.textContent = 'Pick your EV to see EPA range and battery';
+    if (rKwh)   rKwh.textContent = '— kWh';
+    if (rCost)  rCost.textContent = '$—';
+    if (rRange) rRange.textContent = '— mi';
+    return;
+  }
+  if (pill) pill.classList.add('show');
+  if (pillText) pillText.innerHTML = '<span class="mn">' + t.range + ' mi</span> EPA range · <b>' + t.kwh + ' kWh</b> battery';
+  const from = Math.max(0, Math.min(100, parseFloat(document.getElementById('ev-from').value) || 0));
+  const to   = Math.max(from, Math.min(100, parseFloat(document.getElementById('ev-to').value) || 0));
+  const rate = EV_RATES[evRateMode] || 0.13;
+  const loss = EV_LOSS[evRateMode] || 1.05;
+  const kWhUsable = t.kwh * (to - from) / 100;
+  const cost = kWhUsable * rate * loss;
+  const miPerKwh = t.range / t.kwh;
+  const miAdded = kWhUsable * miPerKwh;
+  if (rKwh)   rKwh.textContent = kWhUsable.toFixed(1) + ' kWh';
+  if (rCost)  rCost.textContent = '$' + (Math.round(cost * 100) / 100).toFixed(2);
+  if (rRange) rRange.textContent = Math.round(miAdded) + ' mi';
+}
+
+/* ════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════ */
+evPopulateMakes();
+['ev-from', 'ev-to'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', onEvPctChange);
+});
+evRender();
+${cityQuery}
+</script>`;
+}
+
+// Build the .chains card grid for charging networks — visually identical
+// to the gas-page chain card grid (.cc / .cc.best / .cc-name / .cc-price /
+// .cc-stations).  The "best" highlight goes to the network with the most
+// stations in this city.  Clicking a card calls setNetworkFilter() to
+// filter the station list below — same UX as gas-page chain cards.
+// "clickable" arg controls whether onclick is wired up; false for the
+// statewide hub page where the click has no station list to filter.
+function buildEVNetworkCards(networks, totalStations, clickable = true) {
+  const entries = Object.entries(networks || {})
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  if (!entries.length) {
+    return '<div style="font-size:12.5px;color:#6b6b66;padding:10px 4px">No charging networks listed for this city yet.</div>';
+  }
+  const onclickAttr = clickable ? ' onclick="setNetworkFilter(this.dataset.network)"' : '';
+  return entries.map(([net, count], i) => {
+    const pct = totalStations ? Math.round((count / totalStations) * 100) : 0;
+    const badge = i === 0 ? `      <div class="cc-badge">most stations</div>\n` : '';
+    return `    <div class="cc${i === 0 ? ' best' : ''}" data-network="${escAttr(net)}"${onclickAttr}>
+${badge}      <div class="cc-name">${escHtml(net)}</div>
+      <div class="cc-price">${count}</div>
+      <div class="cc-ch ch-nc">${pct}% of city</div>
+      <div class="cc-stations">${count} station${count === 1 ? '' : 's'} nearby</div>
+    </div>`;
+  }).join('\n');
+}
+
+function evMapsLink(s) {
+  if (s.latitude && s.longitude) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${s.latitude},${s.longitude}`;
+  }
+  const q = encodeURIComponent([s.station_name, s.street_address, s.city, 'TX'].filter(Boolean).join(' '));
+  return `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+}
+
+// Build the .station-grid station cards — same layout as gas-page station
+// cards (.sc, .sc-top, .sc-name, .sc-price, .sc-addr, .sc-bot, .sc-dist,
+// .dir-btn).  Big number on the right is kW (or "Free" when applicable)
+// instead of price.
+function buildEVStationCards(stations, town) {
+  if (!stations || !stations.length) {
+    return '<div style="font-size:12.5px;color:#6b6b66;padding:10px 4px">No public EV charging stations are listed in the NREL database for this city yet.</div>';
+  }
+  // Sort: DC fast (by max kW desc), then free L2, then remaining L2.
+  const sorted = stations.slice().sort((a, b) => {
+    const aFast = a.ev_dc_fast_num > 0 ? 1 : 0;
+    const bFast = b.ev_dc_fast_num > 0 ? 1 : 0;
+    if (aFast !== bFast) return bFast - aFast;
+    if (b.max_kw !== a.max_kw) return b.max_kw - a.max_kw;
+    if ((b.is_free ? 1 : 0) !== (a.is_free ? 1 : 0)) return (b.is_free ? 1 : 0) - (a.is_free ? 1 : 0);
+    return 0;
+  });
+  const display = sorted.slice(0, 24);
+  return display.map((s, i) => {
+    const isFast = s.ev_dc_fast_num > 0;
+    const ports = s.total_ports || (s.ev_dc_fast_num + s.ev_level2_evse_num + s.ev_level1_evse_num);
+    const lvl = isFast ? 'DC Fast' : (s.ev_level2_evse_num > 0 ? 'Level 2' : 'Level 1');
+    const headline = isFast && s.max_kw
+      ? `${s.max_kw} kW`
+      : (s.is_free ? 'Free' : lvl);
+    return `    <div class="sc${i === 0 ? ' best' : ''}" data-network="${escAttr(s.ev_network || 'Non-Networked')}">
+      <div class="sc-top">
+        <div class="sc-name">${escHtml(s.station_name)}</div>
+        <div class="sc-price">${escHtml(headline)}</div>
+      </div>
+      <div class="sc-addr">${escHtml(s.street_address || town.name + ', TX')}</div>
+      <div class="sc-bot">
+        <div class="sc-dist">${escHtml(s.ev_network || 'Non-Networked')} · ${ports || '—'} port${ports === 1 ? '' : 's'}${s.is_free ? ' · free' : ''}${s.is_24h ? ' · 24h' : ''}</div>
+        <a class="dir-btn" href="${evMapsLink(s)}" target="_blank" rel="noopener">Directions →</a>
+      </div>
+    </div>`;
+  }).join('\n');
+}
+
+// FAQ content — re-uses the .faq-section / .faq-header / .faq-stats /
+// .faq-items / details / faq-a / faq-src classes from the gas-page CSS,
+// rendered identically to the gas-page FAQ accordion.
+function buildEVFaqHtml(town, ev) {
+  const items = [
+    {
+      q: `How many EV charging stations are in ${town.name}, TX?`,
+      a: `${escHtml(town.name)}, TX has <b>${ev.stations_count}</b> public EV charging station${ev.stations_count === 1 ? '' : 's'} listed in the U.S. Department of Energy's NREL database — including <b>${ev.dc_fast_count}</b> DC fast charging location${ev.dc_fast_count === 1 ? '' : 's'} and <b>${ev.level2_count}</b> Level 2 location${ev.level2_count === 1 ? '' : 's'}. The list updates weekly.`,
+    },
+    {
+      q: `Where is the fastest EV charger in ${town.name}, TX?`,
+      a: ev.max_kw_in_city > 0
+        ? `The fastest documented charger in ${escHtml(town.name)}, TX delivers up to <b>${ev.max_kw_in_city} kW</b>. Drivers can add roughly 200+ miles of range in 15-30 minutes at chargers in this class — see the station list above for exact addresses and connector types.`
+        : `${escHtml(town.name)}, TX currently has no DC fast chargers in the public NREL database. Most charging here is Level 2 (about 25 miles of range per hour). For long-trip charging, look at nearby cities or the major Texas interstates.`,
+    },
+    {
+      q: `Is there free EV charging in ${town.name}, TX?`,
+      a: ev.free_count > 0
+        ? `Yes — <b>${ev.free_count}</b> free public charging location${ev.free_count === 1 ? '' : 's'} ${ev.free_count === 1 ? 'is' : 'are'} listed in ${escHtml(town.name)}, TX. Many free chargers are at hotels, employers, or city facilities. Use the station list above to filter by free.`
+        : `No fully-free public chargers are documented in ${escHtml(town.name)}, TX in the NREL database, but many workplaces, hotels, and dealerships offer complimentary charging that isn't listed publicly. Check with local employers and lodging.`,
+    },
+    {
+      q: `How much does it cost to charge an EV in ${town.name}, TX?`,
+      a: `Charging at home in Texas runs about <b>$0.13/kWh</b> (residential average), so a full 75-kWh battery costs roughly <b>$10</b>. Public Level 2 averages <b>$0.30/kWh</b> and DC fast charging averages <b>$0.43/kWh</b> — about <b>$32</b> for the same full charge. Use the calculator above to estimate exact costs for your EV.`,
+    },
+    {
+      q: `Which charging networks operate in ${town.name}, TX?`,
+      a: (() => {
+        const top = Object.entries(ev.networks || {}).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        if (!top.length) return `Network breakdown isn't available for ${escHtml(town.name)}, TX yet.`;
+        const list = top.map(([n, c]) => `<b>${escHtml(n)}</b> (${c})`).join(', ');
+        return `The largest charging networks in ${escHtml(town.name)}, TX are ${list}. Major Texas networks include Tesla Supercharger, ChargePoint, EVgo, and Electrify America — most accept open payment via app or credit card.`;
+      })(),
+    },
+  ];
+
+  const sourceLine = `Source: U.S. Dept. of Energy NREL Alternative Fuel Stations API, updated ${escHtml(evUpdatedHuman())} CT`;
+  const itemsHtml = items.map(item => `      <details>
+        <summary>${item.q}</summary>
+        <div class="faq-a">${item.a}<span class="faq-src">${sourceLine}</span></div>
+      </details>`).join('\n');
+
+  const pills = [
+    `${ev.stations_count} stations`,
+    `${ev.dc_fast_count} DC fast`,
+    `${ev.level2_count} Level 2`,
+    `${ev.free_count} free`,
+    ev.max_kw_in_city > 0 ? `${ev.max_kw_in_city} kW max` : null,
+    `${Object.keys(ev.networks || {}).length} network${Object.keys(ev.networks || {}).length === 1 ? '' : 's'}`,
+  ].filter(Boolean);
+  const pillsHtml = pills.map(p => `<span class="pill">${escHtml(p)}</span>`).join('');
+
+  const stats = [
+    { v: ev.stations_count, l: 'stations' },
+    { v: ev.dc_fast_count,  l: 'DC fast' },
+    { v: ev.level2_count,   l: 'Level 2' },
+    { v: ev.free_count,     l: 'free' },
+  ];
+  const statsHtml = stats.map(s => `      <div class="faq-stat"><div class="faq-stat-val">${s.v}</div><div class="faq-stat-lbl">${s.l}</div></div>`).join('\n');
+
+  return `<section class="faq-section">
+  <div class="faq-header">
+    <div class="faq-title-row">
+      <div class="faq-title">Fuel prices &amp; local data — ${escHtml(town.name)} EV ⚡</div>
+      <div class="faq-live">
+        <span class="live-dot"></span>
+        <span>${escHtml(evUpdatedTime())}</span>
+        <span class="faq-weather" id="faq-weather"></span>
+      </div>
+    </div>
+    <div class="pills">${pillsHtml}</div>
+  </div>
+  <div class="faq-context">${escHtml(`Texas hosts roughly ${EV_DATA.total_stations_tx || '4,000+'} public EV charging stations — the second-largest network in the U.S. after California. Tesla Supercharger leads the state, with ChargePoint and EVgo close behind.`)}</div>
+  <div class="faq-stats">
+${statsHtml}
+  </div>
+  <div class="faq-items">
+${itemsHtml}
+  </div>
+</section>`;
+}
+
+function buildEVNearbyCities(town) {
+  // Only link to nearby cities that actually have an EV page (i.e. NREL
+  // has station data).  Cities with zero stations are skipped entirely
+  // so we never produce a broken link.
+  const linkable = nearestCities(town, 30).filter(t => {
+    const ev = evDataFor(t);
+    return ev && ev.stations_count > 0;
+  });
+  if (!linkable.length) return '';
+  const items = linkable.slice(0, 6).map(t => {
+    const ev = evDataFor(t);
+    return `    <li><a href="/ev-charging/${t.slug}/">EV charging in ${escHtml(t.name)} (${ev.stations_count})</a></li>`;
+  }).join('\n');
+  return `<section class="nearby">
+  <h2>Nearby cities — EV charging</h2>
+  <ul class="nearby-list">
+${items}
+  </ul>
+</section>`;
+}
+
+// City <select> for the EV-page hero — same shape as the gas-page city
+// dropdown so visitors can hop between EV city pages.  Only includes
+// cities that have a real EV page (NREL has data); picking any option
+// always lands on a valid /ev-charging/{slug}/ URL.
+function buildEVCityOptions(currentSlug) {
+  return towns
+    .filter(t => {
+      const ev = evDataFor(t);
+      return ev && ev.stations_count > 0;
+    })
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(t => {
+      const sel = t.slug === currentSlug ? ' selected' : '';
+      return `        <option value="${t.slug}" data-slug="${t.slug}"${sel}>${escHtml(t.name)}, TX</option>`;
+    }).join('\n');
+}
+
+// EV cost calculator block — visually mirrors the gas trip-cost calc:
+// .calc-card → .v-card with .cargrid (Make/Model/Trim) + .mpg-pill for
+// the EPA range readout + .gas-block with .gas-tabs for charging-rate
+// switching + .calc-result for the output row.
+function buildEVCalcCard() {
+  return `<div class="calc-card" id="ev-calculator">
+  <h2 class="slabel h-label" style="margin-bottom:14px">EV charging cost calculator</h2>
+
+  <!-- VEHICLE PICKER -->
+  <div class="slabel">Your EV</div>
+  <div class="v-card">
+    <div class="cargrid">
+      <div class="f"><label>Make</label>
+        <select id="ev-make" aria-label="Select EV make" onchange="onEvMakeChange()">
+          <option value="">Select make</option>
+        </select>
+      </div>
+      <div class="f"><label>Model</label>
+        <select id="ev-model" aria-label="Select EV model" onchange="onEvModelChange()" disabled>
+          <option value="">Select model</option>
+        </select>
+      </div>
+      <div class="f"><label>Trim</label>
+        <select id="ev-trim" aria-label="Select EV trim" onchange="onEvTrimChange()" disabled>
+          <option value="">Select trim</option>
+        </select>
+      </div>
+    </div>
+    <div class="mpg-pill" id="ev-pill" style="display:flex"><span id="ev-pill-text">Pick your EV to see EPA range and battery</span></div>
+
+    <div class="divline">charging session</div>
+    <div class="cargrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+      <div class="f"><label>Charge from %</label>
+        <input id="ev-from" type="number" min="0" max="100" value="20">
+      </div>
+      <div class="f"><label>Charge to %</label>
+        <input id="ev-to" type="number" min="0" max="100" value="80">
+      </div>
+    </div>
+
+    <div class="divline" style="margin-top:14px">charging rate</div>
+    <div class="gas-block">
+      <div class="gas-tabs" id="ev-rate-tabs">
+        <button class="gtab on" id="rate-home"   onclick="setEvRate('home', this)">Home<br><small style="font-weight:400;color:#6b6b66">$0.13 /kWh</small></button>
+        <button class="gtab"    id="rate-l2"     onclick="setEvRate('l2', this)">Level 2<br><small style="font-weight:400;color:#6b6b66">$0.30 /kWh</small></button>
+        <button class="gtab"    id="rate-dcfast" onclick="setEvRate('dcfast', this)">DC Fast<br><small style="font-weight:400;color:#6b6b66">$0.43 /kWh</small></button>
+      </div>
+      <div class="gas-body">
+        <div class="api-note" style="margin-top:0">Rates are Texas market averages. Actual session pricing varies by network and time of day.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="calc-result">
+    <div class="ri">
+      <div class="rl">kWh added</div>
+      <div class="rv" id="ev-r-kwh">— kWh</div>
+    </div>
+    <div class="ri">
+      <div class="rl">Estimated cost</div>
+      <div class="rv g" id="ev-r-cost">$—</div>
+    </div>
+    <div class="ri">
+      <div class="rl">Range added</div>
+      <div class="rv" id="ev-r-range">— mi</div>
+    </div>
+  </div>
+</div>`;
+}
+
+const EV_NAV = `<div class="topbar">
+  <a class="logo" href="/">TX<em>Gas</em>Prices</a>
+  <div class="nav">
+    <a href="/">Home</a>
+    <a href="/trip-cost-calculator">Trip Calculator</a>
+    <a href="/cheapest-gas-texas">Cheapest in Texas</a>
+    <a class="on" href="/ev-charging-texas">EV Charging</a>
+  </div>
+</div>`;
+
+// ── buildEVCityPage ───────────────────────────────────────────
+// Per-city EV page.  Uses the same outer chrome as gas city pages:
+//   .site → .topbar (NAV) → main → .hero (hero-top, .chains for networks,
+//   map-frame, station-grid for stations) → .seo-text → .calc-card →
+//   .faq-section → .nearby → .footer.  All CSS classes are reused; no
+//   custom EV-specific class names except the (already gas-page-shared)
+//   .ev-promo style block for the gas-page teaser cross-link.
+function buildEVCityPage(town, ev) {
+  const canonical = `https://txgasprices.net/ev-charging/${town.slug}/`;
+  const stations = ev.stations_count;
+  const dcFast   = ev.dc_fast_count;
+  const level2   = ev.level2_count;
+  const free     = ev.free_count;
+  const maxKw    = ev.max_kw_in_city;
+
+  // Title target ~55 chars: "EV Charging in {City}, TX — {N} Stations | TXGasPrices"
+  const pageTitle = `EV Charging in ${town.name}, TX — ${stations} Stations | TXGasPrices`;
+  const metaDesc = `Live EV charging directory for ${town.name}, TX — ${stations} stations, ${dcFast} DC fast, ${free} free. Cost calculator, network breakdown, fastest chargers.`;
+
+  const updatedHuman = evUpdatedHuman();
+  const updatedTime  = evUpdatedTime();
+  const networkCardsHtml = buildEVNetworkCards(ev.networks, ev.stations_count);
+  const stationCardsHtml = buildEVStationCards(ev.stations || [], town);
+  const faqHtml = buildEVFaqHtml(town, ev);
+  const nearbyHtml = buildEVNearbyCities(town);
+  const calcCardHtml = buildEVCalcCard();
+  const cityOptions = buildEVCityOptions(town.slug);
+  const cityScript = buildEVPageScript(town, ev);
+
+  // JSON-LD: WebPage + BreadcrumbList + FAQPage + Place (with GeoCoords).
+  // The WebPage references a Place (the city) so search engines have an
+  // explicit lat/lng for the page's geographic subject — useful for
+  // "near me" / map-pack ranking signals.
+  const placeId = `${canonical}#place`;
+  const place = {
+    '@context': 'https://schema.org', '@type': 'Place',
+    '@id': placeId,
+    name: `${town.name}, TX`,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: town.name,
+      addressRegion: 'TX',
+      addressCountry: 'US',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: town.lat,
+      longitude: town.lng,
+    },
+  };
+  const webPage = {
+    '@context': 'https://schema.org', '@type': 'WebPage',
+    name: pageTitle, description: metaDesc,
+    dateModified: EV_DATA.updated, url: canonical,
+    about: { '@id': placeId },
+  };
+  const breadcrumb = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Texas Gas Prices', item: 'https://txgasprices.net/' },
+      { '@type': 'ListItem', position: 2, name: 'EV Charging in Texas', item: 'https://txgasprices.net/ev-charging-texas/' },
+      { '@type': 'ListItem', position: 3, name: `EV charging in ${town.name}, TX`, item: canonical },
+    ],
+  };
+  const faqLd = {
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: [
+      `How many EV charging stations are in ${town.name}, TX?`,
+      `Where is the fastest EV charger in ${town.name}, TX?`,
+      `Is there free EV charging in ${town.name}, TX?`,
+      `How much does it cost to charge an EV in ${town.name}, TX?`,
+      `Which charging networks operate in ${town.name}, TX?`,
+    ].map(q => ({ '@type': 'Question', name: q,
+      acceptedAnswer: { '@type': 'Answer', text: 'See the answers section on this page for full details.' } })),
+  };
+
+  // SEO description block (same style as gas-page .seo-text).
+  const seoText = stations > 0
+    ? `${town.name}, TX has <b>${stations}</b> public EV charging stations, including <b>${dcFast}</b> DC fast charger${dcFast === 1 ? '' : 's'} and <b>${level2}</b> Level 2 location${level2 === 1 ? '' : 's'}. ${free > 0 ? `<b>${free}</b> location${free === 1 ? ' is' : 's are'} listed as free.` : ''} The fastest charger in town delivers up to <b>${maxKw || 0} kW</b>. Public charging in ${town.name} averages around <b>$0.30/kWh</b> at Level 2 and <b>$0.43/kWh</b> at DC fast. Use the calculator below to estimate session costs for your specific EV.`
+    : `${town.name}, TX has no public EV charging stations listed in the U.S. Department of Energy's NREL database yet. Many EV drivers in this area charge at home (Texas residential rate ≈ <b>$0.13/kWh</b>) or at workplace and hotel chargers that aren't always reported publicly. See nearby cities below for documented public stations.`;
+
+  // Static-map preview shows actual station pins from our NREL data.
+  // Top 10 DC fast chargers when ≥10 exist, otherwise every station with
+  // coords.  Many NREL "stations" are actually individual stalls at the
+  // same site (Tesla Supercharger lists each stall separately), so we
+  // dedupe by rounded coords before slicing — otherwise all 10 pins land
+  // on the same dot.
+  const sortedForMap = (ev.stations || [])
+    .filter(s => s.latitude && s.longitude)
+    .slice()
+    .sort((a, b) => {
+      const aFast = a.ev_dc_fast_num > 0 ? 1 : 0;
+      const bFast = b.ev_dc_fast_num > 0 ? 1 : 0;
+      if (aFast !== bFast) return bFast - aFast;
+      return (b.max_kw || 0) - (a.max_kw || 0);
+    });
+  const seenCoords = new Set();
+  const stationsForMap = [];
+  for (const s of sortedForMap) {
+    // Round to 4 decimals (~11m) so adjacent stalls collapse but truly
+    // distinct sites a few hundred feet apart stay separate.
+    const key = `${Number(s.latitude).toFixed(4)},${Number(s.longitude).toFixed(4)}`;
+    if (seenCoords.has(key)) continue;
+    seenCoords.add(key);
+    stationsForMap.push(s);
+  }
+  const stationPins = stationsForMap.length > 10
+    ? stationsForMap.slice(0, 10)
+    : stationsForMap;
+  // Use Google Static Maps' NAMED color tokens (green/blue/red/etc) —
+  // gas pages use color:red and that works.  The earlier hex-color +
+  // size:small combo (color:0x1D9E75|size:small|...) silently dropped
+  // the markers from the rendered tile, so revert to the gas-page
+  // marker syntax: one `markers=` group per color, plain "color:NAME",
+  // pipe-separated lat,lng list.  Pins are green (stations) and the
+  // city center is blue so users can tell them apart at a glance.
+  const stationMarkers = stationPins.length > 0
+    ? `&markers=color:green%7C` +
+      stationPins.map(s => `${s.latitude},${s.longitude}`).join('%7C')
+    : '';
+  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${town.lat},${town.lng}&zoom=12&size=800x340&scale=2&maptype=roadmap&markers=color:blue%7C${town.lat},${town.lng}${stationMarkers}&key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI`;
+  // Debug: surface the Houston URL during generate so we can verify it.
+  if (town.slug === 'houston-tx') {
+    console.log(`[debug] houston-tx static map URL: ${staticMapUrl}`);
+  }
+
+  // Map block — same lazy-load pattern as gas pages: static-map preview
+  // is replaced in-place with the Google Maps embed iframe on click,
+  // never opens a new tab.  loadInteractiveMap() is defined inline in
+  // buildEVPageScript() below; the iframe queries Google's own EV
+  // charging POI dataset (more accurate + more comprehensive than NREL).
+  // CITY_NAME_URL form ("Houston TX" → "Houston+TX") — same encoding
+  // the gas pages pass to loadInteractiveMap as the cityUrl argument.
+  const cityUrl = encodeURIComponent(`${town.name} TX`).replace(/%20/g, '+');
+  const mapBlock = `  <div class="slabel">Find nearest EV chargers — tap a pin for directions</div>
+  <div class="map-frame" id="map-container-${town.slug}">
+    <div class="map-placeholder" onclick="loadInteractiveMap('${town.slug}', '${town.lat}', '${town.lng}', '${escAttr(town.name)}', '${cityUrl}')">
+      <img src="${staticMapUrl}"
+        alt="EV charging stations map for ${escHtml(town.name)}, TX" width="800" height="340" loading="lazy">
+      <div class="map-placeholder-overlay">
+        <button type="button" class="map-load-btn">⚡ Tap to load interactive map</button>
+      </div>
+    </div>
+  </div>
+  <p class="map-note">Tap any pin → Google Maps opens with directions. Launches Maps app on mobile.</p>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${pageTitle}</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#1a1a18">
+<meta name="description" content="${escAttr(metaDesc)}">
+<link rel="canonical" href="${canonical}">
+<meta property="og:title" content="${escAttr(pageTitle)}">
+<meta property="og:description" content="${escAttr(metaDesc)}">
+<meta property="og:url" content="${canonical}">
+<meta property="og:image" content="https://txgasprices.net/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://txgasprices.net/og-image.png">
+<script type="application/ld+json">${JSON.stringify(webPage)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
+<script type="application/ld+json">${JSON.stringify(faqLd)}</script>
+<script type="application/ld+json">${JSON.stringify(place)}</script>
+${TEMPLATE_STYLE}
+</head>
+<body>
+<div class="site">
+
+${EV_NAV}
+
+<main>
+
+<!-- HERO — same shape as gas city page hero -->
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <h1 class="hero-title">EV charging in ${escHtml(town.name)}, TX today</h1>
+      <span class="hero-weather" id="weather"></span>
+      <div class="updated"><span class="live-dot"></span>Updated ${escHtml(updatedHuman)}</div>
+      <div class="trustbar"><span class="tb-item">Updated ${escHtml(updatedHuman)} CT</span><span class="tb-item">Source: U.S. DOE NREL</span><span class="tb-item">${stations} station${stations === 1 ? '' : 's'} · ${dcFast} DC fast</span></div>
+    </div>
+    <div class="city-sel">
+      <select onchange="switchEvCity(this)" aria-label="Select a Texas city">
+${cityOptions}
+      </select>
+    </div>
+  </div>
+
+  <h2 class="slabel h-label">Top charging networks — today</h2>
+  <div class="chains" id="ev-networks">
+${networkCardsHtml}
+  </div>
+
+${mapBlock}
+
+  <div class="slabel slabel-row">
+    <h2 class="h-label">Stations sorted by charging power</h2>
+    <span style="display:flex;gap:8px;align-items:center"><span id="ev-station-count" style="font-size:11px;color:#9a9990">${stations} listed · ${dcFast} DC fast</span><button class="reset-btn" id="reset-network" onclick="setNetworkFilter(null)">All networks</button></span>
+  </div>
+  <div class="station-grid" id="ev-stations">
+${stationCardsHtml}
+  </div>
+</div>
+
+<!-- SEO TEXT -->
+<div class="seo-text">
+  ${seoText}
+</div>
+
+${calcCardHtml}
+
+${faqHtml}
+
+${nearbyHtml}
+
+</main>
+
+<div class="footer">
+  <span>EV station data: U.S. DOE NREL · updated ${escHtml(updatedHuman)} CT</span>
+  <span style="margin-left:auto">NREL · DOE AFDC · OpenWeatherMap</span>
+</div>
+
+</div>
+${cityScript}
+</body>
+</html>`;
+}
+
+// ── buildEVHubPage ────────────────────────────────────────────
+// Statewide EV hub at /ev-charging-texas/.  Same outer chrome and same
+// gas-page CSS classes — no custom layout, no new color tokens.
+function buildEVHubPage() {
+  const canonical = 'https://txgasprices.net/ev-charging-texas/';
+  const pageTitle = 'EV Charging in Texas — Charging Stations in 100 Cities';
+  const cityList = Object.entries(EV_DATA.cities || {}).map(([slug, c]) => ({ slug, ...c }));
+  const totalStations = EV_DATA.total_stations_tx || cityList.reduce((s, c) => s + c.stations_count, 0);
+  const stateTotals = cityList.reduce((acc, c) => {
+    acc.dcFast += c.dc_fast_count || 0;
+    acc.level2 += c.level2_count || 0;
+    acc.free   += c.free_count || 0;
+    for (const [n, v] of Object.entries(c.networks || {})) {
+      acc.networks[n] = (acc.networks[n] || 0) + v;
+    }
+    return acc;
+  }, { dcFast: 0, level2: 0, free: 0, networks: {} });
+  const metaDesc = `Find EV charging across Texas — ${totalStations} public stations, ${stateTotals.dcFast} DC fast, ${stateTotals.free} free. Per-city directory for 100 Texas cities.`;
+  const updatedHuman = evUpdatedHuman();
+  const updatedTime  = evUpdatedTime();
+
+  const top10 = cityList.slice().sort((a, b) => b.stations_count - a.stations_count).slice(0, 10);
+
+  // Top-10 cities — server-rendered as ranking rows (gas-page .st-row style
+  // is reused for the homepage top-10 list, so we re-use those classes).
+  const top10Html = top10.map((c, i) => `    <a class="st-row" href="/ev-charging/${c.slug}/">
+      <div class="st-rk">${i + 1}</div>
+      <div class="st-main">
+        <div class="st-city">${escHtml(c.city_name)}, TX</div>
+        <div class="st-chain">${c.dc_fast_count} DC fast · ${c.free_count} free</div>
+      </div>
+      <div class="st-price">${c.stations_count}<span class="st-gal"> stations</span></div>
+    </a>`).join('\n');
+
+  // Networks across the state — re-uses the .chains/.cc grid.
+  const networkCardsHtml = buildEVNetworkCards(stateTotals.networks, totalStations, false);
+
+  // All-100 cities grid — shows all towns with their station count when
+  // available; greys out cities NREL has no entries for.
+  const azTowns = towns.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const azHtml = azTowns.map(t => {
+    const ev = EV_DATA.cities && EV_DATA.cities[t.slug];
+    if (ev && ev.stations_count) {
+      return `      <li><a href="/ev-charging/${t.slug}/">${escHtml(t.name)}, TX <small style="color:#9a9990">(${ev.stations_count})</small></a></li>`;
+    }
+    // No EV page for this city — render as plain text, not a link.
+    return `      <li><span style="color:#9a9990;font-size:12.5px;padding:7px 4px;display:inline-block">${escHtml(t.name)}, TX</span></li>`;
+  }).join('\n');
+
+  // FAQ — same accordion classes.
+  const faqQs = [
+    { q: 'How many EV charging stations are in Texas?',
+      a: `Texas has <b>${totalStations}</b> public EV charging stations listed in the U.S. Department of Energy's NREL database, including <b>${stateTotals.dcFast}</b> DC fast chargers and <b>${stateTotals.free}</b> free chargers. The list updates weekly.` },
+    { q: 'Which Texas cities have the most EV chargers?',
+      a: `${top10.slice(0, 3).map(c => `<b>${escHtml(c.city_name)}</b> (${c.stations_count})`).join(', ')} lead the state. Houston, Austin, San Antonio, Dallas, and Fort Worth together account for the majority of public charging in Texas.` },
+    { q: 'Is EV charging free anywhere in Texas?',
+      a: `Yes — <b>${stateTotals.free}</b> public charging locations across Texas list themselves as free in the NREL database. Free chargers are most common at hotels, employers, retail centers, and city facilities. See individual city pages for current free options.` },
+    { q: 'What is the fastest EV charger in Texas?',
+      a: `Several Tesla V3 Superchargers and Electrify America hyperchargers in Texas deliver up to <b>350 kW</b>. At that pace, a typical EV adds 200+ miles of range in 15-20 minutes. The big metros (Houston, Austin, DFW, San Antonio) have the densest 150+ kW networks.` },
+    { q: 'How much does it cost to charge an EV in Texas?',
+      a: `Charging at home runs about <b>$0.13/kWh</b> (TX residential average), so a full 75-kWh battery costs roughly <b>$10</b>. Public Level 2 averages <b>$0.30/kWh</b>, and DC fast averages <b>$0.43/kWh</b> — about <b>$32</b> for the same full charge. Per-city pages have a calculator with real EV models.` },
+    { q: 'How is this Texas EV charging data sourced?',
+      a: `Station data comes from the U.S. DOE's NREL Alternative Fuel Stations API, refreshed weekly. The list reflects what station operators have reported to NREL — pricing, hours, and connectors can change between updates.` },
+  ];
+  const sourceLine = `Source: U.S. Dept. of Energy NREL Alternative Fuel Stations API, updated ${escHtml(updatedHuman)} CT`;
+  const faqItemsHtml = faqQs.map(item => `      <details>
+        <summary>${item.q}</summary>
+        <div class="faq-a">${item.a}<span class="faq-src">${sourceLine}</span></div>
+      </details>`).join('\n');
+
+  const pillsHtml = [
+    `${totalStations} stations`,
+    `${stateTotals.dcFast} DC fast`,
+    `${stateTotals.free} free`,
+    `${cityList.length} cities`,
+    `${Object.keys(stateTotals.networks).length} networks`,
+  ].map(p => `<span class="pill">${escHtml(p)}</span>`).join('');
+
+  const stats = [
+    { v: totalStations,        l: 'stations' },
+    { v: stateTotals.dcFast,   l: 'DC fast' },
+    { v: stateTotals.level2,   l: 'Level 2' },
+    { v: stateTotals.free,     l: 'free' },
+  ];
+  const statsHtml = stats.map(s => `      <div class="faq-stat"><div class="faq-stat-val">${s.v}</div><div class="faq-stat-lbl">${s.l}</div></div>`).join('\n');
+
+  const cityOptions = buildEVCityOptions(null);
+
+  // JSON-LD: WebPage + BreadcrumbList + FAQPage + ItemList.  ItemList
+  // enumerates all 52 Texas cities with EV charging pages so search
+  // engines treat the hub as a proper directory page (improves how the
+  // sitelinks under /ev-charging-texas/ render in SERPs).
+  const webPage = { '@context': 'https://schema.org', '@type': 'WebPage', name: pageTitle, description: metaDesc, dateModified: EV_DATA.updated, url: canonical };
+  const breadcrumb = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Texas Gas Prices', item: 'https://txgasprices.net/' },
+      { '@type': 'ListItem', position: 2, name: 'EV Charging in Texas', item: canonical },
+    ],
+  };
+  const faqLd = {
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: faqQs.map(({ q }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: 'See the answers section on this page.' } })),
+  };
+  const itemList = {
+    '@context': 'https://schema.org', '@type': 'ItemList',
+    name: 'Texas cities with public EV charging stations',
+    numberOfItems: cityList.length,
+    itemListOrder: 'https://schema.org/ItemListOrderDescending',
+    itemListElement: cityList
+      .slice()
+      .sort((a, b) => b.stations_count - a.stations_count)
+      .map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: `https://txgasprices.net/ev-charging/${c.slug}/`,
+        name: `${c.city_name}, TX`,
+      })),
+  };
+
+  const calcCardHtml = buildEVCalcCard();
+  const hubScript = buildEVPageScript(null, null);
+
+  // Map: statewide overview, same .map-frame / .map-placeholder.
+  const mapBlock = `  <div class="slabel">Texas EV charging map</div>
+  <div class="map-frame">
+    <a class="map-placeholder" href="https://www.google.com/maps/search/ev+charging+texas" target="_blank" rel="noopener">
+      <img src="https://maps.googleapis.com/maps/api/staticmap?center=31.0,-99.0&zoom=6&size=800x340&scale=2&maptype=roadmap&markers=color:0x1D9E75%7C29.7604,-95.3698%7C32.7767,-96.7970%7C30.2672,-97.7431%7C29.4241,-98.4936%7C32.7555,-97.3308&key=AIzaSyB98C7dsv8s_NOCItD5LQOvTviYicYCXdI"
+        alt="EV charging stations across Texas" width="800" height="340" loading="lazy">
+      <div class="map-placeholder-overlay">
+        <button type="button" class="map-load-btn">⚡ Tap to open Texas EV charging map</button>
+      </div>
+    </a>
+  </div>
+  <p class="map-note">Tap any pin → Google Maps opens with directions.</p>`;
+
+  // Style snippet for the .st-row classes used in the top-10 list — these
+  // exist on the gas homepage already, but the EV hub doesn't include the
+  // homepage's style tail.  Re-declare here to keep the visual identical.
+  const STROW_CSS = `<style>
+.st-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:0.5px solid rgba(0,0,0,.08);border-radius:9px;text-decoration:none;color:inherit;margin-bottom:6px;transition:border-color .15s}
+.st-row:hover{border-color:#1D9E75}
+.st-rk{width:24px;height:24px;border-radius:50%;background:#E1F5EE;color:#1D9E75;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.st-main{flex:1;min-width:0}
+.st-city{font-size:13px;font-weight:500;color:#1a1a18}
+.st-chain{font-size:11px;color:#6b6b66;margin-top:1px}
+.st-price{font-size:17px;font-weight:500;color:#0F6E56;text-align:right}
+.st-gal{font-size:11px;color:#9a9990;font-weight:400}
+.az-grid{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 12px;padding:0;margin:8px 0 4px}
+.az-grid li{padding:0}
+.az-grid a{display:block;padding:7px 4px;font-size:12.5px;color:#1D9E75;text-decoration:none;line-height:1.3}
+.az-grid a:hover{text-decoration:underline}
+.hub-content{font-size:13px;line-height:1.6;color:#3a3a36;background:#fff;border:0.5px solid rgba(0,0,0,.09);border-radius:12px;padding:16px 20px;margin:12px 0}
+.hub-content p{margin:0 0 10px}
+.hub-content p:last-child{margin-bottom:0}
+.hub-content b{color:#1a1a18;font-weight:500}
+</style>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${pageTitle}</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#1a1a18">
+<meta name="description" content="${escAttr(metaDesc)}">
+<link rel="canonical" href="${canonical}">
+<meta property="og:title" content="${escAttr(pageTitle)}">
+<meta property="og:description" content="${escAttr(metaDesc)}">
+<meta property="og:url" content="${canonical}">
+<meta property="og:image" content="https://txgasprices.net/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://txgasprices.net/og-image.png">
+<script type="application/ld+json">${JSON.stringify(webPage)}</script>
+<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>
+<script type="application/ld+json">${JSON.stringify(faqLd)}</script>
+<script type="application/ld+json">${JSON.stringify(itemList)}</script>
+${TEMPLATE_STYLE}
+${STROW_CSS}
+</head>
+<body>
+<div class="site">
+
+${EV_NAV}
+
+<main>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <h1 class="hero-title">EV charging in Texas today</h1>
+      <span class="hero-weather" id="weather"></span>
+      <div class="updated"><span class="live-dot"></span>Updated ${escHtml(updatedHuman)}</div>
+      <div class="trustbar"><span class="tb-item">${totalStations} stations</span><span class="tb-item">${stateTotals.dcFast} DC fast</span><span class="tb-item">${cityList.length} cities</span></div>
+    </div>
+    <div class="city-sel">
+      <select onchange="switchEvCity(this)" aria-label="Jump to a Texas city">
+        <option value="" data-slug="">Jump to a city…</option>
+${cityOptions}
+      </select>
+    </div>
+  </div>
+
+  <h2 class="slabel h-label">Top charging networks in Texas</h2>
+  <div class="chains">
+${networkCardsHtml}
+  </div>
+
+${mapBlock}
+
+  <div class="slabel slabel-row">
+    <h2 class="h-label">Top 10 Texas cities by station count</h2>
+  </div>
+  <div>
+${top10Html}
+  </div>
+</div>
+
+<!-- SEO / hub content -->
+<div class="hub-content">
+  <p>Texas hosts one of the largest public EV charging networks in the United States. The state has more than <b>${totalStations}</b> public charging stations across major metros, smaller cities, and the I-10, I-35, I-20 and I-45 corridors that connect them. Charging is densest in the four big metros — Houston, Dallas–Fort Worth, Austin, and San Antonio — but DC fast corridors now reach the Permian Basin, the Rio Grande Valley, and the Texas Panhandle.</p>
+  <p>The state's charging mix combines <b>Tesla Supercharger</b> (still the largest single network in Texas), <b>ChargePoint</b>, <b>EVgo</b>, and <b>Electrify America</b> at the fast-charging tier, plus thousands of <b>Level 2</b> chargers at workplaces, hotels, retail centers, and city facilities. Roughly <b>${stateTotals.free}</b> public chargers are listed as free, typically as a perk for hotel guests, retail customers, or city residents.</p>
+  <p>Texas EV drivers pay roughly <b>$0.13 per kWh</b> at home (residential average), <b>$0.30/kWh</b> at typical Level 2 public chargers, and around <b>$0.43/kWh</b> at DC fast — though peak rates exceed <b>$0.55/kWh</b> at some networks. A 75-kWh battery costs about <b>$10</b> at home and roughly <b>$32</b> at DC fast. Per-city pages have a calculator preloaded with 20 popular EVs and EPA-rated range data.</p>
+  <p>This directory is updated weekly from the U.S. Department of Energy's <a href="https://afdc.energy.gov/stations" target="_blank" rel="noopener">Alternative Fuel Data Center</a> via the NREL public API — the most authoritative open dataset for U.S. public EV charging.</p>
+</div>
+
+${calcCardHtml}
+
+<section class="faq-section">
+  <div class="faq-header">
+    <div class="faq-title-row">
+      <div class="faq-title">EV charging — Texas ⚡</div>
+      <div class="faq-live">
+        <span class="live-dot"></span>
+        <span>${escHtml(updatedTime)}</span>
+        <span class="faq-weather" id="faq-weather"></span>
+      </div>
+    </div>
+    <div class="pills">${pillsHtml}</div>
+  </div>
+  <div class="faq-context">Texas hosts roughly ${totalStations} public EV charging stations — among the most in the U.S. Tesla Supercharger leads the state by site count; ChargePoint and EVgo lead by Level 2 footprint.</div>
+  <div class="faq-stats">
+${statsHtml}
+  </div>
+  <div class="faq-items">
+${faqItemsHtml}
+  </div>
+</section>
+
+<section class="nearby">
+  <h2>All 100 Texas cities — EV charging</h2>
+  <ul class="az-grid">
+${azHtml}
+  </ul>
+  <p style="font-size:11px;color:#9a9990;margin-top:6px">Cities in grey have no public stations listed in the NREL database for that exact city name yet. Smaller suburbs may have chargers listed under the parent metro.</p>
+</section>
+
+</main>
+
+<div class="footer">
+  <span>EV station data: U.S. DOE NREL · updated ${escHtml(updatedHuman)} CT</span>
+  <span style="margin-left:auto">NREL · DOE AFDC · OpenWeatherMap</span>
+</div>
+
+</div>
+${hubScript}
+</body>
+</html>`;
 }
 
 // ── sitemap ──────────────────────────────────────────────────
@@ -1071,6 +2309,19 @@ function buildSitemap() {
 
   urls.push(`  <url><loc>${base}/cheapest-gas-texas/</loc><lastmod>${lastmod}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>`);
   urls.push(`  <url><loc>${base}/trip-cost-calculator/</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+
+  // EV charging URLs — appended after the existing 103 entries so the
+  // gas-page block is unchanged.  Only towns NREL has real station data
+  // for get a sitemap entry; the rest are routed to the hub via the
+  // gas-page teaser.  Each city's lastmod uses the EV data refresh
+  // timestamp (ev-stations.json), which is updated weekly.
+  const evLastmod = (EV_DATA.updated || new Date().toISOString()).split('T')[0];
+  towns.forEach(t => {
+    const ev = EV_DATA.cities && EV_DATA.cities[t.slug];
+    if (!ev || !ev.stations_count) return;
+    urls.push(`  <url><loc>${base}/ev-charging/${t.slug}/</loc><lastmod>${evLastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
+  });
+  urls.push(`  <url><loc>${base}/ev-charging-texas/</loc><lastmod>${evLastmod}</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>`);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -1316,6 +2567,7 @@ ${sharedStyles}
     <a class="on" href="/">Home</a>
     <a href="/trip-cost-calculator">Trip Calculator</a>
     <a href="/cheapest-gas-texas">Cheapest in Texas</a>
+    <a href="/ev-charging-texas">EV Charging</a>
   </div>
 </div>
 
@@ -1730,6 +2982,7 @@ ${sharedStyles}
     <a href="/">Home</a>
     <a href="/trip-cost-calculator">Trip Calculator</a>
     <a class="on" href="/cheapest-gas-texas">Cheapest in Texas</a>
+    <a href="/ev-charging-texas">EV Charging</a>
   </div>
 </div>
 
@@ -2122,6 +3375,7 @@ ${sharedStyles}
     <a href="/">Home</a>
     <a class="on" href="/trip-cost-calculator">Trip Calculator</a>
     <a href="/cheapest-gas-texas">Cheapest in Texas</a>
+    <a href="/ev-charging-texas">EV Charging</a>
   </div>
 </div>
 
@@ -2489,6 +3743,22 @@ fs.mkdirSync('./output/trip-cost-calculator', { recursive: true });
 fs.writeFileSync('./output/trip-cost-calculator/index.html', buildTripCalcPage());
 fs.mkdirSync('./output/cheapest-gas-texas', { recursive: true });
 fs.writeFileSync('./output/cheapest-gas-texas/index.html', buildCheapestGasPage());
+
+// EV charging — only generate a city page when NREL has real station data
+// for that town.  Cities with zero stations don't get a placeholder page
+// (the gas-page teaser routes those visitors to /ev-charging-texas/ instead).
+let evPageCount = 0;
+towns.forEach(town => {
+  const ev = evDataFor(town);
+  if (!ev || !ev.stations_count) return;
+  const dir = `./output/ev-charging/${town.slug}`;
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(`${dir}/index.html`, buildEVCityPage(town, ev));
+  evPageCount++;
+});
+fs.mkdirSync('./output/ev-charging-texas', { recursive: true });
+fs.writeFileSync('./output/ev-charging-texas/index.html', buildEVHubPage());
+console.log(`✓ Generated ${evPageCount} EV city pages + 1 EV hub`);
 
 console.log(`\n✓ Generated ${pageCount} pages across ${towns.length} towns`);
 console.log(`✓ Sitemap written with ${towns.length * 6 + 3} URLs`);
