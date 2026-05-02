@@ -25,30 +25,62 @@ const towns = JSON.parse(fs.readFileSync('./towns.json', 'utf8'));
 
 // Map normalized city name → slug for fast grouping.  NREL returns the
 // station's city in plain text (e.g. "Houston"), which we coerce to a
-// lower-case key and look up against the towns.json roster.  Aliases for a
-// handful of NREL spellings that don't match the canonical town name.
+// lower-case key and look up against the towns.json roster.  Aliases
+// for a handful of NREL spellings that don't match the canonical name.
+// Note: "the woodlands" no longer maps to null — under Voronoi every
+// station with valid coords gets assigned to its nearest tracked city.
 const ALIAS = {
-  'ft worth':         'fort-worth-tx',
-  'ft. worth':        'fort-worth-tx',
-  'mc allen':         'mcallen-tx',
-  'mc kinney':        'mckinney-tx',
-  'the woodlands':    null, // not a tracked town — explicitly drop
+  'ft worth':   'fort-worth-tx',
+  'ft. worth':  'fort-worth-tx',
+  'mc allen':   'mcallen-tx',
+  'mc kinney':  'mckinney-tx',
 };
 
-function slugForNrelCity(rawCity) {
+const SLUG_SET = new Set(towns.map(t => t.slug));
+const TOWN_BY_SLUG = Object.fromEntries(towns.map(t => [t.slug, t]));
+// Cache of towns that have valid coordinates — used for Voronoi nearest-
+// neighbor assignment when the NREL city name doesn't match any slug.
+const TOWNS_WITH_COORDS = towns.filter(t => t.lat != null && t.lng != null);
+
+// Haversine distance in MILES between two (lat,lng) pairs.  Used for
+// Voronoi nearest-city assignment so a station whose NREL city is e.g.
+// "Spring" or "Cypress" still lands on the closest tracked town.
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 3958.8;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
+      * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Try fast name-based match first (exact slug or ALIAS).  Returns the
+// slug if matched, or null if the caller should fall back to Voronoi.
+function slugByName(rawCity) {
   if (!rawCity) return null;
   const norm = String(rawCity).toLowerCase().trim();
   if (Object.prototype.hasOwnProperty.call(ALIAS, norm)) {
     return ALIAS[norm];
   }
-  // Build a slug like the towns.json convention — lowercase, hyphens, "-tx".
   const base = norm.replace(/\./g, '').replace(/\s+/g, '-');
   const candidate = `${base}-tx`;
   return SLUG_SET.has(candidate) ? candidate : null;
 }
 
-const SLUG_SET = new Set(towns.map(t => t.slug));
-const TOWN_BY_SLUG = Object.fromEntries(towns.map(t => [t.slug, t]));
+// Voronoi assignment: pick the tracked town whose center lat/lng is
+// nearest to the station coords.  No radius cutoff; every station with
+// valid coords lands on exactly one city, so no double-counting and no
+// Texas station gets dropped purely because NREL's city field doesn't
+// match our roster.
+function nearestSlug(lat, lng) {
+  let best = null, bestD = Infinity;
+  for (const t of TOWNS_WITH_COORDS) {
+    const d = haversine(lat, lng, t.lat, t.lng);
+    if (d < bestD) { bestD = d; best = t.slug; }
+  }
+  return best;
+}
 
 const BASE_URL = `https://developer.nrel.gov/api/alt-fuel-stations/v1.json`;
 const PAGE_SIZE = 200;
@@ -178,74 +210,178 @@ function extractStation(s) {
   }
   console.log(`Fetched ${all.length} raw stations.`);
 
-  // Group by city slug.  A station whose NREL city does not map to any
-  // towns.json slug is silently dropped — we only generate pages for the
-  // 100 tracked cities.
-  const byCity = {};
-  let dropped = 0;
+  // Group raw NREL records by city slug.  Two-tier assignment:
+  //   1. ALIAS / exact slug match on NREL's `city` field (fast).
+  //   2. Voronoi fallback — nearest tracked town by Haversine distance
+  //      to the station's lat/lng — when the name doesn't match.
+  // Only stations missing both lat AND lng get dropped (ungroupable).
+  // No radius cutoff: every Texas station with coords lands on exactly
+  // one of the 100 tracked cities, so no double-counting.
+  const rawByCity = {};
+  let droppedNoCoords = 0;
+  let matchedByName = 0;
+  let matchedByVoronoi = 0;
   for (const raw of all) {
-    const slug = slugForNrelCity(raw.city);
-    if (!slug) { dropped++; continue; }
-    const station = extractStation(raw);
-    if (!byCity[slug]) byCity[slug] = [];
-    byCity[slug].push(station);
+    let slug = slugByName(raw.city);
+    if (slug) {
+      matchedByName++;
+    } else {
+      const lat = raw.latitude, lng = raw.longitude;
+      if (lat == null || lng == null) { droppedNoCoords++; continue; }
+      slug = nearestSlug(Number(lat), Number(lng));
+      if (!slug) { droppedNoCoords++; continue; }
+      matchedByVoronoi++;
+    }
+    if (!rawByCity[slug]) rawByCity[slug] = [];
+    rawByCity[slug].push(raw);
+  }
+  // For symmetry with the old summary block.  Keeping `dropped` so the
+  // existing post-loop logging still references something sensible.
+  const dropped = droppedNoCoords;
+
+  // Dedup key: lat+lng rounded to 4 decimal places (~11m precision)
+  // collapses adjacent stalls; falls back to normalized name+address
+  // when geo coords are missing.
+  function dedupKey(raw) {
+    const lat = raw.latitude, lng = raw.longitude;
+    if (lat != null && lng != null) {
+      return `geo:${Number(lat).toFixed(4)},${Number(lng).toFixed(4)}`;
+    }
+    const name = String(raw.station_name || '').toLowerCase().trim();
+    const addr = String(raw.street_address || '').toLowerCase().trim();
+    return `name:${name}|${addr}`;
   }
 
-  const cities = {};
-  for (const slug of Object.keys(byCity)) {
-    const stations = byCity[slug];
-    const town = TOWN_BY_SLUG[slug];
-    const networks = {};
-    let dcFast = 0, level2 = 0, freeCount = 0, maxKw = 0;
-    for (const s of stations) {
-      const net = s.ev_network && s.ev_network !== 'Non-Networked'
-        ? s.ev_network
-        : (s.ev_network || 'Non-Networked');
-      networks[net] = (networks[net] || 0) + 1;
-      if (s.ev_dc_fast_num > 0) dcFast++;
-      if (s.ev_level2_evse_num > 0) level2++;
-      if (s.is_free) freeCount++;
-      if (s.max_kw > maxKw) maxKw = s.max_kw;
+  // Aggregate one or more port-records into a single physical-location
+  // record.  Boolean flags OR; ports SUM; max_kw MAX; connectors UNION;
+  // strings/coords come from the first record (which already won the
+  // sort within the city — see below for ordering).
+  function mergeRecord(loc, raw) {
+    const dcNum   = Number(raw.ev_dc_fast_num) || 0;
+    const l2Num   = Number(raw.ev_level2_evse_num) || 0;
+    const l1Num   = Number(raw.ev_level1_evse_num) || 0;
+    const ports   = totalPortsForStation(raw);
+    const kw      = maxKwForStation(raw);
+    const isFree  = isFreeStation(raw);
+    const is24h   = is24hStation(raw);
+    const conns   = parseConnectorTypes(raw.ev_connector_types);
+    if (!loc) {
+      return {
+        name:             raw.station_name || '',
+        address:          raw.street_address || '',
+        city:             raw.city || '',
+        state:            raw.state || '',
+        zip:              raw.zip || '',
+        network:          raw.ev_network || 'Non-Networked',
+        network_web:      raw.ev_network_web || '',
+        lat:              raw.latitude != null ? Number(raw.latitude) : null,
+        lng:              raw.longitude != null ? Number(raw.longitude) : null,
+        max_kw:           kw,
+        total_ports:      ports,
+        is_dc_fast:       dcNum > 0,
+        is_level2:        l2Num > 0,
+        is_free:          isFree,
+        is_24h:           is24h,
+        connectors:       [...conns],
+        pricing:          raw.ev_pricing || '',
+        access_days_time: raw.access_days_time || '',
+        facility_type:    raw.facility_type || '',
+      };
     }
-    // Sort stations: DC fast first, then by max_kw desc, then station name.
+    if (kw > loc.max_kw) loc.max_kw = kw;
+    loc.total_ports += ports;
+    if (dcNum > 0) loc.is_dc_fast = true;
+    if (l2Num > 0) loc.is_level2 = true;
+    if (isFree)    loc.is_free   = true;
+    if (is24h)     loc.is_24h    = true;
+    for (const c of conns) {
+      if (!loc.connectors.includes(c)) loc.connectors.push(c);
+    }
+    if (!loc.pricing && raw.ev_pricing) loc.pricing = raw.ev_pricing;
+    if (!loc.access_days_time && raw.access_days_time) loc.access_days_time = raw.access_days_time;
+    return loc;
+  }
+
+  // Per-city dedup pipeline.
+  const cities = {};
+  let totalUniqueStations = 0;
+  let totalPortsTx = 0;
+  let totalDuplicatesCollapsed = 0;
+  for (const slug of Object.keys(rawByCity)) {
+    const portRecords = rawByCity[slug];
+    const byLocation = {};
+    for (const raw of portRecords) {
+      const key = dedupKey(raw);
+      byLocation[key] = mergeRecord(byLocation[key], raw);
+    }
+    const stations = Object.values(byLocation);
+    totalDuplicatesCollapsed += (portRecords.length - stations.length);
+
+    // Per-city aggregates count UNIQUE physical locations, not ports.
+    // `networks` counts how many unique locations operate each network.
+    const networks = {};
+    let dcFast = 0, level2 = 0, freeCount = 0, maxKw = 0, cityPorts = 0;
+    for (const s of stations) {
+      const net = s.network || 'Non-Networked';
+      networks[net] = (networks[net] || 0) + 1;
+      if (s.is_dc_fast) dcFast++;
+      if (s.is_level2)  level2++;
+      if (s.is_free)    freeCount++;
+      if (s.max_kw > maxKw) maxKw = s.max_kw;
+      cityPorts += s.total_ports;
+    }
+
+    // Sort: DC fast first → max_kw desc → name asc.
     stations.sort((a, b) => {
-      if ((b.ev_dc_fast_num > 0 ? 1 : 0) - (a.ev_dc_fast_num > 0 ? 1 : 0) !== 0) {
-        return (b.ev_dc_fast_num > 0 ? 1 : 0) - (a.ev_dc_fast_num > 0 ? 1 : 0);
-      }
+      const aFast = a.is_dc_fast ? 1 : 0;
+      const bFast = b.is_dc_fast ? 1 : 0;
+      if (aFast !== bFast) return bFast - aFast;
       if (b.max_kw !== a.max_kw) return b.max_kw - a.max_kw;
-      return a.station_name.localeCompare(b.station_name);
+      return (a.name || '').localeCompare(b.name || '');
     });
+
+    const town = TOWN_BY_SLUG[slug];
     cities[slug] = {
       city_name:        town ? town.name : slug,
       stations_count:   stations.length,
       dc_fast_count:    dcFast,
       level2_count:     level2,
       free_count:       freeCount,
+      total_ports:      cityPorts,
       networks,
       max_kw_in_city:   maxKw,
       stations,
     };
+    totalUniqueStations += stations.length;
+    totalPortsTx += cityPorts;
   }
 
   const out = {
-    updated:           new Date().toISOString(),
-    source:            'NREL Alternative Fuel Stations API',
-    total_stations_tx: all.length,
-    cities_covered:    Object.keys(cities).length,
+    updated:              new Date().toISOString(),
+    source:               'NREL Alternative Fuel Stations API',
+    total_stations_tx:    totalUniqueStations,        // unique physical locations
+    total_ports_tx:       totalPortsTx,               // sum of ports across all locations
+    raw_records_fetched:  all.length,                 // pre-dedup port-level record count
+    cities_covered:       Object.keys(cities).length,
     cities,
   };
   fs.writeFileSync('./ev-stations.json', JSON.stringify(out, null, 2));
 
   console.log('\n───── Run summary ─────');
-  console.log(`raw_stations_fetched=${all.length}`);
-  console.log(`stations_dropped_unmatched_city=${dropped}`);
+  console.log(`raw_port_records_fetched=${all.length}`);
+  console.log(`matched_by_name=${matchedByName}`);
+  console.log(`matched_by_voronoi=${matchedByVoronoi}`);
+  console.log(`dropped_no_coords=${droppedNoCoords}`);
+  console.log(`unique_physical_locations=${totalUniqueStations}`);
+  console.log(`total_ports_across_tx=${totalPortsTx}`);
+  console.log(`port_records_collapsed_to_existing_locations=${totalDuplicatesCollapsed}`);
   console.log(`cities_with_stations=${Object.keys(cities).length}`);
   const top = Object.entries(cities)
     .sort((a, b) => b[1].stations_count - a[1].stations_count)
     .slice(0, 10);
   console.log('top_cities=');
   for (const [slug, c] of top) {
-    console.log(`  ${slug.padEnd(22)} ${String(c.stations_count).padStart(4)}  (DC fast ${c.dc_fast_count})`);
+    console.log(`  ${slug.padEnd(22)} ${String(c.stations_count).padStart(4)} stations  ${String(c.total_ports).padStart(4)} ports  (DC fast ${c.dc_fast_count})`);
   }
   console.log('\n✓ Wrote ev-stations.json');
 })().catch(e => {
