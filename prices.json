@@ -1,10 +1,10 @@
 {
-  "updated": "2026-05-13T17:37:38.073Z",
+  "updated": "2026-05-16T14:39:31.617Z",
   "stateAverage": {
-    "regular": 3.97,
-    "midgrade": 4.434,
-    "premium": 4.819,
-    "diesel": 5.123
+    "regular": 3.979,
+    "midgrade": 4.433,
+    "premium": 4.782,
+    "diesel": 5.105
   },
   "source": {
     "aaa": "gasprices.aaa.com (TX state avg, today)",
@@ -17,74 +17,74 @@
     {
       "chain": "Murphy USA",
       "priceMode": "estimated",
-      "regular": 3.85,
-      "midgrade": 4.314,
-      "premium": 4.699,
-      "diesel": 5.023
+      "regular": 3.859,
+      "midgrade": 4.313,
+      "premium": 4.662,
+      "diesel": 5.005
     },
     {
       "chain": "Buc-ee's",
       "priceMode": "estimated",
-      "regular": 3.89,
-      "midgrade": 4.354,
-      "premium": 4.739,
-      "diesel": 5.053
+      "regular": 3.899,
+      "midgrade": 4.353,
+      "premium": 4.702,
+      "diesel": 5.035
     },
     {
       "chain": "HEB Gas",
       "priceMode": "estimated",
-      "regular": 3.92,
-      "midgrade": 4.384,
-      "premium": 4.769,
-      "diesel": 5.083
+      "regular": 3.929,
+      "midgrade": 4.383,
+      "premium": 4.732,
+      "diesel": 5.065
     },
     {
       "chain": "Valero",
       "priceMode": "estimated",
-      "regular": 3.95,
-      "midgrade": 4.414,
-      "premium": 4.799,
-      "diesel": 5.103
+      "regular": 3.959,
+      "midgrade": 4.413,
+      "premium": 4.762,
+      "diesel": 5.085
     },
     {
       "chain": "Exxon",
       "priceMode": "estimated",
-      "regular": 4.02,
-      "midgrade": 4.484,
-      "premium": 4.869,
-      "diesel": 5.163
+      "regular": 4.029,
+      "midgrade": 4.483,
+      "premium": 4.832,
+      "diesel": 5.145
     },
     {
       "chain": "Conoco",
       "priceMode": "estimated",
-      "regular": 4.03,
-      "midgrade": 4.494,
-      "premium": 4.879,
-      "diesel": 5.163
+      "regular": 4.039,
+      "midgrade": 4.493,
+      "premium": 4.842,
+      "diesel": 5.145
     },
     {
       "chain": "Shell",
       "priceMode": "estimated",
-      "regular": 4.04,
-      "midgrade": 4.504,
-      "premium": 4.889,
-      "diesel": 5.173
+      "regular": 4.049,
+      "midgrade": 4.503,
+      "premium": 4.852,
+      "diesel": 5.155
     },
     {
       "chain": "Phillips 66",
       "priceMode": "estimated",
-      "regular": 4.05,
-      "midgrade": 4.514,
-      "premium": 4.899,
-      "diesel": 5.183
+      "regular": 4.059,
+      "midgrade": 4.513,
+      "premium": 4.862,
+      "diesel": 5.165
     },
     {
       "chain": "Chevron",
       "priceMode": "estimated",
-      "regular": 4.07,
-      "midgrade": 4.534,
-      "premium": 4.919,
-      "diesel": 5.193
+      "regular": 4.079,
+      "midgrade": 4.533,
+      "premium": 4.882,
+      "diesel": 5.175
     }
   ],
   "cities": {
@@ -92,7 +92,7 @@
       "chains": [
         {
           "chain": "Costco",
-          "regular": 3.49,
+          "regular": 3.55,
           "station": "Costco",
           "address": "23645 Katy Fwy, Katy",
           "stationCount": 1
@@ -105,18 +105,18 @@
           "stationCount": 2
         },
         {
-          "chain": "Shell",
-          "regular": 3.69,
-          "station": "Shell",
-          "address": "23903 Katy Fwy, Katy",
-          "stationCount": 6
-        },
-        {
           "chain": "HEB Gas",
           "regular": 3.69,
-          "station": "HEB",
-          "address": "29711 Jordan Crossing Blvd, Katy",
-          "stationCount": 6
+          "station": "H-E-B",
+          "address": "6701 S Fry Rd, Katy",
+          "stationCount": 4
+        },
+        {
+          "chain": "Unbranded",
+          "regular": 3.69,
+          "station": "Unbranded",
+          "address": "3716 Greenhouse Rd, Houston",
+          "stationCount": 1
         },
         {
           "chain": "Speedy Stop",
@@ -133,6 +133,20 @@
           "stationCount": 1
         },
         {
+          "chain": "Kroger",
+          "regular": 3.72,
+          "station": "Kroger",
+          "address": "1712 Spring Green Blvd , Katy",
+          "stationCount": 4
+        },
+        {
+          "chain": "Circle K",
+          "regular": 3.72,
+          "station": "Circle K",
+          "address": "2617 FM-1463, Katy",
+          "stationCount": 4
+        },
+        {
           "chain": "Walmart",
           "regular": 3.74,
           "station": "Walmart",
@@ -140,32 +154,18 @@
           "stationCount": 1
         },
         {
-          "chain": "Kroger",
-          "regular": 3.75,
-          "station": "Kroger",
-          "address": "1712 Spring Green Blvd , Katy",
-          "stationCount": 3
-        },
-        {
-          "chain": "Circle K",
-          "regular": 3.75,
-          "station": "Circle K",
-          "address": "2230 N Fry Rd, Houston",
-          "stationCount": 2
+          "chain": "Shell",
+          "regular": 3.74,
+          "station": "Shell",
+          "address": "740 Katy-Fort Bend Rd, Katy",
+          "stationCount": 5
         },
         {
           "chain": "Exxon",
           "regular": 3.79,
           "station": "Exxon",
           "address": "11035 Katy Fwy, Houston",
-          "stationCount": 2
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.79,
-          "station": "7-Eleven",
-          "address": "1250 Pin Oak Rd, Katy",
-          "stationCount": 2
+          "stationCount": 3
         },
         {
           "chain": "QuikTrip",
@@ -175,24 +175,24 @@
           "stationCount": 1
         },
         {
-          "chain": "Katy Hand Car Wash and Detail,",
+          "chain": "Buc-ee's",
           "regular": 3.79,
-          "station": "Katy Hand Car Wash and Detail,",
-          "address": "2850 N Fry Rd, Houston",
+          "station": "Buc-ee's",
+          "address": "27700 Katy Fwy, Katy",
           "stationCount": 1
         },
         {
-          "chain": "Z's Corner Store",
-          "regular": 3.84,
-          "station": "Z's Corner Store",
-          "address": "17355 FM-529, Houston",
+          "chain": "Valero",
+          "regular": 3.82,
+          "station": "Valero",
+          "address": "13155 Katy Fwy, Houston",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Costco",
         "station": "Costco",
-        "price": 3.49,
+        "price": 3.55,
         "address": "23645 Katy Fwy, Katy"
       },
       "stationsSeen": 30,
@@ -202,51 +202,65 @@
       "chains": [
         {
           "chain": "Exxon",
-          "regular": 3.67,
+          "regular": 3.63,
           "station": "Exxon",
           "address": "7650 Campbell Rd, Dallas",
-          "stationCount": 5
+          "stationCount": 7
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.81,
-          "station": "Murphy Express",
-          "address": "2110 N Town East Blvd, Mesquite",
+          "regular": 3.72,
+          "station": "Murphy USA",
+          "address": "1101 U.S. 80 Frontage Road, Mesquite",
           "stationCount": 3
         },
         {
           "chain": "7-Eleven",
-          "regular": 3.83,
+          "regular": 3.78,
           "station": "7-Eleven",
-          "address": "3640 Gus Thomasson Rd, Mesquite",
+          "address": "2318 N Galloway Ave, Mesquite",
           "stationCount": 6
         },
         {
           "chain": "Valero",
-          "regular": 3.88,
+          "regular": 3.78,
           "station": "Valero",
-          "address": "1145 IH-30, Mesquite",
+          "address": "3341 Town East Blvd, Mesquite",
           "stationCount": 4
         },
         {
+          "chain": "RaceWay",
+          "regular": 3.78,
+          "station": "RaceWay",
+          "address": "2400 N Galloway Ave, Mesquite",
+          "stationCount": 1
+        },
+        {
+          "chain": "RaceTrac",
+          "regular": 3.78,
+          "station": "RaceTrac",
+          "address": "2550 Midway Rd, Carrollton",
+          "stationCount": 2
+        },
+        {
           "chain": "QuikTrip",
-          "regular": 3.89,
+          "regular": 3.79,
           "station": "QuikTrip",
           "address": "5403 Arapaho Rd, Dallas",
           "stationCount": 3
         },
         {
           "chain": "Kroger",
-          "regular": 3.89,
+          "regular": 3.83,
           "station": "Kroger",
-          "address": "17194 Preston Rd, Dallas",
-          "stationCount": 1
+          "address": "3600 Gus Thomasson Rd, Mesquite",
+          "stationCount": 2
         },
         {
-          "chain": "RaceWay",
-          "regular": 3.89,
-          "station": "RaceWay",
-          "address": "2400 N Galloway Ave, Mesquite",
+          "chain": "Chevron",
+          "regular": 3.86,
+          "station": "Chevron",
+          "address": "2230 Marsh Ln, Carrollton",
           "stationCount": 1
         },
         {
@@ -255,40 +269,12 @@
           "station": "Automated Fueling",
           "address": "1705 Briercroft Ct, Carrollton",
           "stationCount": 1
-        },
-        {
-          "chain": "RaceTrac",
-          "regular": 3.89,
-          "station": "RaceTrac",
-          "address": "2550 Midway Rd, Carrollton",
-          "stationCount": 2
-        },
-        {
-          "chain": "Chevron",
-          "regular": 3.93,
-          "station": "Chevron",
-          "address": "2230 Marsh Ln, Carrollton",
-          "stationCount": 2
-        },
-        {
-          "chain": "Texaco",
-          "regular": 3.99,
-          "station": "Texaco",
-          "address": "591 W Campbell Rd, Richardson",
-          "stationCount": 1
-        },
-        {
-          "chain": "Conoco",
-          "regular": 3.99,
-          "station": "Conoco",
-          "address": "1310 W Spring Valley Rd, Richardson",
-          "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Exxon",
         "station": "Exxon",
-        "price": 3.67,
+        "price": 3.63,
         "address": "7650 Campbell Rd, Dallas"
       },
       "stationsSeen": 30,
@@ -297,95 +283,88 @@
     "austin-tx": {
       "chains": [
         {
-          "chain": "American Fuels",
-          "regular": 3.73,
-          "station": "American Fuels",
-          "address": "525 W Ben White Blvd, Austin",
-          "stationCount": 1
+          "chain": "Circle K",
+          "regular": 3.67,
+          "station": "Circle K",
+          "address": "1405 W William Cannon Dr, Austin",
+          "stationCount": 3
         },
         {
-          "chain": "Valero",
-          "regular": 3.75,
-          "station": "Valero",
-          "address": "3419 W Slaughter Ln, Austin",
+          "chain": "Chevron",
+          "regular": 3.67,
+          "station": "Chevron",
+          "address": "6903 Brodie Ln, Austin",
           "stationCount": 5
         },
         {
           "chain": "Exxon",
-          "regular": 3.77,
+          "regular": 3.67,
           "station": "Exxon",
           "address": "3431 W William Cannon Dr, Austin",
-          "stationCount": 5
+          "stationCount": 6
         },
         {
-          "chain": "Chevron",
-          "regular": 3.77,
-          "station": "Chevron",
-          "address": "6903 Brodie Ln, Austin",
-          "stationCount": 2
-        },
-        {
-          "chain": "Circle K",
-          "regular": 3.77,
-          "station": "Circle K",
-          "address": "1405 W William Cannon Dr, Austin",
-          "stationCount": 2
+          "chain": "Valero",
+          "regular": 3.67,
+          "station": "Valero",
+          "address": "3419 W Slaughter Ln, Austin",
+          "stationCount": 4
         },
         {
           "chain": "Sam's Club",
-          "regular": 3.77,
+          "regular": 3.67,
           "station": "Sam's Club",
           "address": "9900 S IH-35, Austin",
           "stationCount": 1
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.79,
-          "station": "Murphy USA",
-          "address": "9300 South Ih 35 Service Rd., Bldg. J, Austin",
-          "stationCount": 5
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.79,
-          "station": "7-Eleven",
-          "address": "1220 E New Hope Dr, Cedar Park",
-          "stationCount": 3
-        },
-        {
           "chain": "Costco",
-          "regular": 3.79,
+          "regular": 3.67,
           "station": "Costco",
           "address": "4601 183A Toll Rd, Cedar Park",
           "stationCount": 1
         },
         {
-          "chain": "QuikTrip",
-          "regular": 3.79,
-          "station": "QuikTrip",
-          "address": "7601 W SH-29, Georgetown",
+          "chain": "HEB Gas",
+          "regular": 3.69,
+          "station": "H-E-B",
+          "address": "8700 IH-35, Austin",
           "stationCount": 1
         },
         {
-          "chain": "HEB Gas",
-          "regular": 3.79,
-          "station": "H-E-B",
-          "address": "19344 Ronald Reagan Blvd, Georgetown",
+          "chain": "Murphy USA",
+          "regular": 3.69,
+          "station": "Murphy USA",
+          "address": "201 Walton Way Building B, Cedar Park",
+          "stationCount": 4
+        },
+        {
+          "chain": "7-Eleven",
+          "regular": 3.71,
+          "station": "7-Eleven",
+          "address": "900 W Whitestone Blvd, Cedar Park",
+          "stationCount": 1
+        },
+        {
+          "chain": "QuikTrip",
+          "regular": 3.72,
+          "station": "QuikTrip",
+          "address": "1911 N Bell Blvd, Cedar Park",
           "stationCount": 3
         },
         {
-          "chain": "Walmart",
-          "regular": 3.83,
-          "station": "Walmart",
-          "address": "140 Louis Henna Blvd, Round Rock",
+          "chain": "Fiesta",
+          "regular": 3.73,
+          "station": "Fiesta",
+          "address": "5510 S IH-35, Austin",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "American Fuels",
-        "station": "American Fuels",
-        "price": 3.73,
-        "address": "525 W Ben White Blvd, Austin"
+        "chain": "Circle K",
+        "station": "Circle K",
+        "price": 3.67,
+        "address": "1405 W William Cannon Dr, Austin"
       },
       "stationsSeen": 30,
       "zipsFetched": 5
@@ -393,81 +372,81 @@
     "mcallen-tx": {
       "chains": [
         {
-          "chain": "Murphy USA",
-          "regular": 3.84,
-          "station": "Murphy USA",
-          "address": "2700 Nolana Avenue, McAllen",
-          "stationCount": 1
-        },
-        {
           "chain": "Sam's Club",
-          "regular": 3.84,
+          "regular": 3.69,
           "station": "Sam's Club",
           "address": "7601 N 10th St, McAllen",
           "stationCount": 1
         },
         {
-          "chain": "Valero",
-          "regular": 3.85,
-          "station": "Valero",
-          "address": "3920 N 23rd St, McAllen",
-          "stationCount": 11
-        },
-        {
           "chain": "Walmart Neighborhood Market",
-          "regular": 3.85,
+          "regular": 3.74,
           "station": "Walmart Neighborhood Market",
           "address": "2208 Dove Ave, McAllen",
           "stationCount": 1
         },
         {
-          "chain": "Circle K",
-          "regular": 3.85,
-          "station": "Circle K",
-          "address": "4525 N Ware Rd, McAllen",
-          "stationCount": 2
-        },
-        {
-          "chain": "Stripes",
-          "regular": 3.86,
-          "station": "Stripes",
-          "address": "720 S 10th St, McAllen",
-          "stationCount": 4
-        },
-        {
-          "chain": "Sunoco",
-          "regular": 3.86,
-          "station": "Sunoco",
-          "address": "3000 N Ware Rd, McAllen",
-          "stationCount": 4
-        },
-        {
           "chain": "HEB Gas",
-          "regular": 3.87,
+          "regular": 3.74,
           "station": "H-E-B",
-          "address": "3601 Pecan Blvd, McAllen",
-          "stationCount": 2
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.88,
-          "station": "Exxon",
-          "address": "3624 Alburn Ave, McAllen",
+          "address": "901 Trenton Rd, McAllen",
           "stationCount": 3
         },
         {
+          "chain": "Murphy USA",
+          "regular": 3.74,
+          "station": "Murphy USA",
+          "address": "2700 Nolana Avenue, McAllen",
+          "stationCount": 1
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.74,
+          "station": "Valero",
+          "address": "3920 N 23rd St, McAllen",
+          "stationCount": 11
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.74,
+          "station": "Exxon",
+          "address": "2725 N 23rd St, McAllen",
+          "stationCount": 3
+        },
+        {
+          "chain": "Sunoco",
+          "regular": 3.75,
+          "station": "Sunoco",
+          "address": "1901 Dove Ave, McAllen",
+          "stationCount": 4
+        },
+        {
+          "chain": "Stripes",
+          "regular": 3.77,
+          "station": "Stripes",
+          "address": "720 S 10th St, McAllen",
+          "stationCount": 3
+        },
+        {
+          "chain": "Circle K",
+          "regular": 3.79,
+          "station": "Circle K",
+          "address": "7144 N 23rd St, McAllen",
+          "stationCount": 2
+        },
+        {
           "chain": "7-Eleven",
-          "regular": 3.98,
+          "regular": 3.79,
           "station": "7-Eleven",
           "address": "4401 Pecan Blvd, McAllen",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Murphy USA",
-        "station": "Murphy USA",
-        "price": 3.84,
-        "address": "2700 Nolana Avenue, McAllen"
+        "chain": "Sam's Club",
+        "station": "Sam's Club",
+        "price": 3.69,
+        "address": "7601 N 10th St, McAllen"
       },
       "stationsSeen": 30,
       "zipsFetched": 2
@@ -475,88 +454,74 @@
     "san-antonio-tx": {
       "chains": [
         {
+          "chain": "Murphy USA",
+          "regular": 3.68,
+          "station": "Murphy USA",
+          "address": "7639 Nw Loop 410, San Antonio",
+          "stationCount": 3
+        },
+        {
           "chain": "HEB Gas",
-          "regular": 3.75,
+          "regular": 3.69,
           "station": "H-E-B",
           "address": "9255 Grissom Rd, San Antonio",
           "stationCount": 4
         },
         {
-          "chain": "Exxon",
-          "regular": 3.75,
-          "station": "Exxon",
-          "address": "8928 Culebra Rd, San Antonio",
-          "stationCount": 3
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 3.75,
-          "station": "Murphy Express",
-          "address": "9530 Culebra Rd., San Antonio",
-          "stationCount": 3
-        },
-        {
           "chain": "QuikTrip",
-          "regular": 3.77,
+          "regular": 3.69,
           "station": "QuikTrip",
           "address": "8850 Culebra Rd, San Antonio",
-          "stationCount": 4
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.77,
-          "station": "Valero",
-          "address": "7305 Culebra Rd, San Antonio",
-          "stationCount": 8
+          "stationCount": 5
         },
         {
           "chain": "Walmart Neighborhood Market",
-          "regular": 3.77,
+          "regular": 3.69,
           "station": "Walmart Neighborhood Market",
           "address": "9418 Military Dr W, San Antonio",
           "stationCount": 2
         },
         {
+          "chain": "Valero",
+          "regular": 3.69,
+          "station": "Valero",
+          "address": "11380 FM-1560, San Antonio",
+          "stationCount": 10
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.72,
+          "station": "Exxon",
+          "address": "8928 Culebra Rd, San Antonio",
+          "stationCount": 3
+        },
+        {
           "chain": "Circle K",
-          "regular": 3.82,
+          "regular": 3.75,
           "station": "Circle K",
           "address": "9310 W SL-1604 N, San Antonio",
           "stationCount": 1
         },
         {
           "chain": "1604 Corner Store",
-          "regular": 3.84,
+          "regular": 3.75,
           "station": "1604 Corner Store",
           "address": "9100 W SL-1604 N, San Antonio",
           "stationCount": 1
         },
         {
-          "chain": "7-Eleven",
-          "regular": 3.86,
-          "station": "7-Eleven",
-          "address": "2562 Jackson Keller Rd, San Antonio",
-          "stationCount": 2
-        },
-        {
-          "chain": "Shell",
-          "regular": 3.89,
-          "station": "Shell",
-          "address": "10151 Culebra Rd, San Antonio",
-          "stationCount": 1
-        },
-        {
-          "chain": "Noor Pantry",
-          "regular": 3.89,
-          "station": "Noor Pantry",
-          "address": "8005 Bandera Rd, San Antonio",
+          "chain": "Chevron",
+          "regular": 3.77,
+          "station": "Chevron",
+          "address": "7126 Tezel Rd, San Antonio",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "HEB Gas",
-        "station": "H-E-B",
-        "price": 3.75,
-        "address": "9255 Grissom Rd, San Antonio"
+        "chain": "Murphy USA",
+        "station": "Murphy USA",
+        "price": 3.68,
+        "address": "7639 Nw Loop 410, San Antonio"
       },
       "stationsSeen": 30,
       "zipsFetched": 5
@@ -564,25 +529,46 @@
     "fort-worth-tx": {
       "chains": [
         {
-          "chain": "BJ's",
-          "regular": 3.72,
-          "station": "BJ's",
-          "address": "7241 Harris Pkwy, Fort Worth",
-          "stationCount": 1
+          "chain": "7-Eleven",
+          "regular": 3.61,
+          "station": "7-Eleven",
+          "address": "100 E Main St, Crowley",
+          "stationCount": 10
         },
         {
           "chain": "Walmart",
-          "regular": 3.73,
+          "regular": 3.61,
           "station": "Walmart",
           "address": "1301 FM-1187, Crowley",
           "stationCount": 2
         },
         {
-          "chain": "7-Eleven",
-          "regular": 3.73,
-          "station": "7-Eleven",
-          "address": "100 E Main St, Crowley",
-          "stationCount": 6
+          "chain": "BJ's",
+          "regular": 3.67,
+          "station": "BJ's",
+          "address": "7241 Harris Pkwy, Fort Worth",
+          "stationCount": 1
+        },
+        {
+          "chain": "Kroger",
+          "regular": 3.69,
+          "station": "Kroger",
+          "address": "1004 S Crowley Rd, Crowley",
+          "stationCount": 2
+        },
+        {
+          "chain": "Kent Kwik 470",
+          "regular": 3.75,
+          "station": "Kent Kwik 470",
+          "address": "732 N Crowley Rd, Crowley",
+          "stationCount": 1
+        },
+        {
+          "chain": "Murphy USA",
+          "regular": 3.77,
+          "station": "Murphy Express",
+          "address": "3401 Joyce Dr, Fort Worth",
+          "stationCount": 5
         },
         {
           "chain": "Korner Food Store",
@@ -592,81 +578,53 @@
           "stationCount": 1
         },
         {
-          "chain": "360Fuel",
-          "regular": 3.79,
-          "station": "360Fuel",
-          "address": "4400 Southwest Blvd, Fort Worth",
-          "stationCount": 1
-        },
-        {
-          "chain": "Kroger",
-          "regular": 3.79,
-          "station": "Kroger",
-          "address": "1004 S Crowley Rd, Crowley",
-          "stationCount": 4
-        },
-        {
           "chain": "Exxon",
-          "regular": 3.85,
+          "regular": 3.81,
           "station": "Exxon",
-          "address": "3204 Alta Mere Dr, Fort Worth",
-          "stationCount": 2
-        },
-        {
-          "chain": "Kent Kwik 470",
-          "regular": 3.85,
-          "station": "Kent Kwik 470",
-          "address": "732 N Crowley Rd, Crowley",
-          "stationCount": 1
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 3.86,
-          "station": "Murphy Express",
-          "address": "3401 Joyce Dr, Fort Worth",
-          "stationCount": 4
-        },
-        {
-          "chain": "Walmart Neighborhood Market",
-          "regular": 3.86,
-          "station": "Walmart Neighborhood Market",
-          "address": "4550 Heritage Trace Pkwy, Fort Worth",
+          "address": "6001 Camp Bowie Blvd, Fort Worth",
           "stationCount": 1
         },
         {
           "chain": "RaceTrac",
-          "regular": 3.88,
+          "regular": 3.81,
           "station": "RaceTrac",
           "address": "6495 Camp Bowie Blvd, Fort Worth",
           "stationCount": 2
         },
         {
-          "chain": "QuikTrip",
-          "regular": 3.89,
-          "station": "QuikTrip",
-          "address": "2800 Alta Mere Dr, Fort Worth",
-          "stationCount": 3
+          "chain": "Walmart Neighborhood Market",
+          "regular": 3.82,
+          "station": "Walmart Neighborhood Market",
+          "address": "4550 Heritage Trace Pkwy, Fort Worth",
+          "stationCount": 1
         },
         {
           "chain": "Valero",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "Valero",
           "address": "10800 N Beach St, Fort Worth",
           "stationCount": 1
         },
         {
-          "chain": "Pilot/Flying J",
-          "regular": 3.89,
-          "station": "Pilot",
-          "address": "2400 Alliance Gateway, Fort Worth",
+          "chain": "QuikTrip",
+          "regular": 3.84,
+          "station": "QuikTrip",
+          "address": "3201 Golden Triangle Blvd, Fort Worth",
+          "stationCount": 2
+        },
+        {
+          "chain": "Fuel City",
+          "regular": 3.84,
+          "station": "Fuel City",
+          "address": "1080 S Blue Mound Rd, Blue Mound",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "BJ's",
-        "station": "BJ's",
-        "price": 3.72,
-        "address": "7241 Harris Pkwy, Fort Worth"
+        "chain": "7-Eleven",
+        "station": "7-Eleven",
+        "price": 3.61,
+        "address": "100 E Main St, Crowley"
       },
       "stationsSeen": 30,
       "zipsFetched": 5
@@ -674,53 +632,60 @@
     "el-paso-tx": {
       "chains": [
         {
-          "chain": "Walmart",
-          "regular": 3.85,
-          "station": "Walmart",
-          "address": "7831 Paseo Del Norte, El Paso",
-          "stationCount": 1
-        },
-        {
           "chain": "Sam's Club",
-          "regular": 3.89,
+          "regular": 3.99,
           "station": "Sam's Club",
           "address": "7001 Gateway Blvd W, El Paso",
           "stationCount": 1
         },
         {
           "chain": "Costco",
-          "regular": 3.89,
+          "regular": 4.05,
           "station": "Costco",
           "address": "6101 Gateway Blvd W , El Paso",
           "stationCount": 1
         },
         {
-          "chain": "Circle K",
-          "regular": 3.98,
-          "station": "Circle K",
-          "address": "5600 N Desert Blvd, El Paso",
-          "stationCount": 13
+          "chain": "Walmart",
+          "regular": 4.19,
+          "station": "Walmart",
+          "address": "7831 Paseo Del Norte, El Paso",
+          "stationCount": 1
         },
         {
-          "chain": "Alon",
-          "regular": 3.99,
-          "station": "Alon",
-          "address": "320 S Americas Ave, El Paso",
-          "stationCount": 4
-        },
-        {
-          "chain": "Valero",
-          "regular": 4.09,
-          "station": "Valero",
-          "address": "5400 N Mesa St, El Paso",
-          "stationCount": 2
+          "chain": "Murphy USA",
+          "regular": 4.19,
+          "station": "Murphy USA",
+          "address": "7800 Paseo Del Notre Drive, El Paso",
+          "stationCount": 3
         },
         {
           "chain": "Speedway",
-          "regular": 4.39,
+          "regular": 4.19,
           "station": "Speedway",
-          "address": "1100 Airway Blvd, El Paso",
+          "address": "8500 Alameda Ave, El Paso",
           "stationCount": 6
+        },
+        {
+          "chain": "Circle K",
+          "regular": 4.24,
+          "station": "Circle K",
+          "address": "6200 N Mesa St, El Paso",
+          "stationCount": 11
+        },
+        {
+          "chain": "Alon",
+          "regular": 4.29,
+          "station": "Alon",
+          "address": "3101 N Yarbrough Dr, El Paso",
+          "stationCount": 5
+        },
+        {
+          "chain": "Valero",
+          "regular": 4.38,
+          "station": "Valero",
+          "address": "850 E Redd Rd, El Paso",
+          "stationCount": 1
         },
         {
           "chain": "Chevron",
@@ -728,20 +693,13 @@
           "station": "Chevron",
           "address": "10101 Montana Ave, El Paso",
           "stationCount": 1
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 4.39,
-          "station": "Murphy USA",
-          "address": "7800 Paseo Del Notre Drive, El Paso",
-          "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Walmart",
-        "station": "Walmart",
-        "price": 3.85,
-        "address": "7831 Paseo Del Norte, El Paso"
+        "chain": "Sam's Club",
+        "station": "Sam's Club",
+        "price": 3.99,
+        "address": "7001 Gateway Blvd W, El Paso"
       },
       "stationsSeen": 30,
       "zipsFetched": 3
@@ -750,70 +708,70 @@
       "chains": [
         {
           "chain": "Murphy USA",
-          "regular": 3.79,
+          "regular": 3.72,
           "station": "Murphy Express",
           "address": "5375 S Cooper St, Arlington",
           "stationCount": 2
         },
         {
           "chain": "Walmart",
-          "regular": 3.79,
+          "regular": 3.72,
           "station": "Walmart",
           "address": "4851 S Cooper St, Arlington",
           "stationCount": 1
         },
         {
-          "chain": "Kroger",
-          "regular": 3.85,
-          "station": "Kroger",
-          "address": "5330 S Cooper St, Arlington",
-          "stationCount": 2
-        },
-        {
           "chain": "Mobil",
-          "regular": 3.87,
+          "regular": 3.75,
           "station": "Mobil",
           "address": "2905 S Cooper St, Arlington",
           "stationCount": 1
         },
         {
+          "chain": "Kroger",
+          "regular": 3.75,
+          "station": "Kroger",
+          "address": "5330 S Cooper St, Arlington",
+          "stationCount": 2
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.79,
+          "station": "Valero",
+          "address": "615 W Abram St, Arlington",
+          "stationCount": 2
+        },
+        {
           "chain": "RaceTrac",
-          "regular": 3.89,
+          "regular": 3.82,
           "station": "RaceTrac",
-          "address": "4201 S Bowen Rd, Arlington",
+          "address": "2333 E Pioneer Pkwy, Arlington",
           "stationCount": 4
         },
         {
           "chain": "QuikTrip",
-          "regular": 3.89,
+          "regular": 3.83,
           "station": "QuikTrip",
-          "address": "3532 Matlock Rd, Arlington",
+          "address": "4400 Park Springs Blvd, Arlington",
           "stationCount": 4
         },
         {
           "chain": "VP Racing Fuels",
-          "regular": 3.89,
+          "regular": 3.86,
           "station": "VP Racing Fuels",
           "address": "1201 N Little School Rd, Arlington",
           "stationCount": 1
         },
         {
-          "chain": "Valero",
-          "regular": 3.92,
-          "station": "Valero",
-          "address": "2700 E Abram St, Arlington",
-          "stationCount": 2
-        },
-        {
           "chain": "7-Eleven",
-          "regular": 3.94,
+          "regular": 3.87,
           "station": "7-Eleven",
-          "address": "2120 E Abram St, Arlington",
+          "address": "2801 E Park Row, Arlington",
           "stationCount": 4
         },
         {
           "chain": "Quick Track",
-          "regular": 3.95,
+          "regular": 3.87,
           "station": "Quick Track",
           "address": "5101 Little School Rd, Arlington",
           "stationCount": 1
@@ -826,10 +784,17 @@
           "stationCount": 1
         },
         {
-          "chain": "DK",
+          "chain": "Unbranded",
           "regular": 3.99,
-          "station": "DK",
-          "address": "1508 W Mayfield Rd, Arlington",
+          "station": "Unbranded",
+          "address": "700 Secretary Dr, Arlington",
+          "stationCount": 1
+        },
+        {
+          "chain": "Conoco",
+          "regular": 3.99,
+          "station": "Conoco",
+          "address": "824 E Park Row Dr, Arlington",
           "stationCount": 1
         },
         {
@@ -847,31 +812,24 @@
           "stationCount": 2
         },
         {
-          "chain": "Conoco",
-          "regular": 3.99,
-          "station": "Conoco",
-          "address": "824 E Park Row Dr, Arlington",
-          "stationCount": 1
-        },
-        {
-          "chain": "E-Z Mart",
-          "regular": 4.09,
-          "station": "E-Z Mart",
-          "address": "3785 SW Green Oaks Blvd, Arlington",
-          "stationCount": 1
-        },
-        {
           "chain": "Shamrock",
           "regular": 4.18,
           "station": "Shamrock",
           "address": "2501 E Arkansas Ln, Arlington",
+          "stationCount": 1
+        },
+        {
+          "chain": "Chevron",
+          "regular": 4.19,
+          "station": "Chevron",
+          "address": "2601 E Park Row Dr, Arlington",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Murphy USA",
         "station": "Murphy Express",
-        "price": 3.79,
+        "price": 3.72,
         "address": "5375 S Cooper St, Arlington"
       },
       "stationsSeen": 30,
@@ -881,65 +839,65 @@
       "chains": [
         {
           "chain": "Sam's Club",
-          "regular": 3.74,
+          "regular": 3.65,
           "station": "Sam's Club",
           "address": "4833 S Padre Island Dr, Corpus Christi",
           "stationCount": 1
         },
         {
-          "chain": "Valero",
-          "regular": 3.82,
-          "station": "Valero",
-          "address": "5529 Saratoga Blvd, Corpus Christi",
-          "stationCount": 12
-        },
-        {
           "chain": "Sunoco",
-          "regular": 3.82,
+          "regular": 3.74,
           "station": "Sunoco",
-          "address": "6801 Everhart Rd, Corpus Christi",
-          "stationCount": 3
-        },
-        {
-          "chain": "Walmart",
-          "regular": 3.85,
-          "station": "Walmart",
-          "address": "4111 S Staples St, Corpus Christi",
-          "stationCount": 1
-        },
-        {
-          "chain": "HEB Gas",
-          "regular": 3.85,
-          "station": "H-E-B",
-          "address": "5801 Weber Rd, Corpus Christi",
-          "stationCount": 1
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.85,
-          "station": "Exxon",
-          "address": "3955 S Padre Island Dr, Corpus Christi",
+          "address": "5701A Everhart Rd, Corpus Christi",
           "stationCount": 4
         },
         {
           "chain": "Shell",
-          "regular": 3.86,
+          "regular": 3.74,
           "station": "Shell",
           "address": "5636 Weber Rd, Corpus Christi",
           "stationCount": 2
         },
         {
+          "chain": "Valero",
+          "regular": 3.74,
+          "station": "Valero",
+          "address": "5645 Kostoryz Rd, Corpus Christi",
+          "stationCount": 10
+        },
+        {
           "chain": "7-Eleven",
-          "regular": 3.88,
+          "regular": 3.74,
           "station": "7-Eleven",
           "address": "2125 Saratoga Blvd, Corpus Christi",
+          "stationCount": 1
+        },
+        {
+          "chain": "HEB Gas",
+          "regular": 3.75,
+          "station": "H-E-B",
+          "address": "5801 Weber Rd, Corpus Christi",
+          "stationCount": 2
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.77,
+          "station": "Exxon",
+          "address": "4754 S Padre Island Dr, Corpus Christi",
+          "stationCount": 4
+        },
+        {
+          "chain": "Walmart",
+          "regular": 3.77,
+          "station": "Walmart",
+          "address": "4111 S Staples St, Corpus Christi",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Sam's Club",
         "station": "Sam's Club",
-        "price": 3.74,
+        "price": 3.65,
         "address": "4833 S Padre Island Dr, Corpus Christi"
       },
       "stationsSeen": 25,
@@ -948,53 +906,60 @@
     "plano-tx": {
       "chains": [
         {
-          "chain": "Sam's Club",
-          "regular": 3.64,
-          "station": "Sam's Club",
-          "address": "301 Coit Rd, Plano",
-          "stationCount": 2
-        },
-        {
-          "chain": "Costco",
-          "regular": 3.64,
-          "station": "Costco",
-          "address": "1701 Dallas Pkwy  , Plano",
-          "stationCount": 2
-        },
-        {
-          "chain": "RaceTrac",
-          "regular": 3.66,
-          "station": "RaceTrac",
-          "address": "620 Coit Rd, Plano",
-          "stationCount": 5
-        },
-        {
           "chain": "Murphy USA",
-          "regular": 3.66,
+          "regular": 3.59,
           "station": "Murphy Express",
           "address": "430 Coit Rd, Plano",
           "stationCount": 1
         },
         {
-          "chain": "7-Eleven",
-          "regular": 3.66,
-          "station": "7-Eleven",
-          "address": "3940 W 15th St, Plano",
-          "stationCount": 3
+          "chain": "RaceTrac",
+          "regular": 3.59,
+          "station": "RaceTrac",
+          "address": "620 Coit Rd, Plano",
+          "stationCount": 5
+        },
+        {
+          "chain": "Sam's Club",
+          "regular": 3.59,
+          "station": "Sam's Club",
+          "address": "301 Coit Rd, Plano",
+          "stationCount": 2
         },
         {
           "chain": "Walmart",
-          "regular": 3.68,
+          "regular": 3.59,
           "station": "Walmart",
           "address": "425 Coit Rd, Plano",
           "stationCount": 1
         },
         {
+          "chain": "7-Eleven",
+          "regular": 3.59,
+          "station": "7-Eleven",
+          "address": "3940 W 15th St, Plano",
+          "stationCount": 5
+        },
+        {
           "chain": "HEB Gas",
-          "regular": 3.69,
+          "regular": 3.59,
           "station": "H-E-B",
           "address": "5925 Preston Rd, Plano",
           "stationCount": 1
+        },
+        {
+          "chain": "Costco",
+          "regular": 3.59,
+          "station": "Costco",
+          "address": "1701 Dallas Pkwy  , Plano",
+          "stationCount": 2
+        },
+        {
+          "chain": "Kroger",
+          "regular": 3.69,
+          "station": "Kroger",
+          "address": "3305 Dallas Pkwy, Plano",
+          "stationCount": 3
         },
         {
           "chain": "Chevron",
@@ -1004,11 +969,18 @@
           "stationCount": 1
         },
         {
-          "chain": "Kroger",
+          "chain": "QuikTrip",
+          "regular": 3.72,
+          "station": "QuikTrip",
+          "address": "1100 E Spring Creek Pkwy, Plano",
+          "stationCount": 4
+        },
+        {
+          "chain": "RaceWay",
           "regular": 3.73,
-          "station": "Kroger",
-          "address": "3305 Dallas Pkwy, Plano",
-          "stationCount": 3
+          "station": "RaceWay",
+          "address": "2224 W Parker Rd, Plano",
+          "stationCount": 2
         },
         {
           "chain": "Shell",
@@ -1018,46 +990,25 @@
           "stationCount": 1
         },
         {
-          "chain": "QuikTrip",
-          "regular": 3.74,
-          "station": "QuikTrip",
-          "address": "1100 E Spring Creek Pkwy, Plano",
-          "stationCount": 5
-        },
-        {
-          "chain": "RaceWay",
-          "regular": 3.74,
-          "station": "RaceWay",
-          "address": "609 E Plano Pkwy, Plano",
-          "stationCount": 2
-        },
-        {
           "chain": "Tom Thumb",
-          "regular": 3.79,
+          "regular": 3.75,
           "station": "Tom Thumb",
           "address": "2950 W Parker Rd, Plano",
           "stationCount": 1
         },
         {
-          "chain": "Value Food Store",
-          "regular": 3.79,
-          "station": "Value Food Store",
-          "address": "3209 Ave K, Plano",
-          "stationCount": 1
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.81,
-          "station": "Valero",
-          "address": "3401 K Ave, Plano",
+          "chain": "Exxon",
+          "regular": 3.75,
+          "station": "Exxon",
+          "address": "5940 W Park Blvd, Plano",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Sam's Club",
-        "station": "Sam's Club",
-        "price": 3.64,
-        "address": "301 Coit Rd, Plano"
+        "chain": "Murphy USA",
+        "station": "Murphy Express",
+        "price": 3.59,
+        "address": "430 Coit Rd, Plano"
       },
       "stationsSeen": 30,
       "zipsFetched": 3
@@ -1065,108 +1016,101 @@
     "lubbock-tx": {
       "chains": [
         {
-          "chain": "Phillips 66",
-          "regular": 3.72,
-          "station": "Phillips 66",
-          "address": "7821 82nd St, Lubbock",
-          "stationCount": 11
-        },
-        {
-          "chain": "Alon",
-          "regular": 3.72,
-          "station": "Alon",
-          "address": "7822 82nd St, Lubbock",
-          "stationCount": 2
-        },
-        {
           "chain": "Costco",
-          "regular": 3.77,
+          "regular": 3.76,
           "station": "Costco",
           "address": "6020 34th St, Lubbock",
           "stationCount": 1
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.78,
-          "station": "Murphy USA",
-          "address": "6313 82nd Street, Lubbock",
-          "stationCount": 4
-        },
-        {
           "chain": "Sam's Club",
-          "regular": 3.78,
+          "regular": 3.77,
           "station": "Sam's Club",
           "address": "6016 Marsha Sharp Fwy , Lubbock",
           "stationCount": 1
         },
         {
+          "chain": "Murphy USA",
+          "regular": 3.85,
+          "station": "Murphy USA",
+          "address": "3401 West Loop 289, Lubbock",
+          "stationCount": 4
+        },
+        {
+          "chain": "Phillips 66",
+          "regular": 3.85,
+          "station": "Phillips 66",
+          "address": "5725 19th St, Lubbock",
+          "stationCount": 4
+        },
+        {
+          "chain": "Alon",
+          "regular": 3.89,
+          "station": "Alon",
+          "address": "9802 Slide Rd, Lubbock",
+          "stationCount": 5
+        },
+        {
           "chain": "HEB Gas",
-          "regular": 3.79,
+          "regular": 3.89,
           "station": "H-E-B",
           "address": "4405 114th St, Lubbock",
           "stationCount": 1
         },
         {
-          "chain": "Toot’n Totum",
-          "regular": 3.84,
-          "station": "Toot’n Totum",
-          "address": "7303 82nd St, Lubbock",
-          "stationCount": 1
-        },
-        {
           "chain": "Circle K",
-          "regular": 3.87,
+          "regular": 3.92,
           "station": "Circle K",
-          "address": "6004 45th St, Lubbock",
-          "stationCount": 4
-        },
-        {
-          "chain": "E-Z Mart",
-          "regular": 3.88,
-          "station": "E-Z Mart",
-          "address": "6413 Frankford Ave, Lubbock",
-          "stationCount": 2
+          "address": "3402 Milwaukee Ave, Lubbock",
+          "stationCount": 5
         },
         {
           "chain": "Valero",
-          "regular": 3.89,
+          "regular": 3.99,
           "station": "Valero",
-          "address": "5720 SS-327, Lubbock",
+          "address": "5112 114th St, Lubbock",
+          "stationCount": 3
+        },
+        {
+          "chain": "E-Z Mart",
+          "regular": 3.99,
+          "station": "E-Z Mart",
+          "address": "7402 Quaker Ave, Lubbock",
           "stationCount": 1
         },
         {
-          "chain": "Bolton",
-          "regular": 3.89,
-          "station": "Bolton",
-          "address": "8002 Slide Rd, Lubbock",
-          "stationCount": 1
+          "chain": "Pak-A-Sak",
+          "regular": 3.99,
+          "station": "Pak-A-Sak",
+          "address": "9703 Upland Ave, Lubbock",
+          "stationCount": 2
         },
         {
           "chain": "Toot'n Totum",
-          "regular": 3.89,
+          "regular": 3.99,
           "station": "Toot'n Totum",
           "address": "5024 Milwaukee Ave, Lubbock",
+          "stationCount": 2
+        },
+        {
+          "chain": "United Express.",
+          "regular": 3.99,
+          "station": "United Express.",
+          "address": "3405 50th St, Lubbock",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Phillips 66",
-        "station": "Phillips 66",
-        "price": 3.72,
-        "address": "7821 82nd St, Lubbock"
+        "chain": "Costco",
+        "station": "Costco",
+        "price": 3.76,
+        "address": "6020 34th St, Lubbock"
       },
       "stationsSeen": 30,
       "zipsFetched": 3
     },
     "laredo-tx": {
       "chains": [
-        {
-          "chain": "Valero",
-          "regular": 3.65,
-          "station": "Valero",
-          "address": "15118 Mines Rd, Laredo",
-          "stationCount": 15
-        },
         {
           "chain": "Murphy USA",
           "regular": 3.65,
@@ -1175,53 +1119,60 @@
           "stationCount": 4
         },
         {
-          "chain": "HEB Gas",
-          "regular": 3.67,
-          "station": "H-E-B",
-          "address": "2314 S Zapata Hwy, Laredo",
-          "stationCount": 5
-        },
-        {
-          "chain": "Stripes",
-          "regular": 3.68,
-          "station": "Stripes",
-          "address": "3302 Lomas Del Sur Blvd, Laredo",
-          "stationCount": 2
+          "chain": "Valero",
+          "regular": 3.65,
+          "station": "Valero",
+          "address": "15118 Mines Rd, Laredo",
+          "stationCount": 16
         },
         {
           "chain": "Sam's Club",
-          "regular": 3.71,
+          "regular": 3.66,
           "station": "Sam's Club",
           "address": "4810 San Bernardo Ave, Laredo",
           "stationCount": 1
         },
         {
-          "chain": "Walmart",
-          "regular": 3.75,
-          "station": "Walmart",
-          "address": "2615 Bob Bullock Lp, Laredo",
+          "chain": "HEB Gas",
+          "regular": 3.67,
+          "station": "H-E-B",
+          "address": "2314 S Zapata Hwy, Laredo",
+          "stationCount": 4
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.69,
+          "station": "Shell",
+          "address": "8850 River Bank Dr, Laredo",
           "stationCount": 1
         },
         {
           "chain": "7-Eleven",
-          "regular": 3.79,
+          "regular": 3.74,
           "station": "7-Eleven",
           "address": "218 Bob Bullock Loop, Laredo",
           "stationCount": 1
         },
         {
-          "chain": "Love's",
-          "regular": 3.79,
-          "station": "Love's Travel Stop",
-          "address": "101 Pinnacle Rd, Laredo",
+          "chain": "Walmart",
+          "regular": 3.74,
+          "station": "Walmart",
+          "address": "2615 NE Bob Bullock Loop, Laredo",
+          "stationCount": 2
+        },
+        {
+          "chain": "Stripes",
+          "regular": 3.74,
+          "station": "Stripes",
+          "address": "5301 McPherson Ave, Laredo",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Valero",
-        "station": "Valero",
+        "chain": "Murphy USA",
+        "station": "Murphy USA",
         "price": 3.65,
-        "address": "15118 Mines Rd, Laredo"
+        "address": "13501 Fm 1472, Laredo"
       },
       "stationsSeen": 30,
       "zipsFetched": 3
@@ -1230,59 +1181,66 @@
       "chains": [
         {
           "chain": "Sam's Club",
-          "regular": 3.73,
+          "regular": 3.61,
           "station": "Sam's Club",
           "address": "1213 Market Place Blvd, Irving",
           "stationCount": 1
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.75,
+          "regular": 3.63,
           "station": "Murphy Express",
           "address": "5140 N. Beltline Rd, Irving",
           "stationCount": 1
         },
         {
           "chain": "RaceTrac",
-          "regular": 3.75,
+          "regular": 3.63,
           "station": "RaceTrac",
           "address": "3510 Carbon Rd, Irving",
           "stationCount": 3
         },
         {
           "chain": "Shamrock",
-          "regular": 3.76,
+          "regular": 3.65,
           "station": "Shamrock",
           "address": "3700 N Cheyenne St, Irving",
-          "stationCount": 1
+          "stationCount": 2
         },
         {
           "chain": "QuikTrip",
-          "regular": 3.78,
+          "regular": 3.67,
           "station": "QuikTrip",
           "address": "4301  N Belt Line Rd, Irving",
           "stationCount": 3
         },
         {
-          "chain": "Super Fuels",
-          "regular": 3.85,
-          "station": "Super Fuels",
-          "address": "4455 W Northgate Dr, Irving",
-          "stationCount": 1
+          "chain": "7-Eleven",
+          "regular": 3.67,
+          "station": "7-Eleven",
+          "address": "3321 W Walnut Hill Ln, Irving",
+          "stationCount": 2
         },
         {
           "chain": "Kroger",
-          "regular": 3.86,
+          "regular": 3.69,
           "station": "Kroger",
           "address": "7505 N MacArthur Blvd, Irving",
           "stationCount": 1
         },
         {
           "chain": "Exxon",
-          "regular": 3.86,
+          "regular": 3.71,
           "station": "Exxon",
-          "address": "5420 N MacArthur Blvd, Irving",
+          "address": "770 Lyndon B Johnson Fwy, Irving",
           "stationCount": 5
+        },
+        {
+          "chain": "Super Fuels",
+          "regular": 3.77,
+          "station": "Super Fuels",
+          "address": "4455 W Northgate Dr, Irving",
+          "stationCount": 1
         },
         {
           "chain": "Valero",
@@ -1292,25 +1250,39 @@
           "stationCount": 3
         },
         {
-          "chain": "7-Eleven",
-          "regular": 3.86,
-          "station": "7-Eleven",
-          "address": "3321 W Walnut Hill Ln, Irving",
-          "stationCount": 3
-        },
-        {
-          "chain": "Gulf",
+          "chain": "MacArthur Beer and Wine",
           "regular": 3.87,
-          "station": "Gulf",
-          "address": "5075 W Northgate Dr, Irving",
+          "station": "MacArthur Beer and Wine",
+          "address": "705 N MacArthur Blvd, Irving",
           "stationCount": 1
         },
         {
           "chain": "Grand Trip",
-          "regular": 3.89,
+          "regular": 3.87,
           "station": "Grand Trip",
           "address": "1710 Irving Blvd, Irving",
           "stationCount": 1
+        },
+        {
+          "chain": "Texaco",
+          "regular": 3.89,
+          "station": "Texaco",
+          "address": "9401 N MacArthur Blvd, Irving",
+          "stationCount": 1
+        },
+        {
+          "chain": "Chevron",
+          "regular": 3.89,
+          "station": "Chevron",
+          "address": "7902 Esters Blvd, Irving",
+          "stationCount": 2
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.89,
+          "station": "Shell",
+          "address": "1230 E Airport Fwy, Irving",
+          "stationCount": 2
         },
         {
           "chain": "Buy & Ride",
@@ -1318,33 +1290,12 @@
           "station": "Buy & Ride",
           "address": "110 N Story Rd, Irving",
           "stationCount": 1
-        },
-        {
-          "chain": "Texaco",
-          "regular": 3.99,
-          "station": "Texaco",
-          "address": "9401 N MacArthur Blvd, Irving",
-          "stationCount": 1
-        },
-        {
-          "chain": "Chevron",
-          "regular": 3.99,
-          "station": "Chevron",
-          "address": "8600 MacArthur Blvd, Irving",
-          "stationCount": 2
-        },
-        {
-          "chain": "Shell",
-          "regular": 3.99,
-          "station": "Shell",
-          "address": "1230 E Airport Fwy, Irving",
-          "stationCount": 2
         }
       ],
       "cheapestOverall": {
         "chain": "Sam's Club",
         "station": "Sam's Club",
-        "price": 3.73,
+        "price": 3.61,
         "address": "1213 Market Place Blvd, Irving"
       },
       "stationsSeen": 30,
@@ -1353,25 +1304,67 @@
     "garland-tx": {
       "chains": [
         {
-          "chain": "Murphy USA",
-          "regular": 3.77,
-          "station": "Murphy Express",
-          "address": "5362 N Garland Ave, Garland",
-          "stationCount": 2
-        },
-        {
           "chain": "Sam's Club",
-          "regular": 3.77,
+          "regular": 3.69,
           "station": "Sam's Club",
           "address": "5150 N Garland Ave, Garland",
           "stationCount": 1
         },
         {
+          "chain": "Murphy USA",
+          "regular": 3.74,
+          "station": "Murphy Express",
+          "address": "5362 N Garland Ave, Garland",
+          "stationCount": 2
+        },
+        {
+          "chain": "7-Eleven",
+          "regular": 3.77,
+          "station": "7-Eleven",
+          "address": "6122 Broadway Blvd, Garland",
+          "stationCount": 2
+        },
+        {
           "chain": "RaceTrac",
-          "regular": 3.87,
+          "regular": 3.78,
           "station": "RaceTrac",
-          "address": "4214 Forest Ln, Garland",
+          "address": "6421 Broadway Blvd, Garland",
           "stationCount": 5
+        },
+        {
+          "chain": "QuikTrip",
+          "regular": 3.79,
+          "station": "QuikTrip",
+          "address": "5825 Broadway Blvd, Garland",
+          "stationCount": 4
+        },
+        {
+          "chain": "76",
+          "regular": 3.85,
+          "station": "76",
+          "address": "1102 Lavon Dr, Garland",
+          "stationCount": 1
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.85,
+          "station": "Exxon",
+          "address": "2509 Firewheel Pkwy, Garland",
+          "stationCount": 1
+        },
+        {
+          "chain": "Chevron",
+          "regular": 3.85,
+          "station": "Chevron",
+          "address": "2435 W Miller Rd, Garland",
+          "stationCount": 3
+        },
+        {
+          "chain": "Kroger",
+          "regular": 3.86,
+          "station": "Kroger",
+          "address": "1406 W Walnut Rd, Garland",
+          "stationCount": 1
         },
         {
           "chain": "Whip In",
@@ -1381,32 +1374,11 @@
           "stationCount": 1
         },
         {
-          "chain": "QuikTrip",
-          "regular": 3.92,
-          "station": "QuikTrip",
-          "address": "5825 Broadway Blvd, Garland",
-          "stationCount": 4
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.92,
-          "station": "7-Eleven",
-          "address": "6122 Broadway Blvd, Garland",
+          "chain": "Mobil",
+          "regular": 3.89,
+          "station": "Mobil",
+          "address": "730 W Walnut St, Garland",
           "stationCount": 2
-        },
-        {
-          "chain": "Kroger",
-          "regular": 3.94,
-          "station": "Kroger",
-          "address": "1406 W Walnut Rd, Garland",
-          "stationCount": 1
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.94,
-          "station": "Exxon",
-          "address": "2509 Firewheel Pkwy, Garland",
-          "stationCount": 1
         },
         {
           "chain": "Texaco",
@@ -1416,39 +1388,11 @@
           "stationCount": 2
         },
         {
-          "chain": "Mobil",
-          "regular": 3.99,
-          "station": "Mobil",
-          "address": "730 W Walnut St, Garland",
-          "stationCount": 1
-        },
-        {
-          "chain": "Chevron",
-          "regular": 3.99,
-          "station": "Chevron",
-          "address": "2435 W Miller Rd, Garland",
-          "stationCount": 1
-        },
-        {
           "chain": "Valero",
-          "regular": 4.05,
+          "regular": 3.99,
           "station": "Valero",
-          "address": "509 W Ave D, Garland",
+          "address": "829 W Miller Rd, Garland",
           "stationCount": 4
-        },
-        {
-          "chain": "Food Mart One",
-          "regular": 4.05,
-          "station": "Food Mart One",
-          "address": "2430 W Walnut St, Garland",
-          "stationCount": 1
-        },
-        {
-          "chain": "E-Z Mart",
-          "regular": 4.09,
-          "station": "E-Z Mart",
-          "address": "4102 Bobtown Rd, Garland",
-          "stationCount": 1
         },
         {
           "chain": "Shell",
@@ -1456,33 +1400,26 @@
           "station": "Shell",
           "address": "450 E IH-30, Garland",
           "stationCount": 1
-        },
-        {
-          "chain": "76",
-          "regular": 4.09,
-          "station": "76",
-          "address": "906 SH-66, Garland",
-          "stationCount": 1
-        },
-        {
-          "chain": "CU Store",
-          "regular": 4.09,
-          "station": "CU Store",
-          "address": "506 N 1st St, Garland",
-          "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Murphy USA",
-        "station": "Murphy Express",
-        "price": 3.77,
-        "address": "5362 N Garland Ave, Garland"
+        "chain": "Sam's Club",
+        "station": "Sam's Club",
+        "price": 3.69,
+        "address": "5150 N Garland Ave, Garland"
       },
       "stationsSeen": 30,
       "zipsFetched": 3
     },
     "frisco-tx": {
       "chains": [
+        {
+          "chain": "Costco",
+          "regular": 3.55,
+          "station": "Costco",
+          "address": "11220 Dallas Pkwy, Frisco",
+          "stationCount": 1
+        },
         {
           "chain": "Exxon",
           "regular": 3.55,
@@ -1495,7 +1432,14 @@
           "regular": 3.55,
           "station": "7-Eleven",
           "address": "10820 Eldorado Pkwy, Frisco",
-          "stationCount": 6
+          "stationCount": 7
+        },
+        {
+          "chain": "QuikTrip",
+          "regular": 3.55,
+          "station": "QuikTrip",
+          "address": "2181 FM-423, Little Elm",
+          "stationCount": 3
         },
         {
           "chain": "Shell",
@@ -1505,11 +1449,11 @@
           "stationCount": 1
         },
         {
-          "chain": "RaceTrac",
+          "chain": "Kroger",
           "regular": 3.59,
-          "station": "RaceTrac",
-          "address": "5353 Panther Creek Pkwy, Frisco",
-          "stationCount": 6
+          "station": "Kroger",
+          "address": "3205 Main St, Frisco",
+          "stationCount": 3
         },
         {
           "chain": "Walmart",
@@ -1519,67 +1463,53 @@
           "stationCount": 3
         },
         {
-          "chain": "QuikTrip",
+          "chain": "RaceTrac",
           "regular": 3.59,
-          "station": "QuikTrip",
-          "address": "5530 Eldorado Pkwy, Frisco",
-          "stationCount": 3
-        },
-        {
-          "chain": "Costco",
-          "regular": 3.59,
-          "station": "Costco",
-          "address": "11220 Dallas Pkwy, Frisco",
-          "stationCount": 1
-        },
-        {
-          "chain": "Kroger",
-          "regular": 3.59,
-          "station": "Kroger",
-          "address": "2671 Little Elm Pkwy, Little Elm",
-          "stationCount": 2
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.64,
-          "station": "Valero",
-          "address": "11801 FM-423, Little Elm",
-          "stationCount": 2
+          "station": "RaceTrac",
+          "address": "5353 Panther Creek Pkwy, Frisco",
+          "stationCount": 5
         },
         {
           "chain": "TXB",
-          "regular": 3.65,
+          "regular": 3.61,
           "station": "TXB",
           "address": "15355 Preston Rd, Frisco",
           "stationCount": 1
         },
         {
-          "chain": "Circle K",
-          "regular": 3.67,
-          "station": "Circle K",
-          "address": "3272 Parkwood Rd, Frisco",
+          "chain": "Valero",
+          "regular": 3.63,
+          "station": "Valero",
+          "address": "6529 Dallas Pkwy, Frisco",
           "stationCount": 1
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.67,
+          "regular": 3.65,
           "station": "Murphy Express",
           "address": "9050 Coit Rd, Frisco",
           "stationCount": 1
         },
         {
           "chain": "HEB Gas",
-          "regular": 3.69,
+          "regular": 3.65,
           "station": "H-E-B",
           "address": "4800 Main St, Frisco",
+          "stationCount": 1
+        },
+        {
+          "chain": "Circle K",
+          "regular": 3.68,
+          "station": "Circle K",
+          "address": "12626 Eldorado Pkwy, Frisco",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Exxon",
-        "station": "Exxon",
+        "chain": "Costco",
+        "station": "Costco",
         "price": 3.55,
-        "address": "11655 Preston Rd, Frisco"
+        "address": "11220 Dallas Pkwy, Frisco"
       },
       "stationsSeen": 30,
       "zipsFetched": 3
@@ -1594,6 +1524,13 @@
           "stationCount": 1
         },
         {
+          "chain": "Murphy USA",
+          "regular": 3.64,
+          "station": "Murphy USA",
+          "address": "9091 West University Drive, McKinney",
+          "stationCount": 3
+        },
+        {
           "chain": "Costco",
           "regular": 3.64,
           "station": "Costco",
@@ -1601,11 +1538,25 @@
           "stationCount": 1
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.69,
-          "station": "Murphy USA",
-          "address": "5251 Mckinney Ranch Parkway, McKinney",
-          "stationCount": 2
+          "chain": "Valero",
+          "regular": 3.68,
+          "station": "Valero",
+          "address": "1710 Independence Pkwy, McKinney",
+          "stationCount": 1
+        },
+        {
+          "chain": "7-Eleven",
+          "regular": 3.68,
+          "station": "7-Eleven",
+          "address": "3601 Virginia Pkwy, McKinney",
+          "stationCount": 6
+        },
+        {
+          "chain": "Walmart Neighborhood Market",
+          "regular": 3.68,
+          "station": "Walmart Neighborhood Market",
+          "address": "3450 Virginia Pkwy, McKinney",
+          "stationCount": 1
         },
         {
           "chain": "Circle K",
@@ -1625,14 +1576,21 @@
           "chain": "QuikTrip",
           "regular": 3.69,
           "station": "QuikTrip",
-          "address": "7349 S Custer Rd, McKinney",
+          "address": "4151 Stacy Rd , McKinney",
           "stationCount": 4
         },
         {
-          "chain": "Valero",
+          "chain": "RaceTrac",
           "regular": 3.69,
-          "station": "Valero",
-          "address": "1710 Independence Pkwy, McKinney",
+          "station": "RaceTrac",
+          "address": "2152 Virginia Pkwy, McKinney",
+          "stationCount": 4
+        },
+        {
+          "chain": "Signature Car Wash",
+          "regular": 3.69,
+          "station": "Signature Car Wash",
+          "address": "902 N Central Expy, McKinney",
           "stationCount": 1
         },
         {
@@ -1643,45 +1601,24 @@
           "stationCount": 1
         },
         {
-          "chain": "RaceTrac",
+          "chain": "Kroger",
           "regular": 3.69,
-          "station": "RaceTrac",
-          "address": "5588 S Lake Forest Dr, McKinney",
-          "stationCount": 4
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.69,
-          "station": "7-Eleven",
-          "address": "3601 Virginia Pkwy, McKinney",
-          "stationCount": 9
-        },
-        {
-          "chain": "Walmart Neighborhood Market",
-          "regular": 3.69,
-          "station": "Walmart Neighborhood Market",
-          "address": "3450 Virginia Pkwy, McKinney",
+          "station": "Kroger",
+          "address": "1801 N Lake Forest Dr, McKinney",
           "stationCount": 1
         },
         {
           "chain": "Walmart",
-          "regular": 3.72,
-          "station": "Walmart Fuel Station",
-          "address": "2050 Central Cir, McKinney",
-          "stationCount": 1
+          "regular": 3.69,
+          "station": "Walmart",
+          "address": "2041 Redbud Blvd, McKinney",
+          "stationCount": 2
         },
         {
-          "chain": "Tom Thumb",
-          "regular": 3.73,
-          "station": "Tom Thumb",
-          "address": "3001 Hardin Blvd, McKinney",
-          "stationCount": 1
-        },
-        {
-          "chain": "Kroger",
-          "regular": 3.74,
-          "station": "Kroger",
-          "address": "1801 N Lake Forest Dr, McKinney",
+          "chain": "Shell",
+          "regular": 3.69,
+          "station": "Shell",
+          "address": "1814 N Central Expy, McKinney",
           "stationCount": 1
         }
       ],
@@ -1697,17 +1634,45 @@
     "grand-prairie-tx": {
       "chains": [
         {
+          "chain": "Circle K",
+          "regular": 3.82,
+          "station": "Circle K",
+          "address": "726 E Pioneer Pkwy, Grand Prairie",
+          "stationCount": 2
+        },
+        {
           "chain": "7-Eleven",
-          "regular": 3.89,
+          "regular": 3.82,
           "station": "7-Eleven",
           "address": "230 W Pioneer Pkwy, Grand Prairie",
           "stationCount": 4
         },
         {
-          "chain": "Circle K",
-          "regular": 3.89,
-          "station": "Circle K",
-          "address": "726 E Pioneer Pkwy, Grand Prairie",
+          "chain": "RaceTrac",
+          "regular": 3.85,
+          "station": "RaceTrac",
+          "address": "1851 W Trinity Blvd, Grand Prairie",
+          "stationCount": 3
+        },
+        {
+          "chain": "Mr. Fuel",
+          "regular": 3.85,
+          "station": "Mr. Fuel",
+          "address": "3206 W Trinity Blvd, Grand Prairie",
+          "stationCount": 1
+        },
+        {
+          "chain": "QuikTrip",
+          "regular": 3.87,
+          "station": "QuikTrip",
+          "address": "1110 N Belt Line Rd, Grand Prairie",
+          "stationCount": 2
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.87,
+          "station": "Shell",
+          "address": "925 N Belt Line Rd, Grand Prairie",
           "stationCount": 2
         },
         {
@@ -1718,149 +1683,86 @@
           "stationCount": 1
         },
         {
-          "chain": "RaceTrac",
-          "regular": 3.89,
-          "station": "RaceTrac",
-          "address": "1851 W Trinity Blvd, Grand Prairie",
-          "stationCount": 3
-        },
-        {
-          "chain": "Shell",
-          "regular": 3.9,
-          "station": "Shell",
-          "address": "925 N Belt Line Rd, Grand Prairie",
-          "stationCount": 3
-        },
-        {
-          "chain": "Mr. Fuel",
-          "regular": 3.92,
-          "station": "Mr. Fuel",
-          "address": "3206 W Trinity Blvd, Grand Prairie",
-          "stationCount": 1
-        },
-        {
-          "chain": "QuikTrip",
-          "regular": 3.95,
-          "station": "QuikTrip",
-          "address": "1110 N Belt Line Rd, Grand Prairie",
-          "stationCount": 1
-        },
-        {
           "chain": "Mobil",
-          "regular": 3.95,
+          "regular": 3.89,
           "station": "Mobil",
           "address": "2610 N SH-360, Grand Prairie",
           "stationCount": 1
-        },
-        {
-          "chain": "Automated Fueling",
-          "regular": 3.99,
-          "station": "Automated Fueling",
-          "address": "1209 Sunnyvale Rd, Grand Prairie",
-          "stationCount": 1
-        },
-        {
-          "chain": "Texaco",
-          "regular": 3.99,
-          "station": "Texaco",
-          "address": "1612 E Main St, Grand Prairie",
-          "stationCount": 3
         },
         {
           "chain": "Chevron",
           "regular": 3.99,
           "station": "Chevron",
           "address": "1726 E Main St, Grand Prairie",
-          "stationCount": 4
+          "stationCount": 5
+        },
+        {
+          "chain": "Texaco",
+          "regular": 3.99,
+          "station": "Texaco",
+          "address": "1612 E Main St, Grand Prairie",
+          "stationCount": 1
+        },
+        {
+          "chain": "Valero",
+          "regular": 4.09,
+          "station": "Valero",
+          "address": "2495 W Pioneer Pkwy, Grand Prairie",
+          "stationCount": 1
         },
         {
           "chain": "Exxon",
           "regular": 4.09,
           "station": "Exxon",
           "address": "2584 W Jefferson St, Grand Prairie",
-          "stationCount": 3
+          "stationCount": 4
         },
         {
           "chain": "Quick Fuel",
-          "regular": 4.18,
+          "regular": 4.12,
           "station": "Quick Fuel",
           "address": "851 Post and Paddock St, Grand Prairie",
           "stationCount": 1
         },
         {
-          "chain": "Valero",
+          "chain": "Fina Food Mart",
           "regular": 4.19,
-          "station": "Valero",
-          "address": "2495 W Pioneer Pkwy, Grand Prairie",
-          "stationCount": 2
+          "station": "Fina Food Mart",
+          "address": "1129 E Jefferson St, Grand Prairie",
+          "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "7-Eleven",
-        "station": "7-Eleven",
-        "price": 3.89,
-        "address": "230 W Pioneer Pkwy, Grand Prairie"
+        "chain": "Circle K",
+        "station": "Circle K",
+        "price": 3.82,
+        "address": "726 E Pioneer Pkwy, Grand Prairie"
       },
-      "stationsSeen": 30,
+      "stationsSeen": 29,
       "zipsFetched": 3
     },
     "amarillo-tx": {
       "chains": [
         {
           "chain": "Walmart Neighborhood Market",
-          "regular": 3.76,
+          "regular": 3.89,
           "station": "Walmart Neighborhood Market",
           "address": "7255 Arden Rd, Amarillo",
           "stationCount": 1
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.76,
+          "regular": 3.89,
           "station": "Murphy USA",
           "address": "4800 South Coulter Road, Amarillo",
           "stationCount": 2
-        },
-        {
-          "chain": "Phillips 66",
-          "regular": 3.85,
-          "station": "Phillips 66",
-          "address": "6014 Hillside Rd, Amarillo",
-          "stationCount": 5
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.85,
-          "station": "Valero",
-          "address": "822 S Georgia St, Amarillo",
-          "stationCount": 4
-        },
-        {
-          "chain": "Circle K",
-          "regular": 3.89,
-          "station": "Circle K",
-          "address": "8704 FM 2590, Amarillo",
-          "stationCount": 3
-        },
-        {
-          "chain": "Toot’n Totem",
-          "regular": 3.89,
-          "station": "Toot’n Totem",
-          "address": "14900 FM 2590, Amarillo",
-          "stationCount": 1
         },
         {
           "chain": "Toot'n Totum",
           "regular": 3.89,
           "station": "Toot'n Totum",
           "address": "3320 S Georgia St, Amarillo",
-          "stationCount": 1
-        },
-        {
-          "chain": "CEFCO",
-          "regular": 3.89,
-          "station": "CEFCO",
-          "address": "1917 Bell St, Amarillo",
-          "stationCount": 1
+          "stationCount": 3
         },
         {
           "chain": "United Express",
@@ -1870,100 +1772,121 @@
           "stationCount": 1
         },
         {
+          "chain": "Valero",
+          "regular": 3.97,
+          "station": "Valero",
+          "address": "2305 SW 3rd Ave, Amarillo",
+          "stationCount": 13
+        },
+        {
+          "chain": "Circle K",
+          "regular": 3.99,
+          "station": "Circle K",
+          "address": "7505 Helium Rd, Amarillo",
+          "stationCount": 3
+        },
+        {
+          "chain": "Toot’n Totem",
+          "regular": 3.99,
+          "station": "Toot’n Totem",
+          "address": "14900 FM 2590, Amarillo",
+          "stationCount": 1
+        },
+        {
           "chain": "QuikTrip",
           "regular": 3.99,
           "station": "QuikTrip",
           "address": "7410 Bell St, Amarillo",
+          "stationCount": 1
+        },
+        {
+          "chain": "Phillips 66",
+          "regular": 3.99,
+          "station": "Phillips 66",
+          "address": "3572 S Soncy Rd, Amarillo",
+          "stationCount": 4
+        },
+        {
+          "chain": "CEFCO",
+          "regular": 3.99,
+          "station": "CEFCO",
+          "address": "1917 Bell St, Amarillo",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Walmart Neighborhood Market",
         "station": "Walmart Neighborhood Market",
-        "price": 3.76,
+        "price": 3.89,
         "address": "7255 Arden Rd, Amarillo"
       },
-      "stationsSeen": 20,
+      "stationsSeen": 30,
       "zipsFetched": 3
     },
     "brownsville-tx": {
       "chains": [
         {
-          "chain": "Sam's Club",
-          "regular": 3.74,
-          "station": "Sam's Club",
-          "address": "3570 W Alton Gloor Blvd, Brownsville",
-          "stationCount": 1
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 3.75,
-          "station": "Murphy USA",
-          "address": "6101 Paredes Line, Brownsville",
-          "stationCount": 6
-        },
-        {
-          "chain": "Sunoco",
-          "regular": 3.76,
-          "station": "Sunoco",
-          "address": "1180 E Alton Gloor Blvd, Brownsville",
-          "stationCount": 11
-        },
-        {
           "chain": "Love's",
-          "regular": 3.81,
+          "regular": 3.65,
           "station": "Love's Travel Stop",
           "address": "3400 Nafta Pkwy, Brownsville",
           "stationCount": 1
         },
         {
-          "chain": "Gordon's Bait & Tackle",
-          "regular": 3.81,
-          "station": "Gordon's Bait & Tackle",
-          "address": "7066 Padre Island Hwy, Brownsville",
-          "stationCount": 1
+          "chain": "Murphy USA",
+          "regular": 3.65,
+          "station": "Murphy USA",
+          "address": "2215 Ruben M Torres Blvd., Brownsville",
+          "stationCount": 5
+        },
+        {
+          "chain": "Sunoco",
+          "regular": 3.67,
+          "station": "Sunoco",
+          "address": "2305 FM-511, Brownsville",
+          "stationCount": 11
+        },
+        {
+          "chain": "Circle K",
+          "regular": 3.69,
+          "station": "Circle K",
+          "address": "4585 E Ruben Torres Sr Blvd, Brownsville",
+          "stationCount": 2
         },
         {
           "chain": "Valero",
-          "regular": 3.82,
+          "regular": 3.74,
           "station": "Valero",
-          "address": "4100 Coffee Port Rd, Brownsville",
+          "address": "3324 International Blvd, Brownsville",
+          "stationCount": 5
+        },
+        {
+          "chain": "HEB Gas",
+          "regular": 3.74,
+          "station": "H-E-B",
+          "address": "2250 Boca Chica Blvd, Brownsville",
           "stationCount": 4
         },
         {
           "chain": "Stripes",
-          "regular": 3.82,
+          "regular": 3.75,
           "station": "Stripes",
           "address": "4425 E 14th St, Brownsville",
           "stationCount": 1
         },
         {
-          "chain": "HEB Gas",
-          "regular": 3.82,
-          "station": "H-E-B",
-          "address": "2250 Boca Chica Blvd, Brownsville",
-          "stationCount": 2
-        },
-        {
-          "chain": "Circle K",
-          "regular": 3.82,
-          "station": "Circle K",
-          "address": "1995 Military Rd, Brownsville",
-          "stationCount": 2
-        },
-        {
           "chain": "7-Eleven",
-          "regular": 3.83,
+          "regular": 3.77,
           "station": "7-Eleven",
           "address": "651 E Morrison Rd, Brownsville",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Sam's Club",
-        "station": "Sam's Club",
-        "price": 3.74,
-        "address": "3570 W Alton Gloor Blvd, Brownsville"
+        "chain": "Love's",
+        "station": "Love's Travel Stop",
+        "price": 3.65,
+        "address": "3400 Nafta Pkwy, Brownsville"
       },
       "stationsSeen": 30,
       "zipsFetched": 3
@@ -1971,109 +1894,109 @@
     "killeen-tx": {
       "chains": [
         {
+          "chain": "SUPER QUICK FOOD MART",
+          "regular": 3.7,
+          "station": "SUPER QUICK FOOD MART",
+          "address": "3101 W Stan Schlueter Loop, Killeen",
+          "stationCount": 1
+        },
+        {
           "chain": "Walmart",
-          "regular": 3.81,
+          "regular": 3.73,
           "station": "Walmart",
           "address": "1380 Lowes Blvd, Killeen",
           "stationCount": 2
         },
         {
           "chain": "Walmart Neighborhood Market",
-          "regular": 3.81,
+          "regular": 3.73,
           "station": "Walmart Neighborhood Market",
           "address": "3807 E Stan Schleuter Loop, Killeen",
           "stationCount": 2
         },
         {
           "chain": "HEB Gas",
-          "regular": 3.83,
+          "regular": 3.75,
           "station": "H-E-B",
           "address": "2511 Trimmier Rd, Killeen",
           "stationCount": 2
         },
         {
-          "chain": "SUPER QUICK FOOD MART",
-          "regular": 3.88,
-          "station": "SUPER QUICK FOOD MART",
-          "address": "3101 W Stan Schlueter Loop, Killeen",
-          "stationCount": 1
-        },
-        {
-          "chain": "Casey's",
-          "regular": 3.89,
-          "station": "Casey's",
-          "address": "3004 Stagecoach Rd, killeen",
-          "stationCount": 1
+          "chain": "Valero",
+          "regular": 3.77,
+          "station": "Valero",
+          "address": "2201 Rosewood Dr, Baytown",
+          "stationCount": 3
         },
         {
           "chain": "QuikTrip",
-          "regular": 3.91,
+          "regular": 3.77,
           "station": "Quiktrip",
           "address": "2207 S Clear Creek Rd Suite 304, Killeen",
           "stationCount": 1
         },
         {
           "chain": "Stripes",
-          "regular": 3.94,
+          "regular": 3.78,
           "station": "Stripes",
           "address": "8089 Trimmier Rd, Killeen",
-          "stationCount": 1
-        },
-        {
-          "chain": "CEFCO",
-          "regular": 3.98,
-          "station": "CEFCO",
-          "address": "4803 W Trimmer Rd, Killeen",
           "stationCount": 2
         },
         {
+          "chain": "Casey's",
+          "regular": 3.78,
+          "station": "Casey's",
+          "address": "3004 Stagecoach Rd, killeen",
+          "stationCount": 1
+        },
+        {
           "chain": "Mobil",
-          "regular": 3.98,
+          "regular": 3.79,
           "station": "Mobil",
           "address": "1219 S Fort Hood St, Killeen",
           "stationCount": 2
         },
         {
-          "chain": "Valero",
-          "regular": 3.98,
-          "station": "Valero",
-          "address": "1000 W Stan Schlueter Loop, Killeen",
-          "stationCount": 5
-        },
-        {
           "chain": "7-Eleven",
-          "regular": 3.98,
+          "regular": 3.79,
           "station": "7-Eleven",
           "address": "1001 Willow Springs Rd, Killeen",
           "stationCount": 2
         },
         {
-          "chain": "Shell",
-          "regular": 3.99,
-          "station": "Shell",
-          "address": "10640 SH-195 Ste 104, Killeen",
+          "chain": "CEFCO",
+          "regular": 3.82,
+          "station": "CEFCO",
+          "address": "4803 W Trimmer Rd, Killeen",
           "stationCount": 2
         },
         {
           "chain": "Chevron",
-          "regular": 4.09,
+          "regular": 3.99,
           "station": "Chevron",
-          "address": "3200 S Fort Hood St, Killeen",
-          "stationCount": 4
+          "address": "2201 E Stan Schlueter Lp, Killeen",
+          "stationCount": 7
+        },
+        {
+          "chain": "Shell",
+          "regular": 4.19,
+          "station": "Shell",
+          "address": "10640 SH-195 Ste 104, Killeen",
+          "stationCount": 1
         },
         {
           "chain": "Exxon",
-          "regular": 4.18,
+          "regular": 4.19,
           "station": "Exxon",
-          "address": "1310 W Stan Schlueter Loop, Killeen",
-          "stationCount": 3
+          "address": "907 N Gray St, Killeen",
+          "stationCount": 2
         }
       ],
       "cheapestOverall": {
-        "chain": "Walmart",
-        "station": "Walmart",
-        "price": 3.81,
-        "address": "1380 Lowes Blvd, Killeen"
+        "chain": "SUPER QUICK FOOD MART",
+        "station": "SUPER QUICK FOOD MART",
+        "price": 3.7,
+        "address": "3101 W Stan Schlueter Loop, Killeen"
       },
       "stationsSeen": 30,
       "zipsFetched": 3
@@ -2081,67 +2004,81 @@
     "denton-tx": {
       "chains": [
         {
-          "chain": "Ekon",
-          "regular": 3.86,
-          "station": "Ekon",
-          "address": "1918 Carroll Blvd, Denton",
+          "chain": "Smiley's Express",
+          "regular": 3.79,
+          "station": "Smiley's Express",
+          "address": "601 Fort Worth Dr, Denton",
           "stationCount": 1
         },
         {
           "chain": "Walmart Neighborhood Market",
-          "regular": 3.87,
+          "regular": 3.81,
           "station": "Walmart Neighborhood Market",
           "address": "3922 Teasley Ln, Denton",
           "stationCount": 1
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.87,
+          "regular": 3.82,
           "station": "Murphy USA",
           "address": "1517 S Loop 288, Denton",
           "stationCount": 1
         },
         {
           "chain": "7-Eleven",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "7-Eleven",
-          "address": "4005 Teasley Ln, Denton",
+          "address": "1101 FM-2181, Corinth",
           "stationCount": 5
         },
         {
           "chain": "QuikTrip",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "QuikTrip",
           "address": "3701  IH-35E S , Denton",
           "stationCount": 3
         },
         {
           "chain": "Kroger",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "Kroger",
           "address": "5021 Teasley Ln, Denton",
           "stationCount": 1
         },
         {
           "chain": "Buc-ee's",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "Buc-ee's",
           "address": "2800 S IH-35E, Denton",
           "stationCount": 1
         },
         {
           "chain": "Exxon",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "Exxon",
           "address": "8100 S IH-35E, Lake Dallas",
           "stationCount": 1
         },
         {
           "chain": "Shell",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "Shell",
           "address": "1223 McCormick St, Denton",
+          "stationCount": 3
+        },
+        {
+          "chain": "RaceTrac",
+          "regular": 3.84,
+          "station": "RaceTrac",
+          "address": "3600 E University Dr, Denton",
           "stationCount": 2
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.89,
+          "station": "Valero",
+          "address": "736 Fort  Worth Dr, Denton",
+          "stationCount": 1
         },
         {
           "chain": "Rapido",
@@ -2151,79 +2088,100 @@
           "stationCount": 1
         },
         {
-          "chain": "RaceTrac",
-          "regular": 3.89,
-          "station": "RaceTrac",
-          "address": "1703 S Loop 288, Denton",
-          "stationCount": 2
-        },
-        {
           "chain": "Chevron",
-          "regular": 4.09,
+          "regular": 3.99,
           "station": "Chevron",
           "address": "2400 IH-35E , Denton",
           "stationCount": 2
-        },
-        {
-          "chain": "Sunoco",
-          "regular": 4.09,
-          "station": "Sunoco",
-          "address": "326 E McKinney St, Denton",
-          "stationCount": 1
-        },
-        {
-          "chain": "Valero",
-          "regular": 4.09,
-          "station": "Valero",
-          "address": "3922 E McKinney St, Denton",
-          "stationCount": 2
-        },
-        {
-          "chain": "Smiley's Express",
-          "regular": 4.14,
-          "station": "Smiley's Express",
-          "address": "601 Fort Worth Dr, Denton",
-          "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Ekon",
-        "station": "Ekon",
-        "price": 3.86,
-        "address": "1918 Carroll Blvd, Denton"
+        "chain": "Smiley's Express",
+        "station": "Smiley's Express",
+        "price": 3.79,
+        "address": "601 Fort Worth Dr, Denton"
       },
-      "stationsSeen": 25,
+      "stationsSeen": 23,
       "zipsFetched": 3
     },
     "mesquite-tx": {
       "chains": [
         {
-          "chain": "Walmart Neighborhood Market",
-          "regular": 3.77,
-          "station": "Walmart Neighborhood Market",
-          "address": "1951 Military Pkwy, Mesquite",
-          "stationCount": 1
-        },
-        {
           "chain": "Swift",
-          "regular": 3.78,
+          "regular": 3.59,
           "station": "Swift",
           "address": "2033 Military Pkwy Ste 106, Mesquite",
           "stationCount": 1
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.78,
+          "regular": 3.67,
           "station": "Murphy Express",
           "address": "1712 W. Scyene Rd, Mesquite",
           "stationCount": 4
         },
         {
+          "chain": "Walmart Neighborhood Market",
+          "regular": 3.67,
+          "station": "Walmart Neighborhood Market",
+          "address": "1951 Military Pkwy, Mesquite",
+          "stationCount": 1
+        },
+        {
           "chain": "7-Eleven",
-          "regular": 3.83,
+          "regular": 3.71,
           "station": "7-Eleven",
-          "address": "3640 Gus Thomasson Rd, Mesquite",
-          "stationCount": 5
+          "address": "1900 Scyene Rd, Mesquite",
+          "stationCount": 6
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.75,
+          "station": "Valero",
+          "address": "3030 Military Pkwy, Mesquite",
+          "stationCount": 4
+        },
+        {
+          "chain": "Kroger",
+          "regular": 3.75,
+          "station": "Kroger",
+          "address": "521 N Galloway Ave, Mesquite",
+          "stationCount": 2
+        },
+        {
+          "chain": "QuikTrip",
+          "regular": 3.75,
+          "station": "QuikTrip",
+          "address": "1610 W Scyene Rd, Mesquite",
+          "stationCount": 2
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.76,
+          "station": "Exxon",
+          "address": "105 US-80 E, Mesquite",
+          "stationCount": 4
+        },
+        {
+          "chain": "RaceWay",
+          "regular": 3.78,
+          "station": "RaceWay",
+          "address": "2400 N Galloway Ave, Mesquite",
+          "stationCount": 2
+        },
+        {
+          "chain": "Phillips 66",
+          "regular": 3.78,
+          "station": "Phillips 66",
+          "address": "1701 W Bruton Rd, Balch Springs",
+          "stationCount": 1
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.79,
+          "station": "Shell",
+          "address": "106 E US-80, Mesquite",
+          "stationCount": 1
         },
         {
           "chain": "KP Mart",
@@ -2233,67 +2191,18 @@
           "stationCount": 1
         },
         {
-          "chain": "Exxon",
-          "regular": 3.85,
-          "station": "Exxon",
-          "address": "105 US-80 E, Mesquite",
-          "stationCount": 5
-        },
-        {
-          "chain": "Shell",
-          "regular": 3.85,
-          "station": "Shell",
-          "address": "106 E US-80, Mesquite",
-          "stationCount": 1
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.88,
-          "station": "Valero",
-          "address": "1145 IH-30, Mesquite",
-          "stationCount": 4
-        },
-        {
-          "chain": "RaceWay",
-          "regular": 3.88,
-          "station": "RaceWay",
-          "address": "1015 Gross Rd, Mesquite",
-          "stationCount": 2
-        },
-        {
-          "chain": "QuikTrip",
-          "regular": 3.89,
-          "station": "QuikTrip",
-          "address": "1610 W Scyene Rd, Mesquite",
-          "stationCount": 3
-        },
-        {
-          "chain": "Kroger",
-          "regular": 3.89,
-          "station": "Kroger",
-          "address": "521 N Galloway Ave, Mesquite",
-          "stationCount": 1
-        },
-        {
-          "chain": "Tom Thumb",
-          "regular": 3.91,
-          "station": "Tom Thumb",
-          "address": "1509 Pioneer Rd, Mesquite",
-          "stationCount": 1
-        },
-        {
-          "chain": "Chevron",
-          "regular": 3.95,
-          "station": "Chevron",
-          "address": "4215 N Belt Line Rd, Mesquite",
+          "chain": "Howdy Express",
+          "regular": 3.84,
+          "station": "Howdy Express",
+          "address": "1100 Pioneer Rd, Mesquite",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Walmart Neighborhood Market",
-        "station": "Walmart Neighborhood Market",
-        "price": 3.77,
-        "address": "1951 Military Pkwy, Mesquite"
+        "chain": "Swift",
+        "station": "Swift",
+        "price": 3.59,
+        "address": "2033 Military Pkwy Ste 106, Mesquite"
       },
       "stationsSeen": 30,
       "zipsFetched": 2
@@ -2301,25 +2210,32 @@
     "pasadena-tx": {
       "chains": [
         {
-          "chain": "PitStop Express",
-          "regular": 3.69,
-          "station": "PitStop Express",
-          "address": "602A Fairmont Pkwy, Pasadena",
+          "chain": "The Neighborhood Shop",
+          "regular": 3.65,
+          "station": "The Neighborhood Shop",
+          "address": "2104 Strawberry Rd, Pasadena",
           "stationCount": 1
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.72,
+          "regular": 3.69,
           "station": "Murphy Express",
           "address": "510 Southmore Ave., Pasadena",
           "stationCount": 1
         },
         {
-          "chain": "Check Point",
+          "chain": "MS Express",
+          "regular": 3.75,
+          "station": "MS Express",
+          "address": "1702 Pasadena Blvd, Pasadena",
+          "stationCount": 1
+        },
+        {
+          "chain": "7-Eleven",
           "regular": 3.79,
-          "station": "Check Point",
-          "address": "3490 Preston Ave, Pasadena",
-          "stationCount": 3
+          "station": "7-Eleven",
+          "address": "3933 Fairmont Pkwy, Pasadena",
+          "stationCount": 1
         },
         {
           "chain": "Kroger",
@@ -2329,10 +2245,10 @@
           "stationCount": 1
         },
         {
-          "chain": "Exxon",
+          "chain": "Speed Fuel",
           "regular": 3.79,
-          "station": "Exxon",
-          "address": "4646 Spencer Hwy, Pasadena",
+          "station": "Speed Fuel",
+          "address": "4401 Burke Rd, Pasadena",
           "stationCount": 1
         },
         {
@@ -2340,13 +2256,27 @@
           "regular": 3.79,
           "station": "Valero",
           "address": "3510 Burke Rd, Pasadena",
-          "stationCount": 4
+          "stationCount": 2
         },
         {
-          "chain": "Shell",
-          "regular": 3.84,
-          "station": "Shell",
-          "address": "3028 Shaver St, South Houston",
+          "chain": "76",
+          "regular": 3.79,
+          "station": "76",
+          "address": "1301 S Richey St, Pasadena",
+          "stationCount": 1
+        },
+        {
+          "chain": "Speedy Fuel",
+          "regular": 3.79,
+          "station": "Speedy Fuel",
+          "address": "1901 Allen Genoa Rd, Pasadena",
+          "stationCount": 1
+        },
+        {
+          "chain": "Check Point",
+          "regular": 3.79,
+          "station": "Check Point",
+          "address": "1301 N Allen-Genoa Rd, Pasadena",
           "stationCount": 3
         },
         {
@@ -2357,10 +2287,31 @@
           "stationCount": 1
         },
         {
-          "chain": "7-Eleven",
-          "regular": 3.86,
-          "station": "7-Eleven",
-          "address": "3933 Fairmont Pkwy, Pasadena",
+          "chain": "Prime Mart",
+          "regular": 3.85,
+          "station": "Prime Mart",
+          "address": "1402 Southmore Ave, Pasadena",
+          "stationCount": 1
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.85,
+          "station": "Shell",
+          "address": "3028 Shaver St, South Houston",
+          "stationCount": 3
+        },
+        {
+          "chain": "Chevron",
+          "regular": 3.89,
+          "station": "Chevron",
+          "address": "3423 Strawberry Rd, Pasadena",
+          "stationCount": 3
+        },
+        {
+          "chain": "VOLCO",
+          "regular": 3.89,
+          "station": "VOLCO",
+          "address": "3501 Fairmont Pkwy, Pasadena",
           "stationCount": 1
         },
         {
@@ -2371,17 +2322,10 @@
           "stationCount": 1
         },
         {
-          "chain": "Chevron",
+          "chain": "Exxon",
           "regular": 3.99,
-          "station": "Chevron",
-          "address": "3423 Strawberry Rd, Pasadena",
-          "stationCount": 3
-        },
-        {
-          "chain": "Speed Fuel",
-          "regular": 3.99,
-          "station": "Speed Fuel",
-          "address": "4739 Strawberry Rd, Pasadena",
+          "station": "Exxon",
+          "address": "4646 Spencer Hwy, Pasadena",
           "stationCount": 1
         },
         {
@@ -2390,95 +2334,123 @@
           "station": "Texaco",
           "address": "2626 Spencer Hwy, Pasadena",
           "stationCount": 1
+        },
+        {
+          "chain": "PitStop Express",
+          "regular": 4.09,
+          "station": "PitStop Express",
+          "address": "602A Fairmont Pkwy, Pasadena",
+          "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "PitStop Express",
-        "station": "PitStop Express",
-        "price": 3.69,
-        "address": "602A Fairmont Pkwy, Pasadena"
+        "chain": "The Neighborhood Shop",
+        "station": "The Neighborhood Shop",
+        "price": 3.65,
+        "address": "2104 Strawberry Rd, Pasadena"
       },
-      "stationsSeen": 22,
+      "stationsSeen": 26,
       "zipsFetched": 2
     },
     "waco-tx": {
       "chains": [
         {
-          "chain": "HEB Gas",
-          "regular": 3.79,
-          "station": "H-E-B",
-          "address": "1301 Wooded Acres Dr, Waco",
-          "stationCount": 1
-        },
-        {
           "chain": "Murphy USA",
-          "regular": 3.79,
+          "regular": 3.67,
           "station": "Murphy USA",
           "address": "200 S. New Road, Waco",
           "stationCount": 1
         },
         {
-          "chain": "Pilot/Flying J",
-          "regular": 3.85,
-          "station": "Pilot",
-          "address": "8055 IH-35, Robinson",
-          "stationCount": 1
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.89,
-          "station": "Valero",
-          "address": "901 S Fifth St, Waco",
-          "stationCount": 5
-        },
-        {
-          "chain": "Stripes",
-          "regular": 3.92,
-          "station": "Stripes",
-          "address": "2500 Franklin Ave, Waco",
-          "stationCount": 1
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.93,
-          "station": "7-Eleven",
-          "address": "701 S University Parks Dr, Waco",
+          "chain": "HEB Gas",
+          "regular": 3.72,
+          "station": "H-E-B",
+          "address": "1301 Wooded Acres Dr, Waco",
           "stationCount": 1
         },
         {
           "chain": "Brookshire's",
-          "regular": 3.94,
+          "regular": 3.74,
           "station": "Brookshire's",
           "address": "100 Peplow Dr, Robinson",
           "stationCount": 1
         },
         {
           "chain": "CEFCO",
-          "regular": 3.95,
+          "regular": 3.75,
           "station": "CEFCO",
           "address": "801 N Robinson Rd, Robinson",
           "stationCount": 4
         },
         {
+          "chain": "Pilot/Flying J",
+          "regular": 3.75,
+          "station": "Pilot",
+          "address": "8055 IH-35, Robinson",
+          "stationCount": 1
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.79,
+          "station": "Valero",
+          "address": "4025 Bosque Blvd, Waco",
+          "stationCount": 5
+        },
+        {
+          "chain": "Stripes",
+          "regular": 3.79,
+          "station": "Stripes",
+          "address": "2500 Franklin Ave, Waco",
+          "stationCount": 2
+        },
+        {
+          "chain": "7-Eleven",
+          "regular": 3.84,
+          "station": "7-Eleven",
+          "address": "701 S University Parks Dr, Waco",
+          "stationCount": 1
+        },
+        {
+          "chain": "Sunoco",
+          "regular": 3.97,
+          "station": "Sunoco",
+          "address": "4716 Lake Air Dr, Waco",
+          "stationCount": 2
+        },
+        {
           "chain": "Chevron",
-          "regular": 4.06,
+          "regular": 3.99,
           "station": "Chevron",
           "address": "701 Lake Air Dr, Waco",
-          "stationCount": 3
+          "stationCount": 2
         },
         {
           "chain": "Texaco",
           "regular": 4.14,
           "station": "Texaco",
           "address": "310 S Robinson Dr, Robinson",
-          "stationCount": 2
+          "stationCount": 1
         },
         {
-          "chain": "Sunoco",
+          "chain": "Alon",
           "regular": 4.19,
-          "station": "Sunoco",
-          "address": "6800 Sanger Ave, Waco",
-          "stationCount": 2
+          "station": "Alon",
+          "address": "4200 W Waco Dr, Waco",
+          "stationCount": 1
+        },
+        {
+          "chain": "Conoco",
+          "regular": 4.19,
+          "station": "Conoco",
+          "address": "4020 S Jack Kultgen Fwy, Waco",
+          "stationCount": 1
+        },
+        {
+          "chain": "Pit Stop",
+          "regular": 4.19,
+          "station": "Pit Stop",
+          "address": "211 S Robinson Dr, Robinson",
+          "stationCount": 1
         },
         {
           "chain": "Exxon",
@@ -2489,29 +2461,50 @@
         }
       ],
       "cheapestOverall": {
-        "chain": "HEB Gas",
-        "station": "H-E-B",
-        "price": 3.79,
-        "address": "1301 Wooded Acres Dr, Waco"
+        "chain": "Murphy USA",
+        "station": "Murphy USA",
+        "price": 3.67,
+        "address": "200 S. New Road, Waco"
       },
-      "stationsSeen": 23,
+      "stationsSeen": 25,
       "zipsFetched": 2
     },
     "midland-tx": {
       "chains": [
         {
           "chain": "Alon",
-          "regular": 3.79,
+          "regular": 3.64,
           "station": "Alon",
           "address": "4324 Andrews Hwy, Midland",
           "stationCount": 6
         },
         {
+          "chain": "HEB Gas",
+          "regular": 3.74,
+          "station": "H-E-B",
+          "address": "3325 W Wadley Ave, Midland",
+          "stationCount": 1
+        },
+        {
+          "chain": "Murphy USA",
+          "regular": 3.74,
+          "station": "Murphy USA",
+          "address": "6421 W. Hwy 72, Midland",
+          "stationCount": 4
+        },
+        {
           "chain": "Costco",
-          "regular": 3.79,
+          "regular": 3.74,
           "station": "Costco",
           "address": "1901 Kirkland Dr, Midland",
           "stationCount": 1
+        },
+        {
+          "chain": "Texaco",
+          "regular": 3.77,
+          "station": "Texaco",
+          "address": "1500 W Front St, Midland",
+          "stationCount": 5
         },
         {
           "chain": "Kent Kwik",
@@ -2521,38 +2514,17 @@
           "stationCount": 1
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.84,
-          "station": "Murphy USA",
-          "address": "6421 W. Hwy 72, Midland",
-          "stationCount": 4
-        },
-        {
           "chain": "Chevron",
-          "regular": 3.87,
+          "regular": 3.83,
           "station": "Chevron",
-          "address": "3310 W Wall St, Midland",
-          "stationCount": 5
-        },
-        {
-          "chain": "Shell",
-          "regular": 3.87,
-          "station": "Shell",
-          "address": "3614 W Wall St, Midland",
-          "stationCount": 1
-        },
-        {
-          "chain": "Texaco",
-          "regular": 3.89,
-          "station": "Texaco",
-          "address": "4701 Briarwood Ave, Midland",
-          "stationCount": 5
+          "address": "3006 Garden City Hwy, Midland",
+          "stationCount": 6
         },
         {
           "chain": "Stripes",
-          "regular": 3.89,
+          "regular": 3.87,
           "station": "Stripes",
-          "address": "4400 Briarwood Ave, Midland",
+          "address": "2106 W Front St, Midland",
           "stationCount": 1
         },
         {
@@ -2564,16 +2536,16 @@
         },
         {
           "chain": "Sunoco",
-          "regular": 3.89,
+          "regular": 4.12,
           "station": "Sunoco",
-          "address": "2109 S Midkiff Rd, Midland",
-          "stationCount": 2
+          "address": "11200 W SH-191, Midland",
+          "stationCount": 1
         },
         {
-          "chain": "HEB Gas",
-          "regular": 3.94,
-          "station": "H-E-B",
-          "address": "3325 W Wadley Ave, Midland",
+          "chain": "Tarzan & Jane Travel Center",
+          "regular": 4.19,
+          "station": "Tarzan & Jane Travel Center",
+          "address": "8404 W County Rd 60, Midland",
           "stationCount": 1
         },
         {
@@ -2584,17 +2556,17 @@
           "stationCount": 1
         },
         {
-          "chain": "Tarzan & Jane Travel Center",
+          "chain": "Shoppers Stop",
           "regular": 4.19,
-          "station": "Tarzan & Jane Travel Center",
-          "address": "8404 W County Rd 60, Midland",
+          "station": "Shoppers Stop",
+          "address": "908 W Indiana Ave, Midland",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Alon",
         "station": "Alon",
-        "price": 3.79,
+        "price": 3.64,
         "address": "4324 Andrews Hwy, Midland"
       },
       "stationsSeen": 30,
@@ -2610,52 +2582,80 @@
           "stationCount": 4
         },
         {
-          "chain": "7-Eleven",
-          "regular": 3.77,
-          "station": "7-Eleven",
-          "address": "3581 Plano Pwky, The Colony",
-          "stationCount": 10
-        },
-        {
           "chain": "Kroger",
-          "regular": 3.77,
+          "regular": 3.69,
           "station": "Kroger",
           "address": "4620 SH-121, Lewisville",
           "stationCount": 1
         },
         {
+          "chain": "Fast Fuels",
+          "regular": 3.69,
+          "station": "Fast Fuels",
+          "address": "3901 SH-121, The Colony",
+          "stationCount": 1
+        },
+        {
+          "chain": "7-Eleven",
+          "regular": 3.69,
+          "station": "7-Eleven",
+          "address": "4350 Main St, The Colony",
+          "stationCount": 10
+        },
+        {
           "chain": "QuikTrip",
-          "regular": 3.77,
+          "regular": 3.69,
           "station": "QuikTrip",
           "address": "4850 Main St, The Colony",
           "stationCount": 3
         },
         {
           "chain": "Costco",
-          "regular": 3.79,
+          "regular": 3.74,
           "station": "Costco",
           "address": "851 SH-121, Lewisville",
           "stationCount": 1
         },
         {
           "chain": "Conoco",
-          "regular": 3.85,
+          "regular": 3.79,
           "station": "Conoco",
           "address": "101 E Corporate Dr, Lewisville",
           "stationCount": 1
         },
         {
+          "chain": "Murphy USA",
+          "regular": 3.79,
+          "station": "Murphy USA",
+          "address": "186 Est Fm 3040, Lewisville",
+          "stationCount": 1
+        },
+        {
           "chain": "RaceTrac",
-          "regular": 3.87,
+          "regular": 3.79,
           "station": "RaceTrac",
-          "address": "375 E Fm 3040, Lewisville",
+          "address": "1100 Fm-544, Lewisville",
           "stationCount": 3
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.87,
-          "station": "Murphy USA",
-          "address": "186 Est Fm 3040, Lewisville",
+          "chain": "Tom Thumb",
+          "regular": 3.83,
+          "station": "Tom Thumb",
+          "address": "2305 S Valley Pkwy, Lewisville",
+          "stationCount": 1
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.83,
+          "station": "Exxon",
+          "address": "460 E Round Grove Rd, Lewisville",
+          "stationCount": 1
+        },
+        {
+          "chain": "Chevron",
+          "regular": 3.89,
+          "station": "Chevron",
+          "address": "1298 W Main St, Lewisville",
           "stationCount": 1
         },
         {
@@ -2666,38 +2666,10 @@
           "stationCount": 1
         },
         {
-          "chain": "Fast Fuels",
-          "regular": 3.89,
-          "station": "Fast Fuels",
-          "address": "3901 SH-121, The Colony",
-          "stationCount": 1
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.92,
-          "station": "Exxon",
-          "address": "460 E Round Grove Rd, Lewisville",
-          "stationCount": 1
-        },
-        {
-          "chain": "Tom Thumb",
-          "regular": 3.93,
-          "station": "Tom Thumb",
-          "address": "2305 S Valley Pkwy, Lewisville",
-          "stationCount": 1
-        },
-        {
-          "chain": "Texaco",
-          "regular": 3.99,
-          "station": "Texaco",
-          "address": "397 Southwest Pkwy, Lewisville",
-          "stationCount": 1
-        },
-        {
-          "chain": "Market Street Express Fuel",
-          "regular": 3.99,
-          "station": "Market Street Express Fuel",
-          "address": "700 N Denton Tap Rd, Coppell",
+          "chain": "VP Racing Fuels",
+          "regular": 3.91,
+          "station": "VP Racing Fuels",
+          "address": "101 Holford's Prairie Rd, Lewisville",
           "stationCount": 1
         }
       ],
@@ -2713,6 +2685,20 @@
     "carrollton-tx": {
       "chains": [
         {
+          "chain": "Chevron",
+          "regular": 3.75,
+          "station": "Chevron",
+          "address": "4210 N Josey Ln, Carrollton",
+          "stationCount": 5
+        },
+        {
+          "chain": "RaceTrac",
+          "regular": 3.75,
+          "station": "RaceTrac",
+          "address": "4241 International Pkwy, Carrollton",
+          "stationCount": 3
+        },
+        {
           "chain": "Mobil",
           "regular": 3.79,
           "station": "Mobil",
@@ -2725,20 +2711,6 @@
           "station": "QuikTrip",
           "address": "1528 W Hebron Pkwy, Carrollton",
           "stationCount": 1
-        },
-        {
-          "chain": "Chevron",
-          "regular": 3.79,
-          "station": "Chevron",
-          "address": "3656 Old Denton Rd, Carrollton",
-          "stationCount": 6
-        },
-        {
-          "chain": "RaceTrac",
-          "regular": 3.79,
-          "station": "RaceTrac",
-          "address": "1716 W Frankford Rd, Carrollton",
-          "stationCount": 3
         },
         {
           "chain": "Circle K",
@@ -2766,7 +2738,14 @@
           "regular": 3.83,
           "station": "Texaco",
           "address": "3600 Huffines Blvd, Carrollton",
-          "stationCount": 3
+          "stationCount": 2
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.89,
+          "station": "Valero",
+          "address": "3700 N Josey  Ln, Carrollton",
+          "stationCount": 2
         },
         {
           "chain": "Shell",
@@ -2774,130 +2753,109 @@
           "station": "Shell",
           "address": "1009 W Hebron Pkwy, Carrollton",
           "stationCount": 1
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.99,
-          "station": "Valero",
-          "address": "3700 N Josey  Ln, Carrollton",
-          "stationCount": 2
         }
       ],
       "cheapestOverall": {
-        "chain": "Mobil",
-        "station": "Mobil",
-        "price": 3.79,
-        "address": "1545 W Hebron Pkwy, Carrollton"
+        "chain": "Chevron",
+        "station": "Chevron",
+        "price": 3.75,
+        "address": "4210 N Josey Ln, Carrollton"
       },
-      "stationsSeen": 21,
+      "stationsSeen": 19,
       "zipsFetched": 2
     },
     "round-rock-tx": {
       "chains": [
         {
-          "chain": "Murphy USA",
-          "regular": 3.81,
-          "station": "Murphy USA",
-          "address": "2211 E. Palm Valley Blvd., Round Rock",
-          "stationCount": 2
-        },
-        {
-          "chain": "Walmart",
-          "regular": 3.83,
-          "station": "Walmart",
-          "address": "140 Louis Henna Blvd, Round Rock",
-          "stationCount": 1
-        },
-        {
-          "chain": "Circle K",
-          "regular": 3.83,
-          "station": "Circle K",
-          "address": "15900 UR-620 N, Austin",
-          "stationCount": 4
-        },
-        {
-          "chain": "HEB Gas",
-          "regular": 3.85,
-          "station": "H-E-B",
-          "address": "1700 E Palm Valley Blvd, Round Rock",
-          "stationCount": 2
-        },
-        {
           "chain": "Refuel",
-          "regular": 3.85,
+          "regular": 3.72,
           "station": "Refuel",
           "address": "2500 RM-1431, Round Rock",
           "stationCount": 1
         },
         {
           "chain": "QuikTrip",
-          "regular": 3.85,
+          "regular": 3.72,
           "station": "QuikTrip",
           "address": "3150 RM-1431, Cedar Park",
           "stationCount": 5
         },
         {
-          "chain": "Texaco",
-          "regular": 3.85,
-          "station": "Texaco",
-          "address": "2255 CR-172, Round Rock",
+          "chain": "Murphy USA",
+          "regular": 3.74,
+          "station": "Murphy USA",
+          "address": "2211 E. Palm Valley Blvd., Round Rock",
+          "stationCount": 2
+        },
+        {
+          "chain": "Walmart",
+          "regular": 3.75,
+          "station": "Walmart",
+          "address": "140 Louis Henna Blvd, Round Rock",
           "stationCount": 1
         },
         {
           "chain": "7-Eleven",
-          "regular": 3.86,
+          "regular": 3.76,
           "station": "7-Eleven",
-          "address": "2680 Gattis School Rd, Round Rock",
+          "address": "16310 UR-620 N, Round Rock",
           "stationCount": 5
         },
         {
+          "chain": "Circle K",
+          "regular": 3.77,
+          "station": "Circle K",
+          "address": "900 Louis Henna Blvd, Round Rock",
+          "stationCount": 4
+        },
+        {
           "chain": "Shell",
-          "regular": 3.86,
+          "regular": 3.77,
           "station": "Shell",
-          "address": "2551 Double Creek Dr, Round Rock",
+          "address": "705 E Palm Valley Blvd, Round Rock",
+          "stationCount": 4
+        },
+        {
+          "chain": "HEB Gas",
+          "regular": 3.77,
+          "station": "H-E-B",
+          "address": "603 Louis Henna Blvd, Round Rock",
           "stationCount": 3
         },
         {
-          "chain": "Randalls",
-          "regular": 3.87,
-          "station": "Randalls",
-          "address": "2051 Gattis School Rd, Round Rock",
+          "chain": "Valero",
+          "regular": 3.78,
+          "station": "Valero",
+          "address": "209 W Palm Valley Blvd, Round Rock",
           "stationCount": 1
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.79,
+          "station": "Exxon",
+          "address": "1300 E Palm Valley Blvd, Round Rock",
+          "stationCount": 2
         },
         {
           "chain": "Chevron",
-          "regular": 3.87,
+          "regular": 3.79,
           "station": "Chevron",
-          "address": "409 W Palm Valley Blvd, Round Rock",
+          "address": "1741 N Mays St, Round Rock",
           "stationCount": 1
         },
         {
-          "chain": "Mobil",
-          "regular": 3.87,
-          "station": "Mobil",
-          "address": "553 Louis Henna Blvd, Round Rock",
+          "chain": "Randalls",
+          "regular": 3.79,
+          "station": "Randalls",
+          "address": "2051 Gattis School Rd, Round Rock",
           "stationCount": 1
-        },
-        {
-          "chain": "Sunoco",
-          "regular": 3.89,
-          "station": "Sunoco",
-          "address": "1717 S Mays St, Round Rock",
-          "stationCount": 1
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.89,
-          "station": "Valero",
-          "address": "209 W Palm Valley Blvd, Round Rock",
-          "stationCount": 2
         }
       ],
       "cheapestOverall": {
-        "chain": "Murphy USA",
-        "station": "Murphy USA",
-        "price": 3.81,
-        "address": "2211 E. Palm Valley Blvd., Round Rock"
+        "chain": "Refuel",
+        "station": "Refuel",
+        "price": 3.72,
+        "address": "2500 RM-1431, Round Rock"
       },
       "stationsSeen": 30,
       "zipsFetched": 2
@@ -2905,46 +2863,60 @@
     "abilene-tx": {
       "chains": [
         {
-          "chain": "Sam's Club",
-          "regular": 3.78,
-          "station": "Sam's Club",
-          "address": "5550 S Clack St, Abilene",
-          "stationCount": 1
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 3.8,
-          "station": "Murphy USA",
-          "address": "1434 East Overland Trail, Abilene",
-          "stationCount": 1
-        },
-        {
           "chain": "Walmart Neighborhood Market",
-          "regular": 3.81,
+          "regular": 3.79,
           "station": "Walmart Neighborhood Market",
           "address": "1537 Ambler Ave, Abilene",
           "stationCount": 1
         },
         {
+          "chain": "Murphy USA",
+          "regular": 3.79,
+          "station": "Murphy USA",
+          "address": "1434 East Overland Trail, Abilene",
+          "stationCount": 1
+        },
+        {
           "chain": "Alon",
-          "regular": 3.82,
+          "regular": 3.79,
           "station": "Alon",
-          "address": "4142 N Clack St, Impact",
-          "stationCount": 12
+          "address": "2150 N Treadaway Blvd, Abilene",
+          "stationCount": 14
         },
         {
           "chain": "Casey's",
-          "regular": 3.84,
+          "regular": 3.81,
           "station": "Casey's",
           "address": "2824 East Overland Trail, Abilene",
           "stationCount": 2
         },
         {
+          "chain": "Sam's Club",
+          "regular": 3.83,
+          "station": "Sam's Club",
+          "address": "5550 S Clack St, Abilene",
+          "stationCount": 1
+        },
+        {
           "chain": "DK",
-          "regular": 3.94,
+          "regular": 3.86,
           "station": "DK",
           "address": "4002 Ridgemont Dr, Abilene",
           "stationCount": 3
+        },
+        {
+          "chain": "Sunoco",
+          "regular": 3.87,
+          "station": "Sunoco",
+          "address": "6026 US-277 S, Abilene",
+          "stationCount": 1
+        },
+        {
+          "chain": "United Express",
+          "regular": 3.95,
+          "station": "United Express",
+          "address": "4442 Buffalo Gap Rd, Abilene",
+          "stationCount": 1
         },
         {
           "chain": "Chevron",
@@ -2954,57 +2926,64 @@
           "stationCount": 1
         },
         {
-          "chain": "United Express",
-          "regular": 3.99,
-          "station": "United Express",
-          "address": "4442 Buffalo Gap Rd, Abilene",
-          "stationCount": 1
-        },
-        {
           "chain": "Texaco",
           "regular": 3.99,
           "station": "Texaco",
           "address": "3290 Rebecca Ln, Abilene",
           "stationCount": 1
-        },
-        {
-          "chain": "Sunoco",
-          "regular": 4.06,
-          "station": "Sunoco",
-          "address": "6026 US-277 S, Abilene",
-          "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Sam's Club",
-        "station": "Sam's Club",
-        "price": 3.78,
-        "address": "5550 S Clack St, Abilene"
+        "chain": "Walmart Neighborhood Market",
+        "station": "Walmart Neighborhood Market",
+        "price": 3.79,
+        "address": "1537 Ambler Ave, Abilene"
       },
-      "stationsSeen": 24,
+      "stationsSeen": 26,
       "zipsFetched": 2
     },
     "pearland-tx": {
       "chains": [
         {
+          "chain": "HEB Gas",
+          "regular": 3.69,
+          "station": "H-E-B",
+          "address": "2807 Business Center Dr, Pearland",
+          "stationCount": 2
+        },
+        {
           "chain": "Sam's Club",
-          "regular": 3.72,
+          "regular": 3.69,
           "station": "Sam's Club",
           "address": "15800 S Fwy, Pearland",
           "stationCount": 1
         },
         {
-          "chain": "HEB Gas",
+          "chain": "Murphy USA",
+          "regular": 3.69,
+          "station": "Murphy USA",
+          "address": "1917 N. Main St., Pearland",
+          "stationCount": 2
+        },
+        {
+          "chain": "Costco",
           "regular": 3.72,
-          "station": "H-E-B",
-          "address": "2807 Business Center Dr, Pearland",
+          "station": "Costco",
+          "address": "3510 Business Center Dr, Pearland",
           "stationCount": 1
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.72,
-          "station": "Murphy USA",
-          "address": "1917 N. Main St., Pearland",
+          "chain": "Valero",
+          "regular": 3.74,
+          "station": "Valero",
+          "address": "12712 Broadway St, Pearland",
+          "stationCount": 2
+        },
+        {
+          "chain": "Mobil",
+          "regular": 3.77,
+          "station": "Mobil",
+          "address": "10521 Broadway St, Pearland",
           "stationCount": 2
         },
         {
@@ -3015,24 +2994,17 @@
           "stationCount": 2
         },
         {
-          "chain": "Swift",
-          "regular": 3.79,
-          "station": "Swift",
-          "address": "1600 Cullen Pkwy, Pearland",
-          "stationCount": 1
-        },
-        {
-          "chain": "Mobil",
-          "regular": 3.79,
-          "station": "Mobil",
-          "address": "10521 Broadway St, Pearland",
+          "chain": "Buc-ee's",
+          "regular": 3.77,
+          "station": "Buc-ee's",
+          "address": "11151 Shadow Creek Pkwy, Pearland",
           "stationCount": 2
         },
         {
-          "chain": "Costco",
+          "chain": "Bubbas",
           "regular": 3.79,
-          "station": "Costco",
-          "address": "3510 Business Center Dr, Pearland",
+          "station": "Bubbas",
+          "address": "5752 Bailey Rd, Pearland",
           "stationCount": 1
         },
         {
@@ -3043,11 +3015,11 @@
           "stationCount": 1
         },
         {
-          "chain": "Check Point",
-          "regular": 3.85,
-          "station": "Check Point",
-          "address": "333 FM-521, Fresno",
-          "stationCount": 1
+          "chain": "Shell",
+          "regular": 3.79,
+          "station": "Shell",
+          "address": "10522 Broadway St, Pearland",
+          "stationCount": 7
         },
         {
           "chain": "Exxon",
@@ -3057,46 +3029,39 @@
           "stationCount": 3
         },
         {
-          "chain": "Corner Market",
+          "chain": "Check Point",
           "regular": 3.89,
+          "station": "Check Point",
+          "address": "333 FM-521, Fresno",
+          "stationCount": 1
+        },
+        {
+          "chain": "Chevron",
+          "regular": 3.99,
+          "station": "Chevron",
+          "address": "2300 Smith Ranch Rd, Pearland",
+          "stationCount": 1
+        },
+        {
+          "chain": "Corner Market",
+          "regular": 3.99,
           "station": "Corner Market",
           "address": "3419 Veterans Dr, Pearland",
           "stationCount": 1
         },
         {
-          "chain": "Shell",
-          "regular": 3.89,
-          "station": "Shell",
-          "address": "10522 Broadway St, Pearland",
-          "stationCount": 8
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.89,
-          "station": "Valero",
-          "address": "2204 N Main St, Pearland",
-          "stationCount": 3
-        },
-        {
-          "chain": "Buc-ee's",
-          "regular": 3.99,
-          "station": "Buc-ee's",
-          "address": "11151 Shadow Creek Pkwy, Pearland",
-          "stationCount": 2
-        },
-        {
-          "chain": "Chevron",
+          "chain": "CITGO",
           "regular": 4.09,
-          "station": "Chevron",
-          "address": "3426 S Main St Ste 104, Pearland",
+          "station": "CITGO",
+          "address": "2112 E Broadway St, Pearland",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Sam's Club",
-        "station": "Sam's Club",
-        "price": 3.72,
-        "address": "15800 S Fwy, Pearland"
+        "chain": "HEB Gas",
+        "station": "H-E-B",
+        "price": 3.69,
+        "address": "2807 Business Center Dr, Pearland"
       },
       "stationsSeen": 30,
       "zipsFetched": 2
@@ -3104,24 +3069,17 @@
     "college-station-tx": {
       "chains": [
         {
-          "chain": "Sam's Club",
-          "regular": 3.64,
-          "station": "Sam's Club",
-          "address": "1405  Earl Rudder Fwy, College Station",
-          "stationCount": 1
-        },
-        {
           "chain": "Costco",
-          "regular": 3.64,
+          "regular": 3.66,
           "station": "Costco",
           "address": "4323 SH-6 S, College Station",
           "stationCount": 1
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.69,
-          "station": "Murphy USA",
-          "address": "2220 Harvey Mitchell Parkway South, College Station",
+          "chain": "Sam's Club",
+          "regular": 3.66,
+          "station": "Sam's Club",
+          "address": "1405  Earl Rudder Fwy, College Station",
           "stationCount": 1
         },
         {
@@ -3132,6 +3090,13 @@
           "stationCount": 1
         },
         {
+          "chain": "Murphy USA",
+          "regular": 3.69,
+          "station": "Murphy USA",
+          "address": "2220 Harvey Mitchell Parkway South, College Station",
+          "stationCount": 1
+        },
+        {
           "chain": "HEB Gas",
           "regular": 3.69,
           "station": "H-E-B",
@@ -3139,111 +3104,104 @@
           "stationCount": 2
         },
         {
+          "chain": "Valero",
+          "regular": 3.85,
+          "station": "Valero",
+          "address": "603 Harvey Rd, College Station",
+          "stationCount": 2
+        },
+        {
           "chain": "Exxon",
-          "regular": 3.69,
+          "regular": 3.89,
           "station": "Exxon",
           "address": "1721 Texas Ave S, College Station",
-          "stationCount": 7
+          "stationCount": 9
         },
         {
           "chain": "Sunoco",
-          "regular": 3.77,
+          "regular": 3.99,
           "station": "Sunoco",
           "address": "13601 FM- 2154, College Station",
-          "stationCount": 3
-        },
-        {
-          "chain": "TXB",
-          "regular": 3.79,
-          "station": "TXB",
-          "address": "17855 Hwy 6, College Station",
-          "stationCount": 1
-        },
-        {
-          "chain": "Circle T",
-          "regular": 3.89,
-          "station": "Circle T",
-          "address": "4954 Holleman Dr S, College Station",
-          "stationCount": 1
+          "stationCount": 2
         },
         {
           "chain": "Chevron",
           "regular": 3.99,
           "station": "Chevron",
           "address": "2000 Boonville Rd, College Station",
-          "stationCount": 4
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.99,
-          "station": "Valero",
-          "address": "2160 Rock Prairie Road, College Station",
           "stationCount": 3
         },
         {
-          "chain": "Shell",
-          "regular": 4.19,
-          "station": "Shell",
-          "address": "12677 FM-2154, College Station",
-          "stationCount": 4
+          "chain": "TXB",
+          "regular": 3.99,
+          "station": "TXB",
+          "address": "17855 Hwy 6, College Station",
+          "stationCount": 1
         },
         {
-          "chain": "CITGO",
+          "chain": "Shell",
           "regular": 4.29,
-          "station": "CITGO",
-          "address": "101 Southwest Pkwy, College Station",
-          "stationCount": 1
+          "station": "Shell",
+          "address": "3300 Texas Ave S, College Station",
+          "stationCount": 5
         }
       ],
       "cheapestOverall": {
-        "chain": "Sam's Club",
-        "station": "Sam's Club",
-        "price": 3.64,
-        "address": "1405  Earl Rudder Fwy, College Station"
+        "chain": "Costco",
+        "station": "Costco",
+        "price": 3.66,
+        "address": "4323 SH-6 S, College Station"
       },
-      "stationsSeen": 30,
+      "stationsSeen": 28,
       "zipsFetched": 2
     },
     "richardson-tx": {
       "chains": [
         {
           "chain": "7-Eleven",
-          "regular": 3.85,
+          "regular": 3.81,
           "station": "7-Eleven",
           "address": "1360 S  Plano  Rd, Richardson",
           "stationCount": 3
         },
         {
           "chain": "QuikTrip",
-          "regular": 3.89,
+          "regular": 3.85,
           "station": "QuikTrip",
           "address": "522 W Belt Line Rd, Richardson",
           "stationCount": 1
         },
         {
           "chain": "RaceTrac",
-          "regular": 3.89,
+          "regular": 3.85,
           "station": "RaceTrac",
           "address": "720 E Arapaho Rd, Richardson",
           "stationCount": 1
         },
         {
+          "chain": "Valero",
+          "regular": 3.85,
+          "station": "Valero",
+          "address": "102 E Arapaho Rd, Richardson",
+          "stationCount": 1
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.85,
+          "station": "Shell",
+          "address": "100 S Greenville Ave, Richardson",
+          "stationCount": 6
+        },
+        {
           "chain": "Kroger",
-          "regular": 3.91,
+          "regular": 3.89,
           "station": "Kroger",
           "address": "536 Centennial Blvd, Richardson",
           "stationCount": 1
         },
         {
-          "chain": "Valero",
-          "regular": 3.94,
-          "station": "Valero",
-          "address": "102 E Arapaho Rd, Richardson",
-          "stationCount": 2
-        },
-        {
           "chain": "Texaco",
-          "regular": 3.99,
+          "regular": 3.94,
           "station": "Texaco",
           "address": "591 W Campbell Rd, Richardson",
           "stationCount": 2
@@ -3256,38 +3214,31 @@
           "stationCount": 1
         },
         {
-          "chain": "Shell",
-          "regular": 4.07,
-          "station": "Shell",
-          "address": "100 S Greenville Ave, Richardson",
-          "stationCount": 5
+          "chain": "Chevron",
+          "regular": 3.99,
+          "station": "Chevron",
+          "address": "701 W Spring Valley Rd, Richardson",
+          "stationCount": 2
         },
         {
           "chain": "Exxon",
-          "regular": 4.09,
+          "regular": 3.99,
           "station": "Exxon",
           "address": "710 W Spring Valley Rd, Richardson",
-          "stationCount": 2
-        },
-        {
-          "chain": "Chevron",
-          "regular": 4.09,
-          "station": "Chevron",
-          "address": "2198 E Arapaho Rd, Richardson",
-          "stationCount": 2
+          "stationCount": 3
         },
         {
           "chain": "Mobil",
           "regular": 4.19,
           "station": "Mobil",
           "address": "1436 W Spring Valley Rd   , Richardson",
-          "stationCount": 2
+          "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "7-Eleven",
         "station": "7-Eleven",
-        "price": 3.85,
+        "price": 3.81,
         "address": "1360 S  Plano  Rd, Richardson"
       },
       "stationsSeen": 22,
@@ -3296,6 +3247,13 @@
     "league-city-tx": {
       "chains": [
         {
+          "chain": "Murphy USA",
+          "regular": 3.67,
+          "station": "Murphy USA",
+          "address": "1721 West Fm 646, League City",
+          "stationCount": 2
+        },
+        {
           "chain": "Walmart Neighborhood Market",
           "regular": 3.68,
           "station": "Walmart Neighborhood Market",
@@ -3303,24 +3261,10 @@
           "stationCount": 1
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.68,
-          "station": "Murphy USA",
-          "address": "1721 West Fm 646, League City",
-          "stationCount": 2
-        },
-        {
           "chain": "HEB Gas",
-          "regular": 3.72,
+          "regular": 3.69,
           "station": "H-E-B",
           "address": "2755 E League City Pkwy, League City",
-          "stationCount": 1
-        },
-        {
-          "chain": "PrimeSpot Gas Station",
-          "regular": 3.74,
-          "station": "PrimeSpot Gas Station",
-          "address": "1210 FM Rd 518 East, League City",
           "stationCount": 1
         },
         {
@@ -3328,42 +3272,42 @@
           "regular": 3.74,
           "station": "Kroger",
           "address": "1920 League City Pkwy, League City",
-          "stationCount": 2
-        },
-        {
-          "chain": "Sunoco",
-          "regular": 3.79,
-          "station": "Sunoco",
-          "address": "1111 W League City Pkwy, League City",
           "stationCount": 3
         },
         {
           "chain": "Valero",
-          "regular": 3.79,
+          "regular": 3.78,
           "station": "Valero",
           "address": "1625 W League City Pkwy, League City",
           "stationCount": 5
         },
         {
-          "chain": "Mobil",
-          "regular": 3.94,
-          "station": "Mobil",
-          "address": "1410 W Main St, League City",
+          "chain": "PrimeSpot Gas Station",
+          "regular": 3.79,
+          "station": "PrimeSpot Gas Station",
+          "address": "1210 FM Rd 518 East, League City",
+          "stationCount": 1
+        },
+        {
+          "chain": "Sunoco",
+          "regular": 3.84,
+          "station": "Sunoco",
+          "address": "1111 W League City Pkwy, League City",
+          "stationCount": 3
+        },
+        {
+          "chain": "TL Mini Express",
+          "regular": 3.9,
+          "station": "TL Mini Express",
+          "address": "3100 Tuscan Lakes Blvd, League City",
           "stationCount": 1
         },
         {
           "chain": "Shell",
-          "regular": 3.95,
+          "regular": 3.99,
           "station": "Shell",
           "address": "1114 W League City Pkwy, League City",
           "stationCount": 2
-        },
-        {
-          "chain": "Buc-ee's",
-          "regular": 3.99,
-          "station": "Buc-ee's",
-          "address": "1702 E League City Pkwy, League City",
-          "stationCount": 1
         },
         {
           "chain": "Texaco",
@@ -3374,59 +3318,52 @@
         },
         {
           "chain": "Exxon",
-          "regular": 4.14,
+          "regular": 4.19,
           "station": "Exxon",
-          "address": "2620 League City Pkwy, League City",
-          "stationCount": 2
+          "address": "2402 W Main St, League City",
+          "stationCount": 1
         },
         {
           "chain": "Chevron",
           "regular": 4.19,
           "station": "Chevron",
           "address": "1726 E Main St, League City",
-          "stationCount": 1
+          "stationCount": 2
         },
         {
           "chain": "Casey's",
-          "regular": 4.46,
+          "regular": 4.39,
           "station": "Casey's",
           "address": "1779 State Route 125, Amelia",
           "stationCount": 1
         },
         {
           "chain": "United Dairy Farmers",
-          "regular": 4.46,
+          "regular": 4.39,
           "station": "United Dairy Farmers",
           "address": "1788 E Ohio Pike, Amelia",
           "stationCount": 1
         },
         {
           "chain": "Marathon",
-          "regular": 4.59,
+          "regular": 4.4,
           "station": "Marathon",
           "address": "2203 OH-125, Amelia",
-          "stationCount": 3
+          "stationCount": 4
         },
         {
           "chain": "Speedway",
-          "regular": 4.61,
+          "regular": 4.52,
           "station": "Speedway",
           "address": "595 W Plane St, Bethel",
-          "stationCount": 1
-        },
-        {
-          "chain": "McKinney  Mart",
-          "regular": 4.69,
-          "station": "McKinney  Mart",
-          "address": "205 W Main St, Hamersville",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Walmart Neighborhood Market",
-        "station": "Walmart Neighborhood Market",
-        "price": 3.68,
-        "address": "2625 W Main St, League City"
+        "chain": "Murphy USA",
+        "station": "Murphy USA",
+        "price": 3.67,
+        "address": "1721 West Fm 646, League City"
       },
       "stationsSeen": 30,
       "zipsFetched": 2
@@ -3435,70 +3372,77 @@
       "chains": [
         {
           "chain": "Sam's Club",
-          "regular": 3.82,
+          "regular": 3.73,
           "station": "Sam's Club",
           "address": "4230 John Ben Shepperd Pkwy, Odessa",
           "stationCount": 1
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.89,
+          "regular": 3.79,
           "station": "Murphy USA",
           "address": "2701 Andrews Hwy, Odessa",
           "stationCount": 2
         },
         {
           "chain": "HEB Gas",
-          "regular": 3.89,
+          "regular": 3.79,
           "station": "H-E-B",
           "address": "3801 E 42nd St, Odessa",
           "stationCount": 1
         },
         {
           "chain": "Texaco",
-          "regular": 3.89,
+          "regular": 3.79,
           "station": "Texaco",
           "address": "3722 Andrews Hwy, Odessa",
           "stationCount": 3
         },
         {
           "chain": "Chevron",
-          "regular": 3.89,
+          "regular": 3.79,
           "station": "Chevron",
           "address": "4117 Andrews Hwy, Odessa",
-          "stationCount": 1
-        },
-        {
-          "chain": "Alon",
-          "regular": 3.94,
-          "station": "Alon",
-          "address": "3900 Tanglewood Ln, Odessa",
-          "stationCount": 13
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.97,
-          "station": "Valero",
-          "address": "3601 Billy Hext Rd, Odessa",
           "stationCount": 2
         },
         {
+          "chain": "Sunoco",
+          "regular": 3.79,
+          "station": "Sunoco",
+          "address": "8001 E SH-191 , Odessa",
+          "stationCount": 1
+        },
+        {
+          "chain": "Stripes",
+          "regular": 3.83,
+          "station": "Stripes",
+          "address": "5201 E 42nd St, Odessa",
+          "stationCount": 4
+        },
+        {
           "chain": "Phillips 66",
-          "regular": 3.99,
+          "regular": 3.86,
           "station": "Phillips 66",
           "address": "1601 N Grant Ave, Odessa",
           "stationCount": 3
         },
         {
-          "chain": "Stripes",
-          "regular": 4.04,
-          "station": "Stripes",
-          "address": "1500 S Grant Ave, Odessa",
-          "stationCount": 3
+          "chain": "Valero",
+          "regular": 3.89,
+          "station": "Valero",
+          "address": "2000 E 8th St, Odessa",
+          "stationCount": 1
+        },
+        {
+          "chain": "Alon",
+          "regular": 3.99,
+          "station": "Alon",
+          "address": "4100 E 52nd St, Odessa",
+          "stationCount": 11
         },
         {
           "chain": "Kent Kwik",
-          "regular": 4.09,
+          "regular": 3.99,
           "station": "Kent Kwik",
           "address": "8701 NE SL-338, Odessa",
           "stationCount": 1
@@ -3507,7 +3451,7 @@
       "cheapestOverall": {
         "chain": "Sam's Club",
         "station": "Sam's Club",
-        "price": 3.82,
+        "price": 3.73,
         "address": "4230 John Ben Shepperd Pkwy, Odessa"
       },
       "stationsSeen": 30,
@@ -3515,13 +3459,6 @@
     },
     "beaumont-tx": {
       "chains": [
-        {
-          "chain": "Sam's Club",
-          "regular": 3.62,
-          "station": "Sam's Club",
-          "address": "1615 IH-10 S, Beaumont",
-          "stationCount": 1
-        },
         {
           "chain": "HEB Gas",
           "regular": 3.72,
@@ -3534,7 +3471,7 @@
           "regular": 3.72,
           "station": "Exxon",
           "address": "1055 IH-10 S, Beaumont",
-          "stationCount": 4
+          "stationCount": 5
         },
         {
           "chain": "Kroger",
@@ -3544,10 +3481,10 @@
           "stationCount": 1
         },
         {
-          "chain": "Shell",
-          "regular": 3.79,
-          "station": "Shell",
-          "address": "4095 Dowlen Rd, Beaumont",
+          "chain": "Valero",
+          "regular": 3.77,
+          "station": "Valero",
+          "address": "5805 SH-105, Beaumont",
           "stationCount": 1
         },
         {
@@ -3559,17 +3496,17 @@
         },
         {
           "chain": "Chevron",
-          "regular": 3.95,
+          "regular": 3.99,
           "station": "Chevron",
           "address": "4015 Eastex Fwy, Beaumont",
           "stationCount": 2
         },
         {
-          "chain": "Valero",
+          "chain": "Shell",
           "regular": 3.99,
-          "station": "Valero",
-          "address": "5805 SH-105, Beaumont",
-          "stationCount": 2
+          "station": "Shell",
+          "address": "6390 Calder Ave, Beaumont",
+          "stationCount": 1
         },
         {
           "chain": "CITGO",
@@ -3580,43 +3517,43 @@
         },
         {
           "chain": "Mobil",
-          "regular": 4.09,
+          "regular": 4.19,
           "station": "Mobil",
           "address": "2795 Eastex Fwy, Beaumont",
           "stationCount": 2
         }
       ],
       "cheapestOverall": {
-        "chain": "Sam's Club",
-        "station": "Sam's Club",
-        "price": 3.62,
-        "address": "1615 IH-10 S, Beaumont"
+        "chain": "HEB Gas",
+        "station": "H-E-B",
+        "price": 3.72,
+        "address": "3025 N Dowlen Rd, Beaumont"
       },
-      "stationsSeen": 17,
+      "stationsSeen": 16,
       "zipsFetched": 2
     },
     "allen-tx": {
       "chains": [
         {
           "chain": "Costco",
-          "regular": 3.61,
+          "regular": 3.62,
           "station": "Costco",
           "address": "1067 SH 121, Allen",
           "stationCount": 1
+        },
+        {
+          "chain": "Murphy USA",
+          "regular": 3.65,
+          "station": "Murphy USA",
+          "address": "105 S. Custer Rd, Allen",
+          "stationCount": 3
         },
         {
           "chain": "Chevron",
           "regular": 3.65,
           "station": "Chevron",
           "address": "406 E Main St, Allen",
-          "stationCount": 2
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 3.67,
-          "station": "Murphy USA",
-          "address": "105 S. Custer Rd, Allen",
-          "stationCount": 2
+          "stationCount": 3
         },
         {
           "chain": "7-Eleven",
@@ -3669,35 +3606,49 @@
         },
         {
           "chain": "Shell",
-          "regular": 3.92,
+          "regular": 4.09,
           "station": "Shell",
           "address": "1106 E Bethany Dr, Allen",
+          "stationCount": 1
+        },
+        {
+          "chain": "Conoco",
+          "regular": 4.09,
+          "station": "Conoco",
+          "address": "175 Southview Dr, Lucas",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Costco",
         "station": "Costco",
-        "price": 3.61,
+        "price": 3.62,
         "address": "1067 SH 121, Allen"
       },
-      "stationsSeen": 26,
+      "stationsSeen": 29,
       "zipsFetched": 2
     },
     "sugar-land-tx": {
       "chains": [
         {
           "chain": "Sam's Club",
-          "regular": 3.59,
+          "regular": 3.67,
           "station": "Sam's Club",
           "address": "351 SH-6, Sugar Land",
           "stationCount": 1
         },
         {
           "chain": "Costco",
-          "regular": 3.59,
+          "regular": 3.67,
           "station": "Costco",
           "address": "17520 Southwest Fwy, Sugar Land",
+          "stationCount": 1
+        },
+        {
+          "chain": "Murphy USA",
+          "regular": 3.69,
+          "station": "Murphy Express",
+          "address": "7520 Highway 90 A., Sugar Land",
           "stationCount": 1
         },
         {
@@ -3705,35 +3656,21 @@
           "regular": 3.69,
           "station": "Shell",
           "address": "1750 Williams Trace Blvd, Sugar Land",
-          "stationCount": 13
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 3.72,
-          "station": "Murphy Express",
-          "address": "7520 Highway 90 A., Sugar Land",
-          "stationCount": 1
+          "stationCount": 12
         },
         {
           "chain": "HEB Gas",
           "regular": 3.72,
           "station": "H-E-B",
-          "address": "530 SH-6, Sugar Land",
+          "address": "19900 SW Fwy, Sugar Land",
           "stationCount": 2
         },
         {
-          "chain": "Chevron",
-          "regular": 3.77,
-          "station": "Chevron",
-          "address": "5823 New Territory Blvd, Sugar Land",
-          "stationCount": 1
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.77,
-          "station": "Exxon",
-          "address": "5700 New Territory Blvd, Sugar Land",
-          "stationCount": 4
+          "chain": "Valero",
+          "regular": 3.79,
+          "station": "Valero",
+          "address": "13445 W Airport Blvd, Sugar Land",
+          "stationCount": 2
         },
         {
           "chain": "Kroger",
@@ -3743,95 +3680,109 @@
           "stationCount": 1
         },
         {
-          "chain": "Valero",
-          "regular": 3.99,
-          "station": "Valero",
-          "address": "13445 W Airport Blvd, Sugar Land",
+          "chain": "Exxon",
+          "regular": 3.85,
+          "station": "Exxon",
+          "address": "16760 SW Fwy, Sugar Land",
+          "stationCount": 5
+        },
+        {
+          "chain": "Chevron",
+          "regular": 3.89,
+          "station": "Chevron",
+          "address": "5823 New Territory Blvd, Sugar Land",
           "stationCount": 2
+        },
+        {
+          "chain": "Mobil",
+          "regular": 3.99,
+          "station": "Mobil",
+          "address": "11930 Dairy Ashford Rd, Sugar Land",
+          "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Sam's Club",
         "station": "Sam's Club",
-        "price": 3.59,
+        "price": 3.67,
         "address": "351 SH-6, Sugar Land"
       },
-      "stationsSeen": 26,
+      "stationsSeen": 28,
       "zipsFetched": 2
     },
     "edinburg-tx": {
       "chains": [
         {
-          "chain": "Murphy USA",
-          "regular": 3.83,
-          "station": "Murphy Express",
-          "address": "101 E Monte Cristo Rd, Edinburg",
-          "stationCount": 3
-        },
-        {
-          "chain": "Stripes",
-          "regular": 3.86,
-          "station": "Stripes",
-          "address": "814 S Closner Blvd, Edinburg",
-          "stationCount": 3
+          "chain": "HEB Gas",
+          "regular": 3.74,
+          "station": "H-E-B",
+          "address": "1212 S Closner Blvd, Edinburg",
+          "stationCount": 1
         },
         {
           "chain": "Sunoco",
-          "regular": 3.86,
+          "regular": 3.74,
           "station": "Sunoco",
           "address": "4218 S McColl Rd, Edinburg",
           "stationCount": 6
         },
         {
+          "chain": "Valero",
+          "regular": 3.74,
+          "station": "Valero",
+          "address": "2824 W Freddy Gonzalez Dr, Edinburg",
+          "stationCount": 9
+        },
+        {
+          "chain": "Murphy USA",
+          "regular": 3.74,
+          "station": "Murphy USA",
+          "address": "4245 South Mc Coll Road, Edinburg",
+          "stationCount": 3
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.76,
+          "station": "Exxon",
+          "address": "1415 E University Dr, Edinburg",
+          "stationCount": 3
+        },
+        {
+          "chain": "Stripes",
+          "regular": 3.77,
+          "station": "Stripes",
+          "address": "1210 E Monte Cristo Rd, Edinburg",
+          "stationCount": 3
+        },
+        {
           "chain": "Chevron",
-          "regular": 3.86,
+          "regular": 3.77,
           "station": "Chevron",
           "address": "102 E Monte Cristo Rd, Edinburg",
           "stationCount": 1
         },
         {
-          "chain": "Exxon",
-          "regular": 3.88,
-          "station": "Exxon",
-          "address": "4120 S Bus US-281, Edinburg",
-          "stationCount": 3
-        },
-        {
-          "chain": "HEB Gas",
-          "regular": 3.89,
-          "station": "H-E-B",
-          "address": "1212 S Closner Blvd, Edinburg",
-          "stationCount": 2
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.89,
-          "station": "Valero",
-          "address": "802 W University Dr, Edinburg",
-          "stationCount": 9
-        },
-        {
-          "chain": "El Tigre",
-          "regular": 3.89,
-          "station": "El Tigre",
-          "address": "2812 W University Dr, Edinburg",
+          "chain": "TA Travel Center",
+          "regular": 3.77,
+          "station": "TA Travel Center",
+          "address": "8301 N IH-69C, Edinburg",
           "stationCount": 1
         },
         {
-          "chain": "TA Travel Center",
-          "regular": 3.99,
-          "station": "TA Travel Center",
-          "address": "8301 N IH-69C, Edinburg",
+          "chain": "El Tigre",
+          "regular": 3.87,
+          "station": "El Tigre",
+          "address": "2812 W University Dr, Edinburg",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Murphy USA",
-        "station": "Murphy Express",
-        "price": 3.83,
-        "address": "101 E Monte Cristo Rd, Edinburg"
+        "chain": "HEB Gas",
+        "station": "H-E-B",
+        "price": 3.74,
+        "address": "1212 S Closner Blvd, Edinburg"
       },
-      "stationsSeen": 29,
+      "stationsSeen": 28,
       "zipsFetched": 2
     },
     "tyler-tx": {
@@ -3844,18 +3795,18 @@
           "stationCount": 1
         },
         {
-          "chain": "Brookshire's",
-          "regular": 3.73,
-          "station": "Brookshire's",
-          "address": "6991 Old Jacksonville Hwy, Tyler",
-          "stationCount": 2
-        },
-        {
           "chain": "Murphy USA",
           "regular": 3.73,
           "station": "Murphy USA",
           "address": "187 W South Town Drive, Tyler",
           "stationCount": 1
+        },
+        {
+          "chain": "Brookshire's",
+          "regular": 3.73,
+          "station": "Brookshire's",
+          "address": "6991 Old Jacksonville Hwy, Tyler",
+          "stationCount": 2
         },
         {
           "chain": "Walmart Neighborhood Market",
@@ -3866,38 +3817,45 @@
         },
         {
           "chain": "Super 1 Foods",
-          "regular": 3.77,
+          "regular": 3.73,
           "station": "Super 1 Foods",
-          "address": "3822 Troup Hwy, Tyler",
-          "stationCount": 1
+          "address": "172 Centennial Pkwy, Tyler",
+          "stationCount": 2
+        },
+        {
+          "chain": "CEFCO",
+          "regular": 3.77,
+          "station": "CEFCO",
+          "address": "5502 Old Bullard Rd, Tyler",
+          "stationCount": 2
         },
         {
           "chain": "Exxon",
           "regular": 3.77,
           "station": "Exxon",
           "address": "1001 W Grande Blvd, Tyler",
-          "stationCount": 8
-        },
-        {
-          "chain": "Sunoco",
-          "regular": 3.79,
-          "station": "Sunoco",
-          "address": "15291 SH-155, Tyler",
-          "stationCount": 1
-        },
-        {
-          "chain": "CEFCO",
-          "regular": 3.81,
-          "station": "CEFCO",
-          "address": "5033 Troup Hwy, Tyler",
-          "stationCount": 2
+          "stationCount": 7
         },
         {
           "chain": "Valero",
-          "regular": 3.81,
+          "regular": 3.77,
           "station": "Valero",
           "address": "4300 S Broadway Ave, Tyler",
-          "stationCount": 7
+          "stationCount": 5
+        },
+        {
+          "chain": "Brake Time",
+          "regular": 3.79,
+          "station": "Brake Time",
+          "address": "5120 Old Jacksonville Hwy, Tyler",
+          "stationCount": 1
+        },
+        {
+          "chain": "Mahi Food and Smoke Mart",
+          "regular": 3.79,
+          "station": "Mahi Food and Smoke Mart",
+          "address": "4725 Troup Hwy, Tyler",
+          "stationCount": 1
         },
         {
           "chain": "VP Racing Fuels",
@@ -3907,17 +3865,24 @@
           "stationCount": 1
         },
         {
-          "chain": "Brake Time",
+          "chain": "Chevron",
           "regular": 3.89,
-          "station": "Brake Time",
-          "address": "5120 Old Jacksonville Hwy, Tyler",
+          "station": "Chevron",
+          "address": "16772 FM-2493, Tyler",
+          "stationCount": 2
+        },
+        {
+          "chain": "Zippy J's",
+          "regular": 3.89,
+          "station": "Zippy J's",
+          "address": "1610 S Vine St, Tyler",
           "stationCount": 1
         },
         {
-          "chain": "Chevron",
+          "chain": "Conoco",
           "regular": 3.99,
-          "station": "Chevron",
-          "address": "6098 Old Jacksonville Hwy, Tyler",
+          "station": "Conoco",
+          "address": "3400 E Fifth St, Tyler",
           "stationCount": 1
         },
         {
@@ -3925,13 +3890,6 @@
           "regular": 3.99,
           "station": "RaceRunner",
           "address": "1801 S SE SL-323, Tyler",
-          "stationCount": 1
-        },
-        {
-          "chain": "Zippy J's",
-          "regular": 3.99,
-          "station": "Zippy J's",
-          "address": "1610 S Vine St, Tyler",
           "stationCount": 1
         }
       ],
@@ -3982,6 +3940,13 @@
           "stationCount": 1
         },
         {
+          "chain": "DK",
+          "regular": 3.89,
+          "station": "DK",
+          "address": "2515 5th St, Wichita Falls",
+          "stationCount": 3
+        },
+        {
           "chain": "Pilot/Flying J",
           "regular": 3.89,
           "station": "Flying J",
@@ -3994,13 +3959,6 @@
           "station": "Abel General Store",
           "address": "2400 Brook Ave, Wichita Falls",
           "stationCount": 1
-        },
-        {
-          "chain": "DK",
-          "regular": 3.89,
-          "station": "DK",
-          "address": "2515 5th St, Wichita Falls",
-          "stationCount": 3
         },
         {
           "chain": "Exxon",
@@ -4017,6 +3975,13 @@
           "stationCount": 1
         },
         {
+          "chain": "Shop & Go",
+          "regular": 4.09,
+          "station": "Shop & Go",
+          "address": "1408 Scott St, Wichita Falls",
+          "stationCount": 1
+        },
+        {
           "chain": "Sunoco",
           "regular": 4.29,
           "station": "Sunoco",
@@ -4030,58 +3995,65 @@
         "price": 3.71,
         "address": "3801 Kell Blvd, Wichita Falls"
       },
-      "stationsSeen": 15,
+      "stationsSeen": 16,
       "zipsFetched": 2
     },
     "san-angelo-tx": {
       "chains": [
         {
           "chain": "Sam's Club",
-          "regular": 3.85,
+          "regular": 3.8,
           "station": "Sam's Club",
           "address": "5749 Sherwood Way, San Angelo",
           "stationCount": 1
         },
         {
+          "chain": "Chevron",
+          "regular": 3.84,
+          "station": "Chevron",
+          "address": "5665 Sherwood Way, San Angelo",
+          "stationCount": 1
+        },
+        {
+          "chain": "Stripes",
+          "regular": 3.84,
+          "station": "Stripes",
+          "address": "4560 Sherwood Way, San Angelo",
+          "stationCount": 9
+        },
+        {
           "chain": "Alon",
-          "regular": 3.89,
+          "regular": 3.85,
           "station": "Alon",
           "address": "8210 N US-87, Grape Creek",
           "stationCount": 9
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.92,
+          "regular": 3.86,
           "station": "Murphy USA",
           "address": "5525 Sherwood Way, San Angelo",
           "stationCount": 1
         },
         {
           "chain": "HEB Gas",
-          "regular": 3.92,
+          "regular": 3.87,
           "station": "H-E-B",
-          "address": "5502 Sherwood Way, San Angelo",
+          "address": "3301 Sherwood Way, San Angelo",
           "stationCount": 2
         },
         {
-          "chain": "Stripes",
-          "regular": 3.92,
-          "station": "Stripes",
-          "address": "4560 Sherwood Way, San Angelo",
-          "stationCount": 6
-        },
-        {
           "chain": "Jack's Convenience Store",
-          "regular": 3.94,
+          "regular": 3.91,
           "station": "Jack's Convenience Store",
           "address": "4515 Knickerbocker Rd, San Angelo",
           "stationCount": 1
         },
         {
-          "chain": "Chevron",
-          "regular": 3.94,
-          "station": "Chevron",
-          "address": "5665 Sherwood Way, San Angelo",
+          "chain": "Shell",
+          "regular": 4.14,
+          "station": "Shell",
+          "address": "2451 Sherwood Way, San Angelo",
           "stationCount": 1
         },
         {
@@ -4090,59 +4062,59 @@
           "station": "Phillips 66",
           "address": "3131 Sunset Dr, San Angelo",
           "stationCount": 1
-        },
-        {
-          "chain": "Shell",
-          "regular": 4.19,
-          "station": "Shell",
-          "address": "2451 Sherwood Way, San Angelo",
-          "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Sam's Club",
         "station": "Sam's Club",
-        "price": 3.85,
+        "price": 3.8,
         "address": "5749 Sherwood Way, San Angelo"
       },
-      "stationsSeen": 23,
+      "stationsSeen": 26,
       "zipsFetched": 2
     },
     "longview-tx": {
       "chains": [
         {
-          "chain": "Sam's Club",
-          "regular": 3.63,
-          "station": "Sam's Club",
-          "address": "3310 N 4th St, Longview",
-          "stationCount": 1
-        },
-        {
           "chain": "Fresh by Brookshires",
-          "regular": 3.63,
+          "regular": 3.51,
           "station": "Fresh by Brookshires",
           "address": "3121 N Eastman Rd, Longview",
           "stationCount": 1
         },
         {
+          "chain": "Sam's Club",
+          "regular": 3.57,
+          "station": "Sam's Club",
+          "address": "3310 N 4th St, Longview",
+          "stationCount": 1
+        },
+        {
           "chain": "Murphy USA",
-          "regular": 3.69,
+          "regular": 3.57,
           "station": "Murphy USA",
           "address": "301 E. Loop 281, Longview",
           "stationCount": 3
         },
         {
           "chain": "Walmart Neighborhood Market",
-          "regular": 3.79,
+          "regular": 3.75,
           "station": "Walmart Neighborhood Market",
           "address": "3812 Gilmer Rd, Longview",
           "stationCount": 1
         },
         {
           "chain": "Brookshire's",
-          "regular": 3.79,
+          "regular": 3.75,
           "station": "Brookshire's",
           "address": "3354 Gilmer Rd, Longview",
+          "stationCount": 1
+        },
+        {
+          "chain": "Super 1 Foods",
+          "regular": 3.8,
+          "station": "Super 1 Foods",
+          "address": "1217 E Marshall Ave, Longview",
           "stationCount": 1
         },
         {
@@ -4153,10 +4125,10 @@
           "stationCount": 1
         },
         {
-          "chain": "Super 1 Foods",
-          "regular": 3.88,
-          "station": "Super 1 Foods",
-          "address": "1217 E Marshall Ave, Longview",
+          "chain": "E-Z Mart",
+          "regular": 3.89,
+          "station": "E-Z Mart",
+          "address": "1910 Judson Rd, Longview",
           "stationCount": 1
         },
         {
@@ -4164,14 +4136,7 @@
           "regular": 3.89,
           "station": "Brake Time",
           "address": "2300 Gilmer Rd, Longview",
-          "stationCount": 5
-        },
-        {
-          "chain": "E-Z Mart",
-          "regular": 3.94,
-          "station": "E-Z Mart",
-          "address": "1232 McCann Rd, Longview",
-          "stationCount": 2
+          "stationCount": 4
         },
         {
           "chain": "Exxon",
@@ -4188,106 +4153,113 @@
           "stationCount": 2
         },
         {
-          "chain": "Valero",
-          "regular": 3.99,
-          "station": "Valero",
-          "address": "2720 E Marshall Ave, Longview",
-          "stationCount": 2
-        },
-        {
           "chain": "Shell",
           "regular": 3.99,
           "station": "Shell",
-          "address": "1920 E Marshall Ave, Longview",
-          "stationCount": 5
+          "address": "522 W Marshall Ave, Longview",
+          "stationCount": 7
+        },
+        {
+          "chain": "Brake time corner market",
+          "regular": 4.19,
+          "station": "Brake time corner market",
+          "address": "427 E Loop 281, Longview",
+          "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Sam's Club",
-        "station": "Sam's Club",
-        "price": 3.63,
-        "address": "3310 N 4th St, Longview"
+        "chain": "Fresh by Brookshires",
+        "station": "Fresh by Brookshires",
+        "price": 3.51,
+        "address": "3121 N Eastman Rd, Longview"
       },
-      "stationsSeen": 30,
+      "stationsSeen": 29,
       "zipsFetched": 2
     },
     "pflugerville-tx": {
       "chains": [
         {
           "chain": "Murphy USA",
-          "regular": 3.82,
+          "regular": 3.74,
           "station": "Murphy USA",
           "address": "1548 Fm 685 Bldg #2, Pflugerville",
           "stationCount": 1
         },
         {
+          "chain": "Circle K",
+          "regular": 3.75,
+          "station": "Circle K",
+          "address": "2615 Pecan St W, Pflugerville",
+          "stationCount": 1
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.75,
+          "station": "Valero",
+          "address": "2925 FM-1825, Pflugerville",
+          "stationCount": 2
+        },
+        {
           "chain": "Costco",
-          "regular": 3.82,
+          "regular": 3.75,
           "station": "Costco",
           "address": "1901 Kelly Ln, Pflugerville",
           "stationCount": 1
         },
         {
           "chain": "7-Eleven",
-          "regular": 3.83,
+          "regular": 3.76,
           "station": "7-Eleven",
           "address": "1717 Pflugerville Pkwy, Pflugerville",
           "stationCount": 4
         },
         {
           "chain": "HEB Gas",
-          "regular": 3.84,
+          "regular": 3.76,
           "station": "H-E-B",
           "address": "2641 E Pflugerville Pkwy, Pflugerville",
+          "stationCount": 3
+        },
+        {
+          "chain": "MinuteFuel",
+          "regular": 3.77,
+          "station": "MinuteFuel",
+          "address": "601 Oxford Dr, Pflugerville",
           "stationCount": 1
         },
         {
-          "chain": "Shell",
-          "regular": 3.85,
-          "station": "Shell",
-          "address": "618 FM-685, Pflugerville",
-          "stationCount": 4
-        },
-        {
           "chain": "QuikTrip",
-          "regular": 3.87,
+          "regular": 3.77,
           "station": "QuikTrip",
           "address": "1202 FM-685, Pflugerville",
           "stationCount": 4
         },
         {
-          "chain": "Circle K",
-          "regular": 3.89,
-          "station": "Circle K",
-          "address": "2615 Pecan St W, Pflugerville",
+          "chain": "Shell",
+          "regular": 3.79,
+          "station": "Shell",
+          "address": "419 W Pflugerville Pkwy, Pflugerville",
           "stationCount": 1
         },
         {
           "chain": "Exxon",
-          "regular": 3.89,
+          "regular": 3.79,
           "station": "Exxon",
           "address": "15010 FM-1825, Pflugerville",
           "stationCount": 1
         },
         {
-          "chain": "Valero",
-          "regular": 3.99,
-          "station": "Valero",
-          "address": "208 E Wells Branch Pkwy, Pflugerville",
-          "stationCount": 2
-        },
-        {
-          "chain": "Chevron",
-          "regular": 3.99,
-          "station": "Chevron",
-          "address": "14815-A Dessau Rd, Pflugerville",
+          "chain": "CITGO",
+          "regular": 3.82,
+          "station": "CITGO",
+          "address": "13701 N IH-35, Austin",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
         "chain": "Murphy USA",
         "station": "Murphy USA",
-        "price": 3.82,
+        "price": 3.74,
         "address": "1548 Fm 685 Bldg #2, Pflugerville"
       },
       "stationsSeen": 20,
@@ -4296,102 +4268,95 @@
     "cedar-park-tx": {
       "chains": [
         {
-          "chain": "Xpress Fuel",
-          "regular": 3.76,
-          "station": "Xpress Fuel",
-          "address": "10210 Crystal Falls Pkwy, Leander",
-          "stationCount": 1
-        },
-        {
-          "chain": "Murphy USA",
-          "regular": 3.79,
-          "station": "Murphy USA",
-          "address": "2741 E. Whitestone Blvd., Cedar Park",
-          "stationCount": 3
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.79,
-          "station": "7-Eleven",
-          "address": "1220 E New Hope Dr, Cedar Park",
-          "stationCount": 4
-        },
-        {
           "chain": "Costco",
-          "regular": 3.79,
+          "regular": 3.67,
           "station": "Costco",
           "address": "4601 183A Toll Rd, Cedar Park",
           "stationCount": 1
         },
         {
           "chain": "Chevron",
-          "regular": 3.79,
+          "regular": 3.69,
           "station": "Chevron",
-          "address": "207 N US-183, Leander",
-          "stationCount": 3
-        },
-        {
-          "chain": "Shell",
-          "regular": 3.79,
-          "station": "Shell",
-          "address": "707 S US-183, Leander",
-          "stationCount": 1
-        },
-        {
-          "chain": "QuikTrip",
-          "regular": 3.79,
-          "station": "QuikTrip",
-          "address": "11141 183A Toll Rd, Leander",
-          "stationCount": 3
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.79,
-          "station": "Exxon",
-          "address": "101 N US-183, Leander",
+          "address": "3001 E Whitestone Blvd, Cedar Park",
           "stationCount": 4
         },
         {
-          "chain": "Camco Mart",
-          "regular": 3.79,
-          "station": "Camco Mart",
-          "address": "1912 S Bagdad Rd, Leander",
-          "stationCount": 1
+          "chain": "Murphy USA",
+          "regular": 3.69,
+          "station": "Murphy USA",
+          "address": "201 Walton Way Building B, Cedar Park",
+          "stationCount": 3
         },
         {
           "chain": "Valero",
-          "regular": 3.79,
+          "regular": 3.71,
           "station": "Valero",
-          "address": "12200 Old 2243 W, Leander",
-          "stationCount": 4
-        },
-        {
-          "chain": "HEB Gas",
-          "regular": 3.84,
-          "station": "H-E-B",
-          "address": "170 E Whitestone Blvd , Cedar Park",
+          "address": "901 W Whitestone Blvd, Cedar Park",
           "stationCount": 3
         },
         {
+          "chain": "7-Eleven",
+          "regular": 3.71,
+          "station": "7-Eleven",
+          "address": "900 W Whitestone Blvd, Cedar Park",
+          "stationCount": 4
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.71,
+          "station": "Exxon",
+          "address": "1900 Bagdad Rd, Cedar Park",
+          "stationCount": 5
+        },
+        {
+          "chain": "QuikTrip",
+          "regular": 3.72,
+          "station": "QuikTrip",
+          "address": "1911 N Bell Blvd, Cedar Park",
+          "stationCount": 5
+        },
+        {
+          "chain": "HEB Gas",
+          "regular": 3.72,
+          "station": "H-E-B",
+          "address": "601 N US-183, Leander",
+          "stationCount": 1
+        },
+        {
           "chain": "Circle K",
-          "regular": 3.85,
+          "regular": 3.73,
           "station": "Circle K",
           "address": "900 S Bell Blvd, Cedar Park",
           "stationCount": 1
         },
         {
+          "chain": "Xpress Fuel",
+          "regular": 3.74,
+          "station": "Xpress Fuel",
+          "address": "10210 Crystal Falls Pkwy, Leander",
+          "stationCount": 1
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.77,
+          "station": "Shell",
+          "address": "707 S US-183, Leander",
+          "stationCount": 1
+        },
+        {
           "chain": "Crystal Mart & Kitchen",
-          "regular": 3.85,
+          "regular": 3.79,
           "station": "Crystal Mart & Kitchen",
           "address": "1607 Glass Dr, Leander",
           "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Xpress Fuel",
-        "station": "Xpress Fuel",
-        "price": 3.76,
-        "address": "10210 Crystal Falls Pkwy, Leander"
+        "chain": "Costco",
+        "station": "Costco",
+        "price": 3.67,
+        "address": "4601 183A Toll Rd, Cedar Park"
       },
       "stationsSeen": 30,
       "zipsFetched": 2
@@ -4399,134 +4364,127 @@
     "georgetown-tx": {
       "chains": [
         {
-          "chain": "QuikTrip",
-          "regular": 3.79,
-          "station": "QuikTrip",
-          "address": "7601 W SH-29, Georgetown",
-          "stationCount": 4
-        },
-        {
-          "chain": "HEB Gas",
-          "regular": 3.79,
-          "station": "H-E-B",
-          "address": "19344 Ronald Reagan Blvd, Georgetown",
-          "stationCount": 2
-        },
-        {
-          "chain": "Circle K",
-          "regular": 3.85,
-          "station": "Circle K",
-          "address": "3817 Williams Dr, Georgetown",
-          "stationCount": 2
-        },
-        {
           "chain": "Speedy Stop",
-          "regular": 3.86,
+          "regular": 3.77,
           "station": "Speedy Stop",
           "address": "1007 Leander Rd, Georgetown",
           "stationCount": 1
         },
         {
+          "chain": "HEB Gas",
+          "regular": 3.77,
+          "station": "H-E-B",
+          "address": "19344 Ronald Reagan Blvd, Georgetown",
+          "stationCount": 2
+        },
+        {
           "chain": "Murphy USA",
-          "regular": 3.86,
+          "regular": 3.78,
           "station": "Murphy USA",
           "address": "622 South I-H 35, Georgetown",
           "stationCount": 1
         },
         {
-          "chain": "Costco",
-          "regular": 3.86,
-          "station": "Costco",
-          "address": "2201B N IH 35, Georgetown",
-          "stationCount": 1
-        },
-        {
-          "chain": "Valero",
-          "regular": 3.86,
-          "station": "Valero",
-          "address": "700 N Austin Ave, Georgetown",
-          "stationCount": 4
-        },
-        {
           "chain": "Shell",
-          "regular": 3.88,
+          "regular": 3.79,
           "station": "Shell",
           "address": "1015 Leander Rd, Georgetown",
           "stationCount": 4
         },
         {
-          "chain": "Exxon",
-          "regular": 3.89,
-          "station": "Exxon",
-          "address": "2995 Williams Dr, Georgetown",
-          "stationCount": 4
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.89,
-          "station": "7-Eleven",
-          "address": "2090 Westinghouse Rd, Georgetown",
-          "stationCount": 2
-        },
-        {
-          "chain": "Chevron",
-          "regular": 3.92,
-          "station": "Chevron",
-          "address": "2403 Williams Dr, Georgetown",
-          "stationCount": 1
-        },
-        {
-          "chain": "TXB",
-          "regular": 3.92,
-          "station": "TXB",
-          "address": "1402 Williams Dr, Georgetown",
-          "stationCount": 1
-        },
-        {
-          "chain": "Petroleum Wholesale",
-          "regular": 3.99,
-          "station": "Petroleum Wholesale",
-          "address": "3800 N IH-35, Georgetown",
-          "stationCount": 1
-        },
-        {
           "chain": "JF",
-          "regular": 4.05,
+          "regular": 3.79,
           "station": "JF",
           "address": "101 Luther Dr, Georgetown",
           "stationCount": 1
         },
         {
-          "chain": "Snack Stop",
-          "regular": 4.09,
-          "station": "Snack Stop",
-          "address": "1125 Westinghouse Rd, Georgetown",
+          "chain": "QuikTrip",
+          "regular": 3.79,
+          "station": "QuikTrip",
+          "address": "7601 W SH-29, Georgetown",
+          "stationCount": 3
+        },
+        {
+          "chain": "TXB",
+          "regular": 3.79,
+          "station": "TXB",
+          "address": "1402 Williams Dr, Georgetown",
           "stationCount": 1
+        },
+        {
+          "chain": "Costco",
+          "regular": 3.79,
+          "station": "Costco",
+          "address": "2201B N IH 35, Georgetown",
+          "stationCount": 1
+        },
+        {
+          "chain": "Circle K",
+          "regular": 3.79,
+          "station": "Circle K",
+          "address": "3817 Williams Dr, Georgetown",
+          "stationCount": 1
+        },
+        {
+          "chain": "7-Eleven",
+          "regular": 3.79,
+          "station": "7-Eleven",
+          "address": "1315 W University Ave, Georgetown",
+          "stationCount": 1
+        },
+        {
+          "chain": "Exxon",
+          "regular": 3.79,
+          "station": "Exxon",
+          "address": "2995 Williams Dr, Georgetown",
+          "stationCount": 2
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.99,
+          "station": "Valero",
+          "address": "30713 Chi Chi Dr, Georgetown",
+          "stationCount": 2
         }
       ],
       "cheapestOverall": {
-        "chain": "QuikTrip",
-        "station": "QuikTrip",
-        "price": 3.79,
-        "address": "7601 W SH-29, Georgetown"
+        "chain": "Speedy Stop",
+        "station": "Speedy Stop",
+        "price": 3.77,
+        "address": "1007 Leander Rd, Georgetown"
       },
-      "stationsSeen": 30,
+      "stationsSeen": 20,
       "zipsFetched": 2
     },
     "conroe-tx": {
       "chains": [
         {
+          "chain": "Ike Store",
+          "regular": 3.45,
+          "station": "Ike Store",
+          "address": "12111 FM-3083 , Conroe",
+          "stationCount": 1
+        },
+        {
           "chain": "Sam's Club",
-          "regular": 3.64,
+          "regular": 3.63,
           "station": "Sam's Club",
           "address": "2000 Westview Blvd, Conroe",
           "stationCount": 1
         },
         {
-          "chain": "All-Mart",
-          "regular": 3.69,
-          "station": "All-Mart",
-          "address": "2123 N Thompson St, Conroe",
+          "chain": "Valero",
+          "regular": 3.73,
+          "station": "Valero",
+          "address": "2016 N FM-3083 W, Conroe",
+          "stationCount": 4
+        },
+        {
+          "chain": "Mobil",
+          "regular": 3.73,
+          "station": "Mobil",
+          "address": "3900 E Davis St, Conroe",
           "stationCount": 1
         },
         {
@@ -4545,44 +4503,23 @@
         },
         {
           "chain": "HEB Gas",
-          "regular": 3.75,
+          "regular": 3.89,
           "station": "H-E-B",
           "address": "3875 W Davis St, Conroe",
-          "stationCount": 2
-        },
-        {
-          "chain": "Mobil",
-          "regular": 3.75,
-          "station": "Mobil",
-          "address": "3900 E Davis St, Conroe",
           "stationCount": 1
         },
         {
-          "chain": "Valero",
-          "regular": 3.79,
-          "station": "Valero",
-          "address": "2016 N FM-3083 W, Conroe",
-          "stationCount": 3
-        },
-        {
           "chain": "Exxon",
-          "regular": 3.85,
+          "regular": 3.89,
           "station": "Exxon",
           "address": "1300 W Davis St, Conroe",
-          "stationCount": 4
+          "stationCount": 2
         },
         {
-          "chain": "Shell",
+          "chain": "Super Stop",
           "regular": 3.89,
-          "station": "Shell",
-          "address": "200 S SL-336 W, Conroe",
-          "stationCount": 5
-        },
-        {
-          "chain": "Kroger",
-          "regular": 3.89,
-          "station": "Kroger",
-          "address": "316 S  SL-336 W, Conroe",
+          "station": "Super Stop",
+          "address": "1500 S Frazier St, Conroe",
           "stationCount": 1
         },
         {
@@ -4594,16 +4531,30 @@
         },
         {
           "chain": "Sunoco",
-          "regular": 3.99,
+          "regular": 3.96,
           "station": "Sunoco",
-          "address": "3760 FM-2854, Conroe",
+          "address": "830 Wilson Rd, Conroe",
           "stationCount": 2
         },
         {
-          "chain": "QuikTrip",
+          "chain": "Shell",
           "regular": 3.99,
-          "station": "QuikTrip",
-          "address": "1224 Wilson Rd, Conroe",
+          "station": "Shell",
+          "address": "200 S SL-336 W, Conroe",
+          "stationCount": 5
+        },
+        {
+          "chain": "Kroger",
+          "regular": 3.99,
+          "station": "Kroger",
+          "address": "316 S  SL-336 W, Conroe",
+          "stationCount": 1
+        },
+        {
+          "chain": "All-Mart",
+          "regular": 3.99,
+          "station": "All-Mart",
+          "address": "2123 N Thompson St, Conroe",
           "stationCount": 1
         },
         {
@@ -4612,13 +4563,20 @@
           "station": "Circle K",
           "address": "2497 S SL-336 E, Conroe",
           "stationCount": 1
+        },
+        {
+          "chain": "76",
+          "regular": 4.09,
+          "station": "76",
+          "address": "3800 S SL-336 E, Conroe",
+          "stationCount": 1
         }
       ],
       "cheapestOverall": {
-        "chain": "Sam's Club",
-        "station": "Sam's Club",
-        "price": 3.64,
-        "address": "2000 Westview Blvd, Conroe"
+        "chain": "Ike Store",
+        "station": "Ike Store",
+        "price": 3.45,
+        "address": "12111 FM-3083 , Conroe"
       },
       "stationsSeen": 30,
       "zipsFetched": 2
@@ -4626,24 +4584,24 @@
     "baytown-tx": {
       "chains": [
         {
-          "chain": "Texaco",
-          "regular": 3.69,
-          "station": "Texaco",
-          "address": "2107 W Cedar Bayou Lynchburg Rd, Baytown",
-          "stationCount": 1
-        },
-        {
-          "chain": "Circle T",
-          "regular": 3.69,
-          "station": "Circle T",
-          "address": "2 Williams Ave, Baytown",
-          "stationCount": 1
+          "chain": "Valero",
+          "regular": 3.65,
+          "station": "Valero",
+          "address": "2 Fayle St, Baytown",
+          "stationCount": 4
         },
         {
           "chain": "Murphy USA",
-          "regular": 3.72,
+          "regular": 3.69,
           "station": "Murphy USA",
           "address": "4906 Garth Road, Baytown",
+          "stationCount": 1
+        },
+        {
+          "chain": "HEB Gas",
+          "regular": 3.69,
+          "station": "H-E-B",
+          "address": "6430 Garth Rd, Baytown",
           "stationCount": 1
         },
         {
@@ -4654,34 +4612,6 @@
           "stationCount": 2
         },
         {
-          "chain": "HEB Gas",
-          "regular": 3.72,
-          "station": "H-E-B",
-          "address": "6430 Garth Rd, Baytown",
-          "stationCount": 1
-        },
-        {
-          "chain": "Munchiez",
-          "regular": 3.74,
-          "station": "Munchiez",
-          "address": "2206 E James St, Baytown",
-          "stationCount": 1
-        },
-        {
-          "chain": "7-Eleven",
-          "regular": 3.77,
-          "station": "7-Eleven",
-          "address": "5907 Garth Rd, Baytown",
-          "stationCount": 3
-        },
-        {
-          "chain": "Pilot/Flying J",
-          "regular": 3.79,
-          "station": "Flying J",
-          "address": "1876 East Fwy, Baytown",
-          "stationCount": 1
-        },
-        {
           "chain": "Love's",
           "regular": 3.79,
           "station": "Love's Travel Stop",
@@ -4689,18 +4619,32 @@
           "stationCount": 1
         },
         {
-          "chain": "Valero",
+          "chain": "Texaco",
           "regular": 3.79,
-          "station": "Valero",
-          "address": "3000 W Baker Rd, Baytown",
-          "stationCount": 4
+          "station": "Texaco",
+          "address": "2107 W Cedar Bayou Lynchburg Rd, Baytown",
+          "stationCount": 1
         },
         {
-          "chain": "Sunoco",
+          "chain": "Exxon",
           "regular": 3.79,
-          "station": "Sunoco",
-          "address": "5035 E Wallisville Rd, Baytown",
+          "station": "Exxon",
+          "address": "101 S Alexander Dr, Baytown",
+          "stationCount": 2
+        },
+        {
+          "chain": "Munchiez",
+          "regular": 3.79,
+          "station": "Munchiez",
+          "address": "2206 E James St, Baytown",
           "stationCount": 1
+        },
+        {
+          "chain": "7-Eleven",
+          "regular": 3.85,
+          "station": "7-Eleven",
+          "address": "5907 Garth Rd, Baytown",
+          "stationCount": 2
         },
         {
           "chain": "Oasis",
@@ -4710,17 +4654,24 @@
           "stationCount": 1
         },
         {
-          "chain": "Exxon",
-          "regular": 3.85,
-          "station": "Exxon",
-          "address": "101 S Alexander Dr, Baytown",
-          "stationCount": 4
+          "chain": "Buc-ee's",
+          "regular": 3.89,
+          "station": "Buc-ee's",
+          "address": "4080 East Fwy, Baytown",
+          "stationCount": 1
         },
         {
-          "chain": "Shell",
+          "chain": "TA Travel Center",
           "regular": 3.89,
-          "station": "Shell",
-          "address": "8206 Garth Rd, Baytown",
+          "station": "TA Travel Center",
+          "address": "6800 Thompson Rd, Baytown",
+          "stationCount": 1
+        },
+        {
+          "chain": "Sunoco",
+          "regular": 3.89,
+          "station": "Sunoco",
+          "address": "5035 E Wallisville Rd, Baytown",
           "stationCount": 1
         },
         {
@@ -4731,10 +4682,17 @@
           "stationCount": 1
         },
         {
-          "chain": "Fuel Wise",
+          "chain": "Mobil",
           "regular": 3.95,
-          "station": "Fuel Wise",
-          "address": "4919 N Main St, Baytown",
+          "station": "Mobil",
+          "address": "100 W Baker Rd, Baytown",
+          "stationCount": 4
+        },
+        {
+          "chain": "Pilot/Flying J",
+          "regular": 3.99,
+          "station": "Flying J",
+          "address": "1876 East Fwy, Baytown",
           "stationCount": 1
         },
         {
@@ -4745,10 +4703,10 @@
           "stationCount": 3
         },
         {
-          "chain": "Buc-ee's",
+          "chain": "Shell",
           "regular": 3.99,
-          "station": "Buc-ee's",
-          "address": "4080 East Fwy, Baytown",
+          "station": "Shell",
+          "address": "8206 Garth Rd, Baytown",
           "stationCount": 1
         },
         {
@@ -4760,10 +4718,10 @@
         }
       ],
       "cheapestOverall": {
-        "chain": "Texaco",
-        "station": "Texaco",
-        "price": 3.69,
-        "address": "2107 W Cedar Bayou Lynchburg Rd, Baytown"
+        "chain": "Valero",
+        "station": "Valero",
+        "price": 3.65,
+        "address": "2 Fayle St, Baytown"
       },
       "stationsSeen": 30,
       "zipsFetched": 2
@@ -4771,17 +4729,10 @@
     "atascocita-tx": {
       "chains": [
         {
-          "chain": "All Season Food Store",
-          "regular": 3.59,
-          "station": "All Season Food Store",
-          "address": "8309 C E King Pkwy, Houston",
-          "stationCount": 1
-        },
-        {
-          "chain": "Fuel Depot",
+          "chain": "Murphy USA",
           "regular": 3.69,
-          "station": "Fuel Depot",
-          "address": "11909 Tidwell Rd, Houston",
+          "station": "Murphy USA",
+          "address": "6610 F.M. 1960 East, Humble",
           "stationCount": 1
         },
         {
@@ -4792,46 +4743,53 @@
           "stationCount": 2
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.74,
-          "station": "Murphy USA",
-          "address": "6610 F.M. 1960 East, Humble",
+          "chain": "76",
+          "regular": 3.79,
+          "station": "76",
+          "address": "8650 C E King Pkwy, Houston",
           "stationCount": 1
         },
         {
-          "chain": "Kroger",
-          "regular": 3.75,
-          "station": "Kroger",
-          "address": "14121 E Sam Houston Pkwy N, Houston",
+          "chain": "Fuel Depot",
+          "regular": 3.79,
+          "station": "Fuel Depot",
+          "address": "11909 Tidwell Rd, Houston",
           "stationCount": 1
+        },
+        {
+          "chain": "Shell",
+          "regular": 3.79,
+          "station": "Shell",
+          "address": "11850 Tidwell Rd, Houston",
+          "stationCount": 8
         },
         {
           "chain": "King Grocery",
-          "regular": 3.79,
+          "regular": 3.8,
           "station": "King Grocery",
           "address": "8002 C E King Pkwy, Houston",
           "stationCount": 1
         },
         {
+          "chain": "Exxon",
+          "regular": 3.85,
+          "station": "Exxon",
+          "address": "7435 FM-1960 East, Atascocita",
+          "stationCount": 4
+        },
+        {
+          "chain": "All Season Food Store",
+          "regular": 3.89,
+          "station": "All Season Food Store",
+          "address": "8309 C E King Pkwy, Houston",
+          "stationCount": 1
+        },
+        {
           "chain": "Chevron",
-          "regular": 3.84,
+          "regular": 3.99,
           "station": "Chevron",
           "address": "13955 E Sam Houston Pkwy N , Houston",
-          "stationCount": 3
-        },
-        {
-          "chain": "Shell",
-          "regular": 3.85,
-          "station": "Shell",
-          "address": "7501 FM-1960 East, Atascocita",
-          "stationCount": 8
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.99,
-          "station": "Exxon",
-          "address": "14609 W Lake Houston Pkwy, Houston",
-          "stationCount": 3
+          "stationCount": 2
         },
         {
           "chain": "Mobil",
@@ -4839,19 +4797,40 @@
           "station": "Mobil",
           "address": "17250 W Lake Houston Pkwy, Houston",
           "stationCount": 1
+        },
+        {
+          "chain": "Valero",
+          "regular": 4.09,
+          "station": "Valero",
+          "address": "11907 E Sam Houston Pkwy N, Houston",
+          "stationCount": 3
         }
       ],
       "cheapestOverall": {
-        "chain": "All Season Food Store",
-        "station": "All Season Food Store",
-        "price": 3.59,
-        "address": "8309 C E King Pkwy, Houston"
+        "chain": "Murphy USA",
+        "station": "Murphy USA",
+        "price": 3.69,
+        "address": "6610 F.M. 1960 East, Humble"
       },
-      "stationsSeen": 22,
+      "stationsSeen": 25,
       "zipsFetched": 2
     },
     "rowlett-tx": {
       "chains": [
+        {
+          "chain": "Murphy USA",
+          "regular": 3.79,
+          "station": "Murphy USA",
+          "address": "2505 Lakeview Parkway, Rowlett",
+          "stationCount": 1
+        },
+        {
+          "chain": "Valero",
+          "regular": 3.82,
+          "station": "Valero",
+          "address": "4902 Lakeview Pkwy, Rowlett",
+          "stationCount": 3
+        },
         {
           "chain": "Walmart Neighborhood Market",
           "regular": 3.83,
@@ -4860,52 +4839,45 @@
           "stationCount": 1
         },
         {
-          "chain": "Murphy USA",
-          "regular": 3.86,
-          "station": "Murphy USA",
-          "address": "2505 Lakeview Parkway, Rowlett",
+          "chain": "7-Eleven",
+          "regular": 3.85,
+          "station": "7-Eleven",
+          "address": "8509 Lakeview Pkwy, Rowlett",
+          "stationCount": 2
+        },
+        {
+          "chain": "Tom Thumb",
+          "regular": 3.85,
+          "station": "Tom Thumb",
+          "address": "8701 Lakeview Pkwy, Rowlett",
           "stationCount": 1
         },
         {
           "chain": "RaceTrac",
-          "regular": 3.89,
+          "regular": 3.85,
           "station": "RaceTrac",
           "address": "7401 Lakeview Pkwy, Rowlett",
           "stationCount": 1
         },
         {
           "chain": "QuikTrip",
-          "regular": 3.92,
+          "regular": 3.85,
           "station": "QuikTrip",
           "address": "4901 Lakeview Pkwy, Rowlett",
           "stationCount": 2
         },
         {
-          "chain": "7-Eleven",
-          "regular": 3.92,
-          "station": "7-Eleven",
-          "address": "7818 Rowlett Rd, Rowlett",
-          "stationCount": 2
-        },
-        {
           "chain": "Circle K",
-          "regular": 3.92,
+          "regular": 3.85,
           "station": "Circle K",
           "address": "3601 Rowlett Rd, Rowlett",
           "stationCount": 1
         },
         {
-          "chain": "Valero",
-          "regular": 3.94,
-          "station": "Valero",
-          "address": "1600 Dalrock Rd, Rowlett",
-          "stationCount": 3
-        },
-        {
-          "chain": "Tom Thumb",
+          "chain": "Exxon",
           "regular": 3.95,
-          "station": "Tom Thumb",
-          "address": "8701 Lakeview Pkwy, Rowlett",
+          "station": "Exxon",
+          "address": "8600 Lakeview Pkwy, Rowlett",
           "stationCount": 1
         },
         {
@@ -4913,79 +4885,72 @@
           "regular": 3.99,
           "station": "Shell",
           "address": "1700 Dalrock Rd, Rowlett",
-          "stationCount": 3
-        },
-        {
-          "chain": "Exxon",
-          "regular": 3.99,
-          "station": "Exxon",
-          "address": "8600 Lakeview Pkwy, Rowlett",
-          "stationCount": 1
+          "stationCount": 4
         }
       ],
       "cheapestOverall": {
-        "chain": "Walmart Neighborhood Market",
-        "station": "Walmart Neighborhood Market",
-        "price": 3.83,
-        "address": "8800 Lakeview Pkwy, Rowlett"
+        "chain": "Murphy USA",
+        "station": "Murphy USA",
+        "price": 3.79,
+        "address": "2505 Lakeview Parkway, Rowlett"
       },
-      "stationsSeen": 16,
+      "stationsSeen": 17,
       "zipsFetched": 2
     },
     "flower-mound-tx": {
       "chains": [
         {
-          "chain": "7-Eleven",
-          "regular": 3.89,
-          "station": "7-Eleven",
-          "address": "860 FM-2499, Flower Mound",
+          "chain": "Kroger",
+          "regular": 3.84,
+          "station": "Kroger",
+          "address": "1131 Flower Mound Rd, Flower Mound",
           "stationCount": 2
         },
         {
-          "chain": "QuikTrip",
-          "regular": 3.89,
-          "station": "QuikTrip",
-          "address": "5301 Long Prairie Rd, Flower Mound",
-          "stationCount": 1
+          "chain": "7-Eleven",
+          "regular": 3.84,
+          "station": "7-Eleven",
+          "address": "1065 Cross Timbers Rd, Flower Mound",
+          "stationCount": 2
         },
         {
           "chain": "RaceTrac",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "RaceTrac",
           "address": "1809 Justin Rd, Flower Mound",
           "stationCount": 1
         },
         {
           "chain": "Exxon",
-          "regular": 3.89,
+          "regular": 3.84,
           "station": "Exxon",
           "address": "2101 Long Prairie Rd, Flower Mound",
           "stationCount": 1
         },
         {
-          "chain": "Kroger",
-          "regular": 3.91,
-          "station": "Kroger",
-          "address": "1131 Flower Mound Rd, Flower Mound",
-          "stationCount": 2
-        },
-        {
           "chain": "Tom Thumb",
-          "regular": 3.91,
+          "regular": 3.85,
           "station": "Tom Thumb",
           "address": "2301 Justin Rd, Flower Mound",
           "stationCount": 2
         },
         {
           "chain": "Chevron",
-          "regular": 3.93,
+          "regular": 3.86,
           "station": "Chevron",
           "address": "3700 Long Prairie Rd, Flower Mound",
           "stationCount": 1
         },
         {
+          "chain": "QuikTrip",
+          "regular": 3.87,
+          "station": "QuikTrip",
+          "address": "5301 Long Prairie Rd, Flower Mound",
+          "stationCount": 1
+        },
+        {
           "chain": "Valero",
-          "regular": 3.93,
+          "regular": 3.88,
           "station": "Valero",
           "address": "2400 Cross Timbers Rd, Flower Mound",
           "stationCount": 1
@@ -4995,7 +4960,7 @@
           "regular": 3.98,
           "station": "Shell",
           "address": "3300 Long Prairie Rd, Flower Mound",
-          "stationCount": 4
+          "stationCount": 3
         },
         {
           "chain": "Texaco",
@@ -5013,14 +4978,14 @@
         }
       ],
       "cheapestOverall": {
-        "chain": "7-Eleven",
-        "station": "7-Eleven",
-        "price": 3.89,
-        "address": "860 FM-2499, Flower Mound"
+        "chain": "Kroger",
+        "station": "Kroger",
+        "price": 3.84,
+        "address": "1131 Flower Mound Rd, Flower Mound"
       },
-      "stationsSeen": 18,
+      "stationsSeen": 17,
       "zipsFetched": 2
     }
   },
-  "apifyUpdated": "2026-05-13T17:37:37.578Z"
+  "apifyUpdated": "2026-05-16T14:39:31.127Z"
 }
