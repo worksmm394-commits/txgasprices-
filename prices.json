@@ -1,10 +1,10 @@
 {
-  "updated": "2026-08-31T17:23:38.465Z",
+  "updated": "2026-09-01T14:30:15.852Z",
   "stateAverage": {
-    "regular": 3.6502,
-    "midgrade": 4.0313,
-    "premium": 4.5074,
-    "diesel": 5.1969
+    "regular": 3.6559,
+    "midgrade": 4.0706,
+    "premium": 4.4021,
+    "diesel": 5.1718
   },
   "source": {
     "aaa": "gasprices.aaa.com (TX state avg, today)",
@@ -17,74 +17,74 @@
     {
       "chain": "Murphy USA",
       "priceMode": "estimated",
-      "regular": 3.53,
-      "midgrade": 3.911,
-      "premium": 4.387,
-      "diesel": 5.097
+      "regular": 3.536,
+      "midgrade": 3.951,
+      "premium": 4.282,
+      "diesel": 5.072
     },
     {
       "chain": "Buc-ee's",
       "priceMode": "estimated",
-      "regular": 3.57,
-      "midgrade": 3.951,
-      "premium": 4.427,
-      "diesel": 5.127
+      "regular": 3.576,
+      "midgrade": 3.991,
+      "premium": 4.322,
+      "diesel": 5.102
     },
     {
       "chain": "HEB Gas",
       "priceMode": "estimated",
-      "regular": 3.6,
-      "midgrade": 3.981,
-      "premium": 4.457,
-      "diesel": 5.157
+      "regular": 3.606,
+      "midgrade": 4.021,
+      "premium": 4.352,
+      "diesel": 5.132
     },
     {
       "chain": "Valero",
       "priceMode": "estimated",
-      "regular": 3.63,
-      "midgrade": 4.011,
-      "premium": 4.487,
-      "diesel": 5.177
+      "regular": 3.636,
+      "midgrade": 4.051,
+      "premium": 4.382,
+      "diesel": 5.152
     },
     {
       "chain": "Exxon",
       "priceMode": "estimated",
-      "regular": 3.7,
-      "midgrade": 4.081,
-      "premium": 4.557,
-      "diesel": 5.237
+      "regular": 3.706,
+      "midgrade": 4.121,
+      "premium": 4.452,
+      "diesel": 5.212
     },
     {
       "chain": "Conoco",
       "priceMode": "estimated",
-      "regular": 3.71,
-      "midgrade": 4.091,
-      "premium": 4.567,
-      "diesel": 5.237
+      "regular": 3.716,
+      "midgrade": 4.131,
+      "premium": 4.462,
+      "diesel": 5.212
     },
     {
       "chain": "Shell",
       "priceMode": "estimated",
-      "regular": 3.72,
-      "midgrade": 4.101,
-      "premium": 4.577,
-      "diesel": 5.247
+      "regular": 3.726,
+      "midgrade": 4.141,
+      "premium": 4.472,
+      "diesel": 5.222
     },
     {
       "chain": "Phillips 66",
       "priceMode": "estimated",
-      "regular": 3.73,
-      "midgrade": 4.111,
-      "premium": 4.587,
-      "diesel": 5.257
+      "regular": 3.736,
+      "midgrade": 4.151,
+      "premium": 4.482,
+      "diesel": 5.232
     },
     {
       "chain": "Chevron",
       "priceMode": "estimated",
-      "regular": 3.75,
-      "midgrade": 4.131,
-      "premium": 4.607,
-      "diesel": 5.267
+      "regular": 3.756,
+      "midgrade": 4.171,
+      "premium": 4.502,
+      "diesel": 5.242
     }
   ],
   "cities": {
@@ -4987,5 +4987,5 @@
       "zipsFetched": 2
     }
   },
-  "apifyUpdated": "2026-08-31T17:23:37.894Z"
+  "apifyUpdated": "2026-09-01T14:30:15.453Z"
 }
